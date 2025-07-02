@@ -228,6 +228,10 @@ The framework is designed for adaptation:
 
 The framework represents one approach to AI-assisted development. Contributions and adaptations are welcome.
 
+## Connect
+
+Feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/peterkrueck/) if you have questions, need clarification, or wish to provide feedback.
+
 ---
 
 *Built for developers seeking automated, context-aware AI assistance without manual overhead.*
