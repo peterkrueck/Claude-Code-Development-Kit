@@ -1,6 +1,6 @@
-# Documentation Architecture Template
+# Documentation Architecture
 
-This template demonstrates a **3-tier documentation system** that organizes knowledge by stability and scope, enabling efficient AI context loading and scalable development.
+This project uses a **3-tier documentation system** that organizes knowledge by stability and scope, enabling efficient AI context loading and scalable development.
 
 ## How the 3-Tier System Works
 
@@ -19,8 +19,6 @@ This hierarchy allows AI agents to load targeted context efficiently while maint
 
 ## Tier 1: Foundational Documentation (System-Wide)
 
-Example foundational documents for your project:
-
 - **[Master Context](/CLAUDE.md)** - *Essential for every session.* Coding standards, security requirements, MCP server integration patterns, and development protocols
 - **[Project Structure](/docs/ai-context/project-structure.md)** - *REQUIRED reading.* Complete technology stack, file tree, and system architecture. Must be attached to Gemini consultations
 - **[System Integration](/docs/ai-context/system-integration.md)** - *For cross-component work.* Communication patterns, data flow, testing strategies, and performance optimization
@@ -29,76 +27,63 @@ Example foundational documents for your project:
 
 ## Tier 2: Component-Level Documentation
 
-Component-specific context files for major system areas:
+### Backend Components
+- **[Backend Context](/backend/CLAUDE.md)** - *Server implementation.* API patterns, database integration, service architecture, and performance considerations
+- **[Worker Services](/workers/CLAUDE.md)** - *Background processing.* Job queue patterns, scheduling, and async task management
+- **[Shared Libraries](/shared/CLAUDE.md)** - *Reusable code.* Common utilities, shared types, and cross-component functionality
 
-- **[Backend Context](/[backend-dir]/CLAUDE.md)** - *Server implementation.* API patterns, database integration, service architecture, and performance considerations
-- **[Frontend Context](/[frontend-dir]/CLAUDE.md)** - *Client implementation.* UI patterns, state management, user interactions, and integration points
-- **[Mobile Context](/[mobile-dir]/CLAUDE.md)** - *Mobile implementation.* Platform-specific patterns, native integrations, and cross-platform considerations
-- **[Infrastructure Context](/[infra-dir]/CLAUDE.md)** - *DevOps implementation.* Deployment automation, monitoring setup, and operational procedures
+### Frontend Components
+- **[Web Application](/frontend/CLAUDE.md)** - *Client implementation.* UI patterns, state management, routing, and user interaction patterns
+- **[Mobile Application](/mobile/CLAUDE.md)** - *Mobile implementation.* Platform-specific patterns, native integrations, and mobile optimizations
+- **[Admin Dashboard](/admin/CLAUDE.md)** - *Administrative interface.* Permission patterns, admin workflows, and management tools
+
+### Infrastructure Components
+- **[Infrastructure Code](/infrastructure/CLAUDE.md)** - *IaC patterns.* Terraform/CloudFormation templates, resource definitions, and deployment automation
+- **[Monitoring Setup](/monitoring/CLAUDE.md)** - *Observability patterns.* Metrics collection, alerting rules, and dashboard configurations
 
 ## Tier 3: Feature-Specific Documentation
 
 Granular CLAUDE.md files co-located with code for minimal cascade effects:
 
 ### Backend Feature Documentation
-Example backend documentation structure:
-- **[Core Services](/[backend]/src/core/CLAUDE.md)** - *Business logic patterns.* Service architecture, data processing, integration patterns, and error handling
-- **[API Layer](/[backend]/src/api/CLAUDE.md)** - *API patterns.* Endpoint design, validation, middleware, and request/response handling
-- **[Data Layer](/[backend]/src/data/CLAUDE.md)** - *Data patterns.* Database models, queries, migrations, and data access patterns
+- **[Core Services](/backend/src/core/services/CLAUDE.md)** - *Business logic patterns.* Service architecture, data processing, integration patterns, and error handling
+- **[API Layer](/backend/src/api/CLAUDE.md)** - *API patterns.* Endpoint design, validation, middleware, and request/response handling
+- **[Data Layer](/backend/src/data/CLAUDE.md)** - *Data patterns.* Database models, queries, migrations, and data access patterns
+- **[Authentication](/backend/src/auth/CLAUDE.md)** - *Auth patterns.* Authentication flows, authorization rules, session management, and security
+- **[Integrations](/backend/src/integrations/CLAUDE.md)** - *External services.* Third-party API clients, webhook handlers, and service adapters
 
 ### Frontend Feature Documentation
-Example frontend documentation structure:
-- **[UI Components](/[frontend]/src/components/CLAUDE.md)** - *Component patterns.* Reusable components, styling, state management, and interaction patterns
-- **[API Client](/[frontend]/src/api/CLAUDE.md)** - *Client patterns.* HTTP clients, error handling, caching, and data synchronization
-- **[State Management](/[frontend]/src/store/CLAUDE.md)** - *State patterns.* Global state, local state, data flow, and persistence
+- **[UI Components](/frontend/src/components/CLAUDE.md)** - *Component patterns.* Reusable components, styling patterns, accessibility, and composition strategies
+- **[State Management](/frontend/src/store/CLAUDE.md)** - *State patterns.* Global state, local state, data flow, and persistence strategies
+- **[API Client](/frontend/src/api/CLAUDE.md)** - *Client patterns.* HTTP clients, error handling, caching, and data synchronization
+- **[Routing](/frontend/src/routes/CLAUDE.md)** - *Navigation patterns.* Route definitions, guards, lazy loading, and deep linking
+- **[Utilities](/frontend/src/utils/CLAUDE.md)** - *Helper functions.* Formatters, validators, transformers, and common utilities
 
-### Shared/Utility Documentation
-Cross-cutting concerns documentation:
-- **[Logging System](/src/utils/logging/CLAUDE.md)** - *Logging patterns.* Structured logging, correlation IDs, performance monitoring, and debugging support
-- **[Security Utils](/src/utils/security/CLAUDE.md)** - *Security patterns.* Authentication, authorization, input validation, and secure communication
-- **[Testing Utils](/src/utils/testing/CLAUDE.md)** - *Testing patterns.* Test utilities, mocking strategies, integration testing, and performance testing
+### Shared Feature Documentation
+- **[Common Types](/shared/src/types/CLAUDE.md)** - *Type definitions.* Shared interfaces, enums, and type utilities
+- **[Validation Rules](/shared/src/validation/CLAUDE.md)** - *Validation patterns.* Schema definitions, custom validators, and error messages
+- **[Constants](/shared/src/constants/CLAUDE.md)** - *Shared constants.* Configuration values, enums, and magic numbers
+- **[Utilities](/shared/src/utils/CLAUDE.md)** - *Shared utilities.* Cross-platform helpers, formatters, and common functions
 
-## Template Customization
 
-To implement this documentation structure in your project:
 
-1. **Adapt Tier 1 Structure**:
-   - Copy foundational documents to your project root and docs folder
-   - Update file paths to match your project structure
-   - Replace placeholder content with your specific architectural decisions
+## Adding New Documentation
 
-2. **Create Tier 2 Components**:
-   - Add CLAUDE.md files to major component directories
-   - Document component-specific patterns and integration points
-   - Keep content focused on architectural principles, not implementation details
+### New Component
+1. Create `/new-component/CLAUDE.md` (Tier 2)
+2. Add entry to this file under appropriate section
+3. Create feature-specific Tier 3 docs as features develop
 
-3. **Establish Tier 3 Features**:
-   - Co-locate CLAUDE.md files with feature code
-   - Document specific implementation patterns and local decisions
-   - Keep content granular and focused on immediate code context
+### New Feature
+1. Create `/component/src/feature/CLAUDE.md` (Tier 3)
+2. Reference parent component patterns
+3. Add entry to this file under component's features
 
-4. **Maintain Documentation Hygiene**:
-   - Update documentation when making architectural changes
-   - Remove outdated documentation to prevent confusion
-   - Ensure AI agents can efficiently navigate the structure
-
-## Benefits for AI Development
-
-This documentation architecture enables:
-- **Efficient Context Loading**: AI agents load only relevant documentation
-- **Scalable Knowledge Management**: Documentation grows with project complexity
-- **Consistent Patterns**: Standardized approaches across all development areas
-- **Reduced Context Overhead**: Targeted documentation reduces token usage
-- **Enhanced AI Understanding**: Structured information improves AI assistance quality
-
-## Integration with Commands
-
-This documentation structure works seamlessly with command templates:
-- **Auto-loading**: Commands automatically load relevant tier documentation
-- **Context Hierarchy**: AI agents understand which documentation to prioritize
-- **Efficient Workflows**: Multi-agent commands can partition work by documentation tiers
-- **Consistent Quality**: Documentation standards ensure reliable AI assistance
+### Deprecating Documentation
+1. Remove obsolete CLAUDE.md files
+2. Update this mapping document
+3. Check for broken references in other docs
 
 ---
 
-*This template provides a proven structure for organizing project documentation to maximize AI assistance effectiveness. Adapt it based on your specific project architecture and development needs.*
+*This documentation architecture template should be customized to match your project's actual structure and components. Add or remove sections based on your architecture.*

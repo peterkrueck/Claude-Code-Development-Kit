@@ -1,51 +1,128 @@
-# Command Templates
+# 🔧 Command Templates
 
-Multi-agent orchestration templates that structure sophisticated AI development workflows.
+Orchestration templates that enable Claude Code to coordinate multi-agent workflows for different development tasks.
 
-## How Commands Work
+## Overview
 
-Each command template leverages Claude Code's **sub-agent spawning capability** to orchestrate parallel analysis by specialized AI agents. Commands automatically load project context and integrate with MCP servers for enhanced expertise.
+After reading the [main framework documentation](../README.md), you'll understand how these commands fit into the integrated system. Each command:
 
-## Available Templates
+- **Auto-loads** the appropriate documentation tier for its task
+- **Spawns specialized agents** based on complexity 
+- **Integrates MCP servers** when external expertise helps
+- **Maintains documentation** to keep AI context current
 
-### full-context.md
-**Adaptive multi-agent analysis** - Intelligently scales from direct analysis to complex multi-agent orchestration based on task complexity. Spawns specialized sub-agents for comprehensive code understanding.
+## Available Commands
 
-### code-review.md  
-**Production-focused review** - Dynamically allocates specialized agents (security, performance, architecture) based on review scope. Surfaces only critical, high-impact findings with quantified business impact.
+### 📊 `/full-context`
+**Purpose**: Comprehensive context gathering and analysis when you need deep understanding or plan to execute code changes.
 
-### refactor.md
-**Strategic refactoring orchestration** - Systematic multi-agent analysis of refactoring scope, impact assessment, and incremental implementation planning with risk mitigation.
+**When to use**:
+- Starting work on a new feature or bug
+- Need to understand how systems interconnect
+- Planning architectural changes
+- Any task requiring thorough analysis before implementation
 
-### handoff.md
-**Knowledge transfer coordination** - Structures comprehensive project handoffs with context preservation, task continuity, and team transition management.
+**How it works**: Adaptively scales from direct analysis to multi-agent orchestration based on request complexity. Agents read documentation, analyze code, map dependencies, and consult MCP servers as needed.
 
-### create-docs.md & update-docs.md
-**Documentation workflow automation** - Orchestrates documentation generation, consistency checking, and lifecycle integration across development workflows.
+### 🔍 `/code-review` 
+**Purpose**: Get multiple expert perspectives on code quality, focusing on high-impact findings rather than nitpicks.
 
-## Usage
+**When to use**:
+- After implementing new features
+- Before merging important changes
+- When you want security, performance, and architecture insights
+- Need confidence in code quality
 
+**How it works**: Spawns specialized agents (security, performance, architecture) that analyze in parallel. Each agent focuses on critical issues that matter for production code.
+
+### 📝 `/update-docs`
+**Purpose**: Keep documentation synchronized with code changes, ensuring AI context remains current.
+
+**When to use**:
+- After modifying code
+- After adding new features
+- When project structure changes
+- Following any significant implementation
+
+**How it works**: Analyzes what changed and updates the appropriate CLAUDE.md files across all tiers. Maintains the context that future AI sessions will rely on.
+
+### 📄 `/create-docs`
+**Purpose**: Generate initial documentation structure for existing projects that lack AI-optimized documentation.
+
+**When to use**:
+- Adopting the framework in an existing project
+- Starting documentation from scratch
+- Need to document legacy code
+- Setting up the 3-tier structure
+
+**How it works**: Analyzes your project structure and creates appropriate CLAUDE.md files at each tier, establishing the foundation for AI-assisted development.
+
+### ♻️ `/refactor`
+**Purpose**: Intelligently restructure code while maintaining functionality and updating all dependencies.
+
+**When to use**:
+- Breaking up large files
+- Improving code organization
+- Extracting reusable components
+- Cleaning up technical debt
+
+**How it works**: Analyzes file structure, maps dependencies, identifies logical split points, and handles all import/export updates across the codebase.
+
+### 🤝 `/handoff`
+**Purpose**: Preserve context when ending a session or when the conversation becomes too long.
+
+**When to use**:
+- Ending a work session
+- Context limit approaching
+- Switching between major tasks
+- Supplementing `/compact` with permanent storage
+
+**How it works**: Updates the handoff documentation with session achievements, current state, and next steps. Ensures smooth continuation in future sessions.
+
+## Integration Patterns
+
+### Typical Workflow
 ```bash
-# Commands integrate automatically with documentation system and MCP servers
-claude exec full-context "analyze authentication system"
-claude exec code-review "review payment processing security" 
-claude exec refactor "optimize data pipeline performance"
+/full-context "implement user notifications"    # Understand
+# ... implement the feature ...
+/code-review "review notification system"       # Validate  
+/update-docs "document notification feature"    # Synchronize
+/handoff "completed notification system"        # Preserve
 ```
 
-## Template Structure
+### Quick Analysis
+```bash
+/full-context "why is the API slow?"           # Investigate
+# ... apply fixes ...
+/update-docs "document performance fixes"       # Update context
+```
 
-Each command template includes:
-- **Multi-agent strategy selection** - Adaptive orchestration based on complexity
-- **Context auto-loading** - Efficient integration with documentation system  
-- **MCP server integration** - Leverages external expertise (Gemini, Context7)
-- **Result synthesis** - Combines findings from multiple specialized agents
+### Major Refactoring
+```bash
+/full-context "analyze authentication module"   # Understand current state
+/refactor "@auth/large-auth-file.ts"          # Restructure
+/code-review "review refactored auth"          # Verify quality
+/update-docs "document new auth structure"     # Keep docs current
+```
 
 ## Customization
 
-Adapt templates for your specific:
-- **Agent allocation patterns** - Modify how sub-agents are spawned and specialized
-- **Context loading strategy** - Customize which documentation auto-loads
-- **Integration workflows** - Adjust MCP server usage patterns
-- **Output synthesis** - Tailor how multi-agent results are combined
+Each command template can be adapted:
 
-Commands work as part of the integrated framework - see the [main README](../README.md) for complete system architecture.
+- **Adjust agent strategies** - Modify how many agents spawn and their specializations
+- **Change context loading** - Customize which documentation tiers load
+- **Tune MCP integration** - Adjust when to consult external services
+- **Modify output formats** - Tailor results to your preferences
+
+Commands are stored in `.claude/commands/` and can be edited directly.
+
+## Key Principles
+
+1. **Commands work together** - Each command builds on others' outputs
+2. **Documentation stays current** - Commands maintain their own context
+3. **Complexity scales naturally** - Simple tasks stay simple, complex tasks get sophisticated analysis
+4. **Context is continuous** - Information flows between sessions through documentation
+
+---
+
+*For detailed implementation of each command, see the individual command files in this directory.*

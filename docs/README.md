@@ -1,123 +1,204 @@
-# Documentation Templates
+# Documentation System Guide
 
-AI-optimized documentation templates that enable sophisticated Claude Code workflows through structured context and auto-loading integration.
+This guide explains how the 3-tier documentation architecture powers the AI Development Framework and why it provides superior results compared to traditional documentation approaches.
 
-## Documentation Architecture: 3-Tier System
+## Critical Foundation Files
 
-This system organizes knowledge by **stability and scope** for efficient AI context loading:
+Two files form the cornerstone of the entire documentation system:
 
-**Tier 1 (Foundation)** - Stable, system-wide documentation that rarely changes  
-**Tier 2 (Component)** - Architectural charters for major components  
-**Tier 3 (Feature-Specific)** - Granular documentation co-located with code
+1. **docs-overview.md** - The central routing guide that directs AI agents to appropriate documentation based on task complexity. This file maps your entire documentation structure and enables intelligent context loading.
 
-This hierarchy allows AI agents to load targeted context efficiently while maintaining a stable foundation of core knowledge.
+2. **project-structure.md** - The comprehensive overview of your project's complete file structure and technology stack. This file is required reading for all AI agents and must be attached to Gemini consultations.
 
-## CLAUDE.md 3-Tier Implementation
+These foundation files ensure AI agents always have the essential context needed to understand your project and navigate to relevant documentation.
 
-The framework includes templates for implementing CLAUDE.md files at each documentation tier:
+## Why the 3-Tier System
 
-**Tier 1 (claude-master)** - Project root `CLAUDE.md`  
-- Master AI context with project overview and coding standards
-- MCP server integration patterns and development protocols  
-- System-wide architectural decisions and quality requirements
-- Auto-loaded by all commands for consistent AI assistance
+### Traditional Documentation Problems
 
-**Tier 2 (Component)** - Major component directories  
-- Component-specific context referencing master CLAUDE.md
-- Architecture patterns and implementation guidelines for that component
-- Key module structure and integration points
-- Critical implementation details with code examples
+Standard documentation approaches create friction for AI-assisted development:
 
-**Tier 3 (Feature-Specific)** - Feature/module subdirectories
-- Focused technical documentation for specific implementations  
-- Detailed code patterns and architectural decisions
-- Performance optimizations and error handling approaches
-- Integration patterns and technical trade-offs
+- **Context Overload** - AI agents must process entire documentation sets for simple tasks
+- **Maintenance Burden** - Every code change cascades to multiple documentation locations
+- **Stale Content** - Documentation diverges from implementation reality
+- **No AI Optimization** - Human-readable formats lack structure for machine processing
 
-**Implementation Example**:
+### The 3-Tier Solution
+
+The framework solves these problems through hierarchical organization:
+
+**Tier 1: Foundation (Rarely Changes)**
+- Project-wide standards, architecture decisions, technology stack
+- Auto-loads for every AI session
+- Provides consistent baseline without redundancy
+
+**Tier 2: Component (Occasionally Changes)**
+- Component boundaries, architectural patterns, integration points
+- Loads only when working within specific components
+- Isolates architectural decisions from implementation details
+
+**Tier 3: Feature (Frequently Changes)**
+- Implementation specifics, technical details, local patterns
+- Co-located with code for immediate updates
+- Minimizes documentation cascade when code changes
+
+## Benefits vs Traditional Systems
+
+### 1. Intelligent Context Loading
+
+**Traditional**: AI loads entire documentation corpus regardless of task
+**3-Tier**: Commands load only relevant tiers based on complexity
+
+Example:
+- Simple query → Tier 1 only (minimal tokens)
+- Component work → Tier 1 + relevant Tier 2
+- Deep implementation → All relevant tiers
+
+### 2. Maintenance Efficiency
+
+**Traditional**: Update multiple documents for each change
+**3-Tier**: Updates isolated to appropriate tier
+
+Example:
+- API endpoint change → Update only Tier 3 API documentation
+- New component → Add Tier 2 documentation, Tier 1 unchanged
+- Coding standard → Update only Tier 1, applies everywhere
+
+### 3. AI Performance Optimization
+
+**Traditional**: AI struggles to find relevant information
+**3-Tier**: Structured hierarchy guides AI to precise context
+
+The system provides:
+- Clear routing logic for agent navigation
+- Predictable documentation locations
+- Efficient token usage through targeted loading
+
+## Integration with Framework Components
+
+### Command Integration
+
+Commands leverage the 3-tier structure for intelligent operation:
+
 ```
-your-project/
-├── CLAUDE.md                          # Tier 1 (claude-master)
-├── backend/
-│   ├── CLAUDE.md                      # Tier 2 (component)
-│   └── src/api/
-│       └── CLAUDE.md                  # Tier 3 (feature-specific)
-└── frontend/  
-    ├── CLAUDE.md                      # Tier 2 (component)
-    └── src/components/
-        └── CLAUDE.md                  # Tier 3 (feature-specific)
-```
-
-## Directory Structure
-
-### ai-context/
-**Foundation templates for Tier 1 documentation**
-
-- **project-structure.md** - Technology stack and file tree template
-- **docs-overview.md** - 3-tier documentation architecture template
-- **system-integration.md** - Cross-component integration patterns
-- **deployment-infrastructure.md** - Infrastructure and deployment patterns
-- **handoff.md** - Task management and session continuity template
-
-### open-issues/
-**Issue tracking templates**
-
-Templates for documenting technical problems, bugs, and improvements requiring investigation or resolution.
-
-- **example-api-performance-issue.md** - Comprehensive issue documentation template
-
-### specs/
-**Specification templates**
-
-Templates for documenting technical specifications, feature requirements, and implementation plans.
-
-- **example-feature-specification.md** - Feature and component specification template
-- **example-api-integration-spec.md** - External service integration template
-
-### CLAUDE.md Templates
-**3-Tier AI context system**
-
-Complete template system for structured AI context management across project levels:
-
-- **CLAUDE.md** - Master AI context template (claude-master, Tier 1)
-- **claude-tier2-component.md** - Component-level context template (Tier 2)  
-- **claude-tier3-feature.md** - Feature-specific context template (Tier 3)
-
-## Template Purposes
-
-### Foundation Templates (ai-context/)
-- **project-structure.md** - Documents complete technology stack, file organization, and architectural decisions
-- **docs-overview.md** - Explains 3-tier documentation system implementation and context loading strategies
-- **system-integration.md** - Provides patterns for component communication, data flow, and cross-cutting concerns
-- **deployment-infrastructure.md** - Templates for containerization, CI/CD, monitoring, and scaling strategies
-- **handoff.md** - Structures task continuity, session transitions, and knowledge transfer processes
-
-### Process Templates
-- **open-issues/** - Systematic issue tracking with root cause analysis and solution planning
-- **specs/** - Structured specification development with requirements, implementation phases, and testing strategies
-
-### Integration Templates (CLAUDE.md System)
-- **CLAUDE.md (claude-master)** - Tier 1 master AI context providing project overview, coding standards, and MCP server integration patterns
-- **claude-tier2-component.md** - Tier 2 component-specific context template with architecture patterns and implementation guidelines  
-- **claude-tier3-feature.md** - Tier 3 feature-specific context template with detailed implementation patterns and technical decisions
-
-## Usage
-
-```bash
-# Copy complete structure to your project
-cp -r docs/* your-project/docs/
-
-# Customize CLAUDE.md with project specifics
-# Replace placeholders in ai-context/ templates
-# Adapt process templates for your workflow
+Command Execution → Analyze Task Complexity → Load Appropriate Tiers
+                                            ↓
+                                   Simple: Tier 1 only
+                                   Component: Tiers 1-2
+                                   Complex: All relevant tiers
 ```
 
-## Integration with Framework
+### MCP Server Integration
 
-Templates auto-load into Claude Code commands based on task scope, providing:
-- **Efficient context loading** - AI agents load only relevant documentation tiers
-- **Consistent AI instructions** - Standardized patterns across all development tasks
-- **MCP server integration** - Seamless connection to external AI expertise
-- **Scalable documentation** - Structure grows with project complexity
+External AI services receive proper context through the tier system:
 
-Part of the integrated Claude Code AI Development Framework - see [main README](../README.md) for complete system architecture.
+- **Gemini Consultations** - Auto-attach `project-structure.md` (Tier 1)
+- **Context7 Lookups** - Happen within established project context
+- **Recommendations** - Align with documented architecture
+
+### Multi-Agent Routing
+
+The documentation structure determines agent behavior:
+
+- Number of agents spawned based on tiers involved
+- Each agent receives targeted documentation subset
+- Parallel analysis without context overlap
+
+## Key Files and Their Roles
+
+### Foundation Files (ai-context/)
+
+**docs-overview.md**
+- Template for implementing 3-tier documentation
+- Maps documentation structure for AI navigation
+- [View Template](ai-context/docs-overview.md)
+
+**project-structure.md**
+- Complete technology stack and file organization
+- Required reading for all AI agents
+- Auto-attaches to Gemini consultations
+- [View Template](ai-context/project-structure.md)
+
+**system-integration.md**
+- Cross-component communication patterns
+- Integration architectures for multi-agent analysis
+- [View Template](ai-context/system-integration.md)
+
+**deployment-infrastructure.md**
+- Infrastructure patterns and constraints
+- Deployment context for AI recommendations
+- [View Template](ai-context/deployment-infrastructure.md)
+
+**handoff.md**
+- Session continuity between AI interactions
+- Task state preservation
+- [View Template](ai-context/handoff.md)
+
+### Context Templates
+
+**CLAUDE.md** (Tier 1)
+- Master AI context with coding standards
+- Project-wide instructions and patterns
+- [View Template](CLAUDE.md)
+
+**claude-tier2-component.md**rh
+- Component-level architectural context
+- [View Template](claude-tier2-component.md)
+
+**claude-tier3-feature.md**
+- Feature-specific implementation details
+- [View Template](claude-tier3-feature.md)
+
+## Implementation Strategy
+
+### 1. Start with Templates
+
+Use provided templates as foundation:
+- Copy and customize for your project
+- Maintain consistent structure
+- Focus on AI-consumable formatting
+
+### 2. Follow Natural Boundaries
+
+Let your architecture guide tier placement:
+- Stable decisions → Tier 1
+- Component design → Tier 2
+- Implementation details → Tier 3
+
+### 3. Co-locate Documentation
+
+Place CLAUDE.md files with related code:
+```
+backend/
+├── CLAUDE.md          # Backend architecture (Tier 2)
+└── src/
+    └── api/
+        └── CLAUDE.md  # API implementation (Tier 3)
+```
+
+### 4. Maintain Hierarchy
+
+Ensure clear relationships:
+- Tier 3 references Tier 2 patterns
+- Tier 2 follows Tier 1 standards
+- No circular dependencies
+
+### 5. Use Documentation Commands
+
+The framework provides commands to manage documentation:
+- **`/create-docs`** - Generate initial documentation structure for projects without existing docs
+- **`/update-docs`** - Regenerate and update documentation after code changes to keep everything current
+
+## Measuring Success
+
+The 3-tier system succeeds when:
+
+1. **AI agents find context quickly** - No searching through irrelevant documentation
+2. **Updates stay localized** - Changes don't cascade unnecessarily
+3. **Documentation stays current** - Co-location ensures updates happen
+4. **Commands work efficiently** - Appropriate context loads automatically
+5. **MCP servers provide relevant advice** - External AI understands your project
+
+---
+
+*Part of the Claude Code AI Development Framework - see [main documentation](../README.md) for complete system overview.*

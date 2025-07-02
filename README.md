@@ -1,88 +1,233 @@
 # Claude Code AI Development Framework
 
-A sophisticated methodology that transforms Claude Code into an orchestrated AI development team through **multi-agent workflows**, **structured context**, and **specialized expertise integration**.
+An integrated system that transforms Claude Code into an orchestrated development environment through automated documentation management, multi-agent workflows, and external AI expertise.
 
-## The System
+## System Overview
 
-This framework leverages Claude Code's unique **sub-agent orchestration capability** to enable sophisticated development workflows that scale from simple queries to complex architectural analysis.
+The framework leverages Claude Code's sub-agent orchestration capabilities to create a self-maintaining development system. Three core components work together to deliver automated, context-aware AI assistance:
 
-### Three-Layer Architecture
+1. **Documentation System** - Structured context that auto-loads based on task requirements
+2. **Command Templates** - Orchestration patterns for multi-agent workflows
+3. **MCP Servers** - External AI services providing current documentation and consultation
+
+## Terminology
+
+- **CLAUDE.md** - Master context files containing project-specific AI instructions, coding standards, and integration patterns
+- **MCP (Model Context Protocol)** - Standard for integrating external AI services with Claude Code
+- **Sub-agents** - Specialized AI agents spawned by Claude Code to work on specific aspects of a task in parallel
+- **3-Tier Documentation** - Hierarchical organization (Foundation/Component/Feature) that minimizes maintenance while maximizing AI effectiveness
+- **Auto-loading** - Automatic inclusion of relevant documentation when commands execute
+
+## Architecture
+
+### Integrated Intelligence Loop
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   COMMANDS      │    │  DOCUMENTATION   │    │  MCP SERVERS    │
-│  Orchestration  │◄──►│     Context      │◄──►│   Expertise     │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-     │                           │                        │
-     ▼                           ▼                        ▼
-• Multi-agent spawn         • Auto-loading           • Live documentation
-• Parallel analysis         • 3-tier structure       • Optional AI consultation  
-• Dynamic strategy          • AI-optimized           • Domain expertise
+                        CLAUDE CODE
+                   ┌─────────────────┐
+                   │                 │
+                   │    COMMANDS      │
+                   │                 │
+                   └────────┬────────┘
+                  Multi-agent│orchestration
+                   Parallel │execution
+                   Dynamic  │scaling
+                           ╱│╲
+                          ╱ │ ╲
+          Routes agents  ╱  │  ╲  Leverages
+          to right docs ╱   │   ╲ expertise
+                       ╱    │    ╲
+                      ▼     │     ▼
+         ┌─────────────────┐│┌─────────────────┐
+         │                 │││                 │
+         │  DOCUMENTATION  │││  MCP SERVERS   │
+         │                 │││                 │
+         └─────────────────┘│└─────────────────┘
+          3-tier structure  │  Context7 + Gemini
+          Auto-loading      │  Real-time updates
+          Context routing   │  AI consultation
+                      ╲     │     ╱
+                       ╲    │    ╱
+        Provides project╲   │   ╱ Enhances with
+        context for      ╲  │  ╱  current best
+        consultation      ╲ │ ╱   practices
+                           ╲│╱
+                            ▼
+                    Integrated Workflow
 ```
 
-**Commands** orchestrate multiple AI agents for parallel analysis  
-**Documentation** provides structured context that auto-loads efficiently  
-**MCP Servers** integrate specialized AI capabilities and current knowledge
+### Auto-Loading Mechanism
 
-## What Makes This Unique
+Every command execution automatically loads critical documentation:
 
-Unlike other AI tools, Claude Code can **spawn multiple specialized agents** that work in parallel. This framework harnesses that capability to create sophisticated workflows that:
+```
+@/CLAUDE.md                              # Master AI context and coding standards
+@/docs/ai-context/project-structure.md   # Complete technology stack and file tree
+@/docs/ai-context/docs-overview.md       # Documentation routing map
+```
 
-- **Scale complexity dynamically** - Simple queries get direct answers, complex tasks get multi-agent analysis
-- **Integrate external expertise** - MCP servers provide specialized knowledge beyond base AI capabilities  
-- **Maintain context efficiently** - Structured documentation optimizes AI understanding
+This ensures:
+- Consistent AI behavior across all sessions
+- Zero manual context management
+- Efficient token usage through targeted loading
+
+### Component Integration
+
+**Commands ↔️ Documentation**
+- Commands determine which documentation tiers to load based on task complexity
+- Documentation structure guides agent spawning patterns
+- Commands update documentation to maintain current context
+
+**Commands → MCP Servers**
+- Context7 provides up-to-date library documentation
+- Gemini offers architectural consultation for complex problems
+- Integration happens seamlessly within command workflows
+
+**Documentation → MCP Servers**
+- Project structure auto-attaches to Gemini consultations
+- Ensures external AI understands specific architecture
+- Makes all recommendations project-relevant
 
 ## Quick Start
 
-1. **Prerequisites**: 
-   - **Required**: [Claude Code](https://claude.ai/code), [Context7 MCP](https://github.com/upstash/context7)
-   - **Optional**: [Gemini MCP](https://github.com/peterkrueck/mcp-gemini-assistant) for AI consultation
-   - **Alternatives**: Third-party MCP servers (e.g., Zen) can be substituted based on your needs
+### Prerequisites
 
-2. **Setup Framework**:
+- **Required**: [Claude Code](https://claude.ai/code), [Context7 MCP](https://github.com/upstash/context7)
+- **Optional**: [Gemini MCP](https://github.com/peterkrueck/mcp-gemini-assistant) for AI consultation
+
+### Installation
+
+1. **Copy framework structure**:
    ```bash
-   # Copy to your project
    cp -r docs/* your-project/docs/
    cp -r commands/* your-project/.claude/commands/
-   
-   # Customize CLAUDE.md with your project details
    ```
 
-3. **Run Sophisticated Workflows**:
- # 1. Start with comprehensive context gathering
-   /full-context "understand the user authentication flow across frontend and backend"
+2. **Configure foundation files**:
+   
+   # Update with your technology stack
+   docs/ai-context/project-structure.md
+   
+   # Customize for your directory layout
+   docs/ai-context/docs-overview.md
+   
+   # Set project-specific standards
+   CLAUDE.md
+   ```
 
-# 2. Implement changes based on analysis findings
 
-# 3. Review implemented changes for quality and security
-   /code-review "review the updated authentication implementation"
+## Common Tasks
 
-# 4. Update documentation to reflect changes and maintain consistency  
-   /update-docs "update documentation with recent changes"
+### Starting New Feature Development
 
-This sequence ensures thorough understanding → informed implementation → quality validation → documentation consistency.
+```bash
+/full-context "implement user authentication across backend and frontend"
+```
 
-## System Integration Examples
+The system:
+1. Auto-loads project documentation
+2. Spawns specialized agents (security, backend, frontend)
+3. Consults Context7 for authentication framework documentation
+4. Asks Gemini 2.5 pro for feedback and improvement suggestions
+4. Provides comprehensive analysis and implementation plan
 
-### Multi-Agent Code Review
-Command spawns specialized agents (security, performance, architecture) that analyze code in parallel, while MCP servers provide current security best practices and framework documentation.
+### Code Review with Multiple Perspectives
 
-### Complex Architecture Planning  
-Documentation system auto-loads project context, command orchestrates planning agents, and Gemini / AI MCP provides deep architectural analysis based on complete codebase understanding.
+```bash
+/code-review "review authentication implementation"
+```
 
-### Live Documentation Integration
-Context7 MCP provides up-to-date library documentation while commands structure the analysis and documentation templates capture decisions for future AI sessions.
+Multiple agents analyze:
+- Security vulnerabilities
+- Performance implications
+- Architectural alignment
+- Integration impacts
 
-## Components
+### Maintaining Documentation Currency
 
-- **[Commands](commands/)** - Multi-agent orchestration templates
-- **[Documentation System](docs/)** - AI-optimized context architecture  
-- **MCP Integration** - Patterns for external AI expertise
+```bash
+/update-docs "document authentication changes"
+```
 
-## The Result
+Automatically:
+- Updates affected CLAUDE.md files across all tiers
+- Keeps project-structure.md and docs-overview.md up-to-date
+- Maintains context for future AI sessions
+- Ensures documentation matches implementation
 
-Transform Claude Code from a simple assistant into a **coordinated AI development team** capable of sophisticated analysis, architectural planning, and expert consultation - capabilities unavailable in other AI development tools.
+## Example Project Structure
+
+```
+your-project/
+├── .claude/
+│   └── commands/              # AI orchestration templates
+├── docs/
+│   ├── ai-context/            # Foundation documentation (Tier 1)
+│   │   ├── docs-overview.md   # Documentation routing map
+│   │   ├── project-structure.md # Technology stack and file tree
+│   │   ├── system-integration.md # Cross-component patterns
+│   │   ├── deployment-infrastructure.md # Infrastructure context
+│   │   └── handoff.md        # Session continuity
+│   ├── open-issues/           # Issue tracking templates
+│   ├── specs/                 # Feature specifications
+│   └── README.md              # Documentation system guide
+├── CLAUDE.md                  # Master AI context (Tier 1)
+├── backend/
+│   └── CLAUDE.md              # Backend context (Tier 2)
+└── backend/src/api/
+    └── CLAUDE.md              # API context (Tier 3)
+```
+
+## Configuration
+
+### Environment Setup
+
+MCP servers require configuration in Claude Code settings:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["@upstash/context7"]
+    },
+    "gemini": {
+      "command": "npx",
+      "args": ["mcp-gemini-assistant"],
+      "env": {
+        "GEMINI_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+### Customization
+
+The framework is designed for adaptation:
+
+- **Commands** - Modify orchestration patterns in `.claude/commands/`
+- **Documentation** - Adjust tier structure for your architecture
+- **MCP Integration** - Add additional servers for specialized expertise
+
+## Best Practices
+
+1. **Let documentation guide development** - The 3-tier structure reflects natural boundaries
+2. **Update documentation immediately** - Use `/update-docs` after significant changes
+3. **Trust the auto-loading** - Avoid manual context management
+4. **Scale complexity naturally** - Simple tasks stay simple, complex tasks get sophisticated analysis
+
+
+## Documentation
+
+- [Documentation System Guide](docs/) - Understanding the 3-tier architecture
+- [Commands Reference](commands/) - Detailed command usage
+- [MCP Integration](docs/CLAUDE.md) - Configuring external services
+
+## Contributing
+
+The framework represents one approach to AI-assisted development. Contributions and adaptations are welcome.
 
 ---
 
-*This framework represents production-tested patterns for AI-assisted development. Each component works independently but achieves maximum impact when used as an integrated system.*
+*Built for developers seeking automated, context-aware AI assistance without manual overhead.*
