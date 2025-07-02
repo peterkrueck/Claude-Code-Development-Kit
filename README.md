@@ -1,114 +1,88 @@
-# AI Development Framework
+# Claude Code AI Development Framework
 
-A sophisticated AI-assisted development methodology leveraging Claude Code with MCP server integrations for complex software engineering tasks.
+A sophisticated methodology that transforms Claude Code into an orchestrated AI development team through **multi-agent workflows**, **structured context**, and **specialized expertise integration**.
 
-## Overview
+## The System
 
-This framework demonstrates advanced patterns for AI-assisted development including:
+This framework leverages Claude Code's unique **sub-agent orchestration capability** to enable sophisticated development workflows that scale from simple queries to complex architectural analysis.
 
-- **Multi-agent orchestration** for complex code analysis and implementation
-- **Adaptive context management** with structured documentation systems
-- **MCP server integration** for specialized AI capabilities
-- **Sophisticated command templates** for common development workflows
+### Three-Layer Architecture
 
-## Key Components
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   COMMANDS      │    │  DOCUMENTATION   │    │  MCP SERVERS    │
+│  Orchestration  │◄──►│     Context      │◄──►│   Expertise     │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+     │                           │                        │
+     ▼                           ▼                        ▼
+• Multi-agent spawn         • Auto-loading           • Live documentation
+• Parallel analysis         • 3-tier structure       • Optional AI consultation  
+• Dynamic strategy          • AI-optimized           • Domain expertise
+```
 
-### Documentation System
-- **AI Context Architecture**: Structured documentation optimized for AI consumption
-- **Auto-loading Context**: Intelligent project context management
-- **Adaptive Documentation**: Documentation that scales with project complexity
+**Commands** orchestrate multiple AI agents for parallel analysis  
+**Documentation** provides structured context that auto-loads efficiently  
+**MCP Servers** integrate specialized AI capabilities and current knowledge
 
-### Command Templates
-- **Full Context Analysis**: Multi-agent system for comprehensive code understanding
-- **Strategic Code Review**: High-impact code review focusing on production risks
-- **Architecture Planning**: Systematic approach to complex implementation planning
+## What Makes This Unique
 
-### MCP Server Integration
-- **Gemini Coding Assistant**: Advanced coding consultation with session management
-- **Context7 Documentation**: Up-to-date library documentation access
-- **Custom Integration Patterns**: Proven patterns for MCP server orchestration
+Unlike other AI tools, Claude Code can **spawn multiple specialized agents** that work in parallel. This framework harnesses that capability to create sophisticated workflows that:
 
-## Prerequisites
-
-- [Claude Code](https://claude.ai/code) CLI tool
-- [Gemini MCP Server](https://github.com/peterkrueck/gemini-mcp) for AI consultation
-- [Context7 MCP Server](https://github.com/upstash/context7) for up-to-date documentation access
-- Python 3.8+ and Node.js 18+ for MCP server setup
+- **Scale complexity dynamically** - Simple queries get direct answers, complex tasks get multi-agent analysis
+- **Integrate external expertise** - MCP servers provide specialized knowledge beyond base AI capabilities  
+- **Maintain context efficiently** - Structured documentation optimizes AI understanding
 
 ## Quick Start
 
-1. **Install MCP Servers**:
-   ```bash
-   # Install Gemini MCP Server
-   git clone https://github.com/peterkrueck/gemini-mcp.git
-   cd gemini-mcp
-   # Follow installation instructions in the repository
-   
-   # Install Context7 MCP Server
-   git clone https://github.com/upstash/context7.git
-   cd context7
-   # Follow installation instructions in the repository
-   ```
+1. **Prerequisites**: 
+   - **Required**: [Claude Code](https://claude.ai/code), [Context7 MCP](https://github.com/upstash/context7)
+   - **Optional**: [Gemini MCP](https://github.com/peterkrueck/mcp-gemini-assistant) for AI consultation
+   - **Alternatives**: Third-party MCP servers (e.g., Zen) can be substituted based on your needs
 
-2. **Copy Framework Components**:
+2. **Setup Framework**:
    ```bash
-   # Copy documentation system to your project
-   cp -r documentation_system/* your-project/docs/
-   
-   # Copy command templates to your project
+   # Copy to your project
+   cp -r docs/* your-project/docs/
    cp -r commands/* your-project/.claude/commands/
+   
+   # Customize CLAUDE.md with your project details
    ```
 
-3. **Configure Your Project**:
-   - Adapt the `CLAUDE-template.md` to your project specifics
-   - Update documentation structure in `docs/ai-context/`
-   - Customize command templates for your development workflow
+3. **Run Sophisticated Workflows**:
+ # 1. Start with comprehensive context gathering
+   /full-context "understand the user authentication flow across frontend and backend"
 
-## Architecture
+# 2. Implement changes based on analysis findings
 
-The framework operates on three core principles:
+# 3. Review implemented changes for quality and security
+   /code-review "review the updated authentication implementation"
 
-1. **Context-First Development**: AI systems work best with comprehensive, structured context
-2. **Multi-Agent Orchestration**: Complex tasks benefit from specialized AI agents working in parallel
-3. **Iterative Sophistication**: Start simple, add complexity as needs evolve
+# 4. Update documentation to reflect changes and maintain consistency  
+   /update-docs "update documentation with recent changes"
 
-## Usage Patterns
+This sequence ensures thorough understanding → informed implementation → quality validation → documentation consistency.
 
-### Full Context Analysis
-For comprehensive understanding of complex codebases:
-```bash
-claude exec full-context "analyze the authentication system"
-```
+## System Integration Examples
 
-### Strategic Code Review
-For production-focused code review:
-```bash
-claude exec code-review "review the payment processing module"
-```
+### Multi-Agent Code Review
+Command spawns specialized agents (security, performance, architecture) that analyze code in parallel, while MCP servers provide current security best practices and framework documentation.
 
-### Architecture Planning
-For systematic implementation planning:
-```bash
-claude exec architecture "plan real-time collaboration feature"
-```
+### Complex Architecture Planning  
+Documentation system auto-loads project context, command orchestrates planning agents, and Gemini / AI MCP provides deep architectural analysis based on complete codebase understanding.
 
-## Integration with MCP Servers
+### Live Documentation Integration
+Context7 MCP provides up-to-date library documentation while commands structure the analysis and documentation templates capture decisions for future AI sessions.
 
-The framework is designed to work seamlessly with MCP servers:
+## Components
 
-- **Gemini Consultation**: For complex coding problems requiring deep analysis
-- **Context7 Documentation**: For up-to-date library and framework documentation
-- **Custom MCP Servers**: Extensible patterns for domain-specific AI tools
+- **[Commands](commands/)** - Multi-agent orchestration templates
+- **[Documentation System](docs/)** - AI-optimized context architecture  
+- **MCP Integration** - Patterns for external AI expertise
 
-## Contributing
+## The Result
 
-This framework represents proven patterns from production AI-assisted development. Contributions should focus on:
+Transform Claude Code from a simple assistant into a **coordinated AI development team** capable of sophisticated analysis, architectural planning, and expert consultation - capabilities unavailable in other AI development tools.
 
-- Additional command templates for common workflows
-- Documentation structure improvements
-- MCP server integration patterns
-- Real-world usage examples
+---
 
-## License
-
-MIT License - Use this framework to accelerate your AI-assisted development workflows.
+*This framework represents production-tested patterns for AI-assisted development. Each component works independently but achieves maximum impact when used as an integrated system.*

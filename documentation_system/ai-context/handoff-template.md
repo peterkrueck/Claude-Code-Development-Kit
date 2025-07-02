@@ -1,1 +1,0 @@
-Currently no handoff tasks.

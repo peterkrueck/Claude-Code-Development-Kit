@@ -1,4 +1,4 @@
-# [PROJECT NAME] - AI Context Template
+# [PROJECT NAME] - AI Context Template (claude-master)
 
 ## 1. Project Overview
 - **Vision:** [Describe your project's vision and goals]
@@ -113,44 +113,6 @@ def calculate_similarity(text1: str, text2: str) -> float:
 - Structure logs for machines, not humans - use JSON format with consistent fields (timestamp, level, correlation_id, event, context) for automated analysis
 - Make debugging possible across service boundaries
 
-**Structured Logging Principles:**
-- **Category-based filtering**: Use predefined log categories for granular control
-- **NO direct console.log**: Always use structured logging with appropriate category loggers
-- **Smart throttling**: Implement throttling for high-frequency logs (e.g., audio chunks) to reduce noise while maintaining visibility
-- **Consistent patterns**: Use pre-configured category loggers when they fit; create new category loggers for new feature areas
-- **Creating new categories**: When adding a new feature area that doesn't fit existing categories:
-  - **TypeScript**: Create logger with `createCategoryLogger('newcategory')` and update `LogCategory` type in `types.ts`
-  - **Python**: Create logger with `get_logger("newcategory")` - no type updates needed
-- **Discover available loggers**: Before logging, check what loggers are available in the relevant module:
-  - **TypeScript/Frontend**: Check `src/lib/utils/logging/category-helpers.ts` for exported loggers
-  - **Python/Backend**: Check `src/core/utils/logging.py` for defined loggers
-  - Categories differ between frontend and backend - use what's appropriate for each context
-  - **Quick discovery**: Check your project's logging utility files for available loggers
-
-```typescript
-// Example - Frontend logging pattern
-import { apiLogger, componentLogger } from '[your-logging-module]';
-apiLogger.info('API request started', { url, method });
-
-// Example - Creating new category logger when needed
-import { createCategoryLogger } from '[your-logging-utilities]';
-export const featureLogger = createCategoryLogger('newfeature');
-featureLogger.info('Feature initialized', { config: 'value' });
-
-// Example - Backend logging pattern
-from [your_logging_module] import api_logger, get_logger
-api_logger.info("Request started", url=url, method=method)
-
-// Example - Creating new logger when needed
-feature_logger = get_logger("newfeature")
-feature_logger.info("Feature initialized", config="value")
-```
-
-```typescript
-// Bad - Never do this
-console.log('Processing request:', data);  // ❌ Bypasses category filtering
-```
-
 ### State Management
 - Have one source of truth for each piece of state
 - Make state changes explicit and traceable
@@ -255,12 +217,3 @@ Run the appropriate commands based on what was modified:
 ### 2. Verification
 - Ensure all type checks pass before considering the task complete
 - If type errors are found, fix them before marking the task as done
-
-
-
-## 6. Quick Commands
-[Replace with your project's specific commands]
-- `npm run dev`: Start development server
-- `npm run test`: Run tests
-- `npm run build`: Build project
-- `npm run lint`: Run linting
