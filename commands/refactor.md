@@ -103,7 +103,43 @@ Based on synthesized analysis, determine:
 - **Test impacts**: Plan for test file updates
 - **Documentation needs**: Identify doc updates required
 
-## Step 6: Execute Refactoring
+## Step 6: Refactoring Value Assessment
+
+### Evaluate Refactoring Worth
+After synthesizing all analysis, critically evaluate whether the proposed refactoring will actually improve the codebase:
+
+**Positive Indicators (Worth Refactoring):**
+- File significantly exceeds reasonable size limits (500+ lines for components, 1000+ for utilities)
+- Clear separation of concerns violations (UI mixed with business logic, multiple unrelated features)
+- High cyclomatic complexity that would be reduced
+- Repeated code patterns that could be abstracted
+- Poor testability that would improve with modularization
+- Dependencies would become cleaner and more maintainable
+- Aligns with project's architectural patterns
+
+**Negative Indicators (Not Worth Refactoring):**
+- File is already well-organized despite its size
+- Splitting would create artificial boundaries that reduce clarity
+- Would introduce unnecessary complexity or abstraction
+- Dependencies would become more convoluted
+- File serves a single, cohesive purpose effectively
+- Refactoring would violate project conventions
+- Minimal actual improvement in maintainability
+
+### Decision Point
+Based on the assessment:
+
+**If Refactoring IS Worth It:**
+- Print clear summary of benefits: "✅ This refactoring will improve the codebase by: [specific benefits]"
+- Proceed automatically to Step 7 (Execute Refactoring)
+
+**If Refactoring IS NOT Worth It:**
+- Be brutally honest about why: "❌ This refactoring is not recommended because: [specific reasons]"
+- Explain what makes the current structure acceptable
+- Ask user explicitly: "The file is currently well-structured for its purpose. Do you still want to proceed with the refactoring? (yes/no)"
+- Only continue if user confirms
+
+## Step 7: Execute Refactoring
 
 Implement the refactoring based on the synthesized analysis:
 
@@ -127,7 +163,7 @@ Implement the refactoring based on the synthesized analysis:
 - **Test compatibility** - Verify imports work correctly
 
 
-## Step 7: Quality Verification
+## Step 8: Quality Verification
 
 For each refactored file:
 - **Check imports** - Verify all imports resolve correctly
@@ -146,8 +182,9 @@ For each refactored file:
 Provide a comprehensive summary of:
 - **Analysis Results**: Key findings from each sub-agent
 - **Refactoring Strategy**: Chosen approach and rationale
-- **Files Created**: New structure with explanations
-- **Dependencies Fixed**: Import/export changes made
+- **Value Assessment**: Whether refactoring improves the code (from Step 6)
+- **Files Created**: New structure with explanations (if refactoring proceeded)
+- **Dependencies Fixed**: Import/export changes made (if refactoring proceeded)
 - **Issues Encountered**: Any problems and resolutions
 
 Now proceed with multi-agent analysis and refactoring of the tagged files: $ARGUMENTS
