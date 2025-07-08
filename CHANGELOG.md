@@ -5,6 +5,14 @@ All notable changes to the AI Development Framework will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+### What's New in v2.0.0:
+- **Security**: Automatic scanning prevents accidental exposure of API keys and secrets
+- **Context Enhancement**: Project structure automatically included in Gemini consultations
+- **Developer Experience**: Audio notifications for task completion and input requests
+- **No Breaking Changes**: All v1.0.0 features remain unchanged and fully compatible
+
+
 ## [2.0.0] - 2025-07-08
 
 ### Added
@@ -18,13 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Simplified main README installation process
-- Moved detailed hook setup instructions to dedicated `hooks/README.md`
 - Updated framework overview to include hooks integration with existing components
-- Reorganized hook-related files into structured subdirectories
 
-### Removed
-- MCP server configuration from templates (now user responsibility)
-- Redundant hook installation instructions from main README
 
 ## [1.0.0] - 2025-07-01
 
@@ -49,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sub-agent orchestration for complex tasks
 - Seamless integration with external AI expertise
 - Self-maintaining documentation system
+
 
 ## Upgrading from v1.0.0 to v2.0.0
 
@@ -75,9 +79,3 @@ The hooks system is optional but recommended for enhanced security and developer
    # Run the hook setup verification
    /hook-setup
    ```
-
-### What's New in v2.0.0:
-- **Security**: Automatic scanning prevents accidental exposure of API keys and secrets
-- **Context Enhancement**: Project structure automatically included in Gemini consultations
-- **Developer Experience**: Audio notifications for task completion and input requests
-- **No Breaking Changes**: All v1.0.0 features remain unchanged and fully compatible
