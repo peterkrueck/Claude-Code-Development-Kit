@@ -5,7 +5,7 @@ All notable changes to the AI Development Framework will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] - 2025-01-08
+## [2.0.0] - 2025-07-08
 
 ### Added
 - Comprehensive hooks system as 4th core framework component
@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MCP server configuration from templates (now user responsibility)
 - Redundant hook installation instructions from main README
 
-## [1.0.0] - 2024-12-01
+## [1.0.0] - 2025-07-01
 
 ### Added
 - Initial framework release with 3 core components
