@@ -63,7 +63,7 @@ These hooks execute at specific points in Claude Code's lifecycle, providing det
 **Purpose**: Provides pleasant audio feedback when Claude Code needs your attention or completes tasks.
 
 **Triggers**: 
-- `Notification` events (input needed)
+- `Notification` events (all notifications including input needed)
 - `Stop` events (main task completion)
 
 **Features**:
@@ -128,7 +128,7 @@ Add to your Claude Code `settings.json`:
     ],
     "Notification": [
       {
-        "matcher": "input_needed",
+        "matcher": ".*",
         "hooks": [
           {
             "type": "command",

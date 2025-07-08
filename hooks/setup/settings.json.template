@@ -24,7 +24,7 @@
     ],
     "Notification": [
       {
-        "matcher": "input_needed",
+        "matcher": ".*",
         "hooks": [
           {
             "type": "command",
