@@ -1,5 +1,9 @@
 # Claude Code AI Development Framework
 
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/peterkrueck/AI-Development-Framework/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Changelog](https://img.shields.io/badge/changelog-v2.0.0-orange.svg)](CHANGELOG.md)
+
 An integrated system that transforms Claude Code into an orchestrated development environment through automated documentation management, multi-agent workflows, and external AI expertise.
 
 ## System Overview
@@ -131,8 +135,11 @@ These hooks integrate seamlessly with the command and MCP server workflows, prov
    CLAUDE.md
    ```
 
-3. **Install hooks** 
-   - See [hooks/README.md](hooks/) for setup instructions
+3. **Install hooks**
+   ```bash
+   cp hooks/setup/settings.json.template your-project/.claude/settings.json
+   # See [hooks/README.md](hooks/) for detailed setup
+   ```
 
 
 ## Common Tasks
@@ -227,6 +234,7 @@ The framework is designed for adaptation:
 - [Commands Reference](commands/) - Detailed command usage
 - [MCP Integration](docs/CLAUDE.md) - Configuring external services
 - [Hooks System](hooks/) - Security scanning, context injection, and notifications
+- [Changelog](CHANGELOG.md) - Version history and migration guides
 
 ## Contributing
 

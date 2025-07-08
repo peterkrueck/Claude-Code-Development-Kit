@@ -59,10 +59,9 @@ Starting multi-agent hook setup verification...
 ✓ Sound files present
 
 [Configuration Agent]
-⚠ Claude Code settings.json not found
-  → Copy hooks/setup/settings.json.template to:
-    macOS: ~/Library/Application Support/Claude/claude_code/settings.json
-  → Update GEMINI_API_KEY and WORKSPACE values
+✓ Project settings found: .claude/settings.json
+✓ Hook configurations verified
+✓ WORKSPACE environment variable set correctly
 
 [Documentation Agent]
 ✓ Project structure documentation found

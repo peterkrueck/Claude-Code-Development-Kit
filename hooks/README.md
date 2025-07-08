@@ -82,8 +82,11 @@ These hooks execute at specific points in Claude Code's lifecycle, providing det
    cp -r hooks your-project/.claude/
    ```
 
-2. **Configure Claude Code settings**:
-   Copy the provided `hooks/setup/settings.json.template` to your Claude Code configuration directory and customize as needed.
+2. **Configure hooks in your project**:
+   ```bash
+   cp hooks/setup/settings.json.template your-project/.claude/settings.json
+   ```
+   Then edit the WORKSPACE path in the settings file.
 
 3. **Test the hooks**:
    ```bash
