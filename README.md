@@ -4,11 +4,12 @@ An integrated system that transforms Claude Code into an orchestrated developmen
 
 ## System Overview
 
-The framework leverages Claude Code's sub-agent orchestration capabilities to create a self-maintaining development system. Three core components work together to deliver automated, context-aware AI assistance:
+The framework leverages Claude Code's sub-agent orchestration capabilities to create a self-maintaining development system. Four core components work together to deliver automated, context-aware AI assistance:
 
 1. **Documentation System** - Structured context that auto-loads based on task requirements
 2. **Command Templates** - Orchestration patterns for multi-agent workflows
 3. **MCP Servers** - External AI services providing current documentation and consultation
+4. **Hooks System** - Automated security scanning, context injection, and developer experience enhancements
 
 ## Terminology
 
@@ -17,6 +18,7 @@ The framework leverages Claude Code's sub-agent orchestration capabilities to cr
 - **Sub-agents** - Specialized AI agents spawned by Claude Code to work on specific aspects of a task in parallel
 - **3-Tier Documentation** - Hierarchical organization (Foundation/Component/Feature) that minimizes maintenance while maximizing AI effectiveness
 - **Auto-loading** - Automatic inclusion of relevant documentation when commands execute
+- **Hooks** - Shell scripts that execute at specific points in Claude Code's lifecycle for security, automation, and UX enhancements
 
 ## Architecture
 
@@ -88,23 +90,37 @@ This ensures:
 - Ensures external AI understands specific architecture
 - Makes all recommendations project-relevant
 
+### Hooks Integration
+
+The framework includes battle-tested hooks that enhance Claude Code's capabilities:
+
+- **Security Scanner** - Prevents accidental exposure of secrets when using MCP servers
+- **Context Injector** - Automatically includes Tier 1 files in Gemini consultations
+- **Notification System** - Provides audio feedback for task completion and input requests
+
+These hooks integrate seamlessly with the command and MCP server workflows, providing:
+- Pre-execution security checks for all external AI calls
+- Automatic context enhancement for better AI responses
+- Developer awareness through pleasant audio notifications
+
 ## Quick Start
 
 ### Prerequisites
 
-- **Required**: [Claude Code](https://claude.ai/code), [Context7 MCP](https://github.com/upstash/context7)
-- **Optional**: [Gemini MCP](https://github.com/peterkrueck/mcp-gemini-assistant) for AI consultation
+- **Required**: [Claude Code](https://claude.ai/code)
+- **Recommended**: MCP servers like [Context7](https://github.com/upstash/context7) or [Gemini Assistant](https://github.com/peterkrueck/mcp-gemini-assistant)
 
 ### Installation
 
 1. **Copy framework structure**:
    ```bash
    cp -r docs/* your-project/docs/
-   cp -r commands/* your-project/.claude/commands/
+   cp -r commands your-project/.claude/commands/
+   cp -r hooks your-project/.claude/hooks/
    ```
 
 2. **Configure foundation files**:
-   
+   ```bash
    # Update with your technology stack
    docs/ai-context/project-structure.md
    
@@ -114,6 +130,9 @@ This ensures:
    # Set project-specific standards
    CLAUDE.md
    ```
+
+3. **Install hooks** 
+   - See [hooks/README.md](hooks/) for setup instructions
 
 
 ## Common Tasks
@@ -160,7 +179,14 @@ Automatically:
 ```
 your-project/
 ├── .claude/
-│   └── commands/              # AI orchestration templates
+│   ├── commands/              # AI orchestration templates
+│   ├── hooks/                 # Security and automation hooks
+│   │   ├── config/            # Hook configuration files
+│   │   ├── sounds/            # Notification audio files
+│   │   ├── gemini-context-injector.sh
+│   │   ├── mcp-security-scan.sh
+│   │   └── notify.sh
+│   └── settings.json          # Claude Code configuration
 ├── docs/
 │   ├── ai-context/            # Foundation documentation (Tier 1)
 │   │   ├── docs-overview.md   # Documentation routing map
@@ -180,35 +206,12 @@ your-project/
 
 ## Configuration
 
-### Environment Setup
-
-MCP servers require configuration in Claude Code settings:
-
-```json
-{
-  "mcpServers": {
-    "context7": {
-      "command": "npx",
-      "args": ["@upstash/context7"]
-    },
-    "gemini": {
-      "command": "npx",
-      "args": ["mcp-gemini-assistant"],
-      "env": {
-        "GEMINI_API_KEY": "your-api-key"
-      }
-    }
-  }
-}
-```
-
-### Customization
-
 The framework is designed for adaptation:
 
 - **Commands** - Modify orchestration patterns in `.claude/commands/`
 - **Documentation** - Adjust tier structure for your architecture
 - **MCP Integration** - Add additional servers for specialized expertise
+- **Hooks** - Customize security patterns, add new hooks, or modify notifications in `.claude/hooks/`
 
 ## Best Practices
 
@@ -223,6 +226,7 @@ The framework is designed for adaptation:
 - [Documentation System Guide](docs/) - Understanding the 3-tier architecture
 - [Commands Reference](commands/) - Detailed command usage
 - [MCP Integration](docs/CLAUDE.md) - Configuring external services
+- [Hooks System](hooks/) - Security scanning, context injection, and notifications
 
 ## Contributing
 

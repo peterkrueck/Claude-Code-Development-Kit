@@ -140,26 +140,25 @@ def calculate_similarity(text1: str, text2: str) -> float:
 - Detailed explanations of complex implementations
 - Highly security relevant tasks
 
-**IMPORTANT: Include project context in new sessions:**
-- Include `/docs/ai-context/project-structure.md` in the `attached_files` array when starting a **new consultation session**
-- This provides Gemini with comprehensive understanding of our technology stack, file organization, and project architecture
-- Not needed for follow-up questions in the same session (context is retained)
+**Automatic Context Injection:**
+- The framework's `gemini-context-injector.sh` hook automatically includes `/docs/ai-context/project-structure.md` for new sessions
+- This ensures Gemini always has comprehensive understanding of your technology stack and architecture
+
 
 **Usage patterns:**
 ```python
-# New consultation session (always include project structure)
+# New consultation session (project structure auto-attached by hooks)
 mcp__gemini__consult_gemini(
     specific_question="How should I optimize this voice pipeline?",
     problem_description="Need to reduce latency in real-time audio processing",
     code_context="Current pipeline processes audio sequentially...",
     attached_files=[
-        "docs/ai-context/project-structure.md",  # Include for new sessions
-        "agents/tutor-server/src/core/pipelines/ptt_live_api/core.py"
+        "src/core/pipelines/voice_pipeline.py"  # Your specific files
     ],
     preferred_approach="optimize"
 )
 
-# Follow-up in existing session (no need to re-attach project structure)
+# Follow-up in existing session
 mcp__gemini__consult_gemini(
     specific_question="What about memory usage?",
     session_id="session_123",
