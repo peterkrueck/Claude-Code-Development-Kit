@@ -51,15 +51,13 @@ You have complete freedom to design sub-agent tasks based on:
 Task: "Analyze [SPECIFIC_COMPONENT(S)] for [TASK_OBJECTIVE] related to user request '$ARGUMENTS'"
 
 Standard Investigation Workflow:
-1. Read /CLAUDE.md - **CRITICAL:** AI instructions, coding standards, and development protocols
-2. Read /docs/ai-context/project-structure.md - **CRITICAL:** Technology stack, complete file tree and architecture
-3. Read /docs/ai-context/docs-overview.md - **CRITICAL:** Documentation architecture and available resources
-4. (Optionally) Read relevant documentation files for architectural context
-5. Analyze actual code files in [COMPONENT(S)] for implementation reality
-6. For code-related tasks: Map import/export dependencies and identify affected files
-7. Assess impact on tests, configurations, and related components
-8. Verify alignment with project patterns and conventions
-9. For structural changes: Identify obsolete code, unused imports, and files that should be removed
+1. Review auto-loaded project context (CLAUDE.md, project-structure.md, docs-overview.md)
+2. (Optionally) Read additional relevant documentation files for architectural context
+3. Analyze actual code files in [COMPONENT(S)] for implementation reality
+4. For code-related tasks: Map import/export dependencies and identify affected files
+5. Assess impact on tests, configurations, and related components
+6. Verify alignment with project patterns and conventions
+7. For structural changes: Identify obsolete code, unused imports, and files that should be removed
 
 Return comprehensive findings that address the user's request from this component perspective, including architectural insights, implementation details, dependency mapping, and practical considerations for safe execution."
 ```

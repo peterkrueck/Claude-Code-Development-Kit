@@ -1,6 +1,6 @@
 # Documentation System Guide
 
-This guide explains how the 3-tier documentation architecture powers the AI Development Framework and why it provides superior results compared to traditional documentation approaches.
+This guide explains how the 3-tier documentation architecture powers the Claude Code Development Kit and why it provides superior results compared to traditional documentation approaches.
 
 ## Critical Foundation Files
 
@@ -25,7 +25,7 @@ Standard documentation approaches create friction for AI-assisted development:
 
 ### The 3-Tier Solution
 
-The framework solves these problems through hierarchical organization:
+The kit solves these problems through hierarchical organization:
 
 **Tier 1: Foundation (Rarely Changes)**
 - Project-wide standards, architecture decisions, technology stack
@@ -74,7 +74,7 @@ The system provides:
 - Predictable documentation locations
 - Efficient token usage through targeted loading
 
-## Integration with Framework Components
+## Integration with Kit Components
 
 ### Command Integration
 
@@ -185,7 +185,7 @@ Ensure clear relationships:
 
 ### 5. Use Documentation Commands
 
-The framework provides commands to manage documentation:
+The kit provides commands to manage documentation:
 - **`/create-docs`** - Generate initial documentation structure for projects without existing docs
 - **`/update-docs`** - Regenerate and update documentation after code changes to keep everything current
 
@@ -201,4 +201,4 @@ The 3-tier system succeeds when:
 
 ---
 
-*Part of the Claude Code AI Development Framework - see [main documentation](../README.md) for complete system overview.*
+*Part of the Claude Code Development Kit - see [main documentation](../README.md) for complete system overview.*

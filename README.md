@@ -1,6 +1,6 @@
-# Claude Code AI Development Framework
+# Claude Code Development Kit
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/peterkrueck/AI-Development-Framework/releases)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/peterkrueck/Claude-Code-Development-Kit/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Changelog](https://img.shields.io/badge/changelog-v2.0.0-orange.svg)](CHANGELOG.md)
 
@@ -8,7 +8,7 @@ An integrated system that transforms Claude Code into an orchestrated developmen
 
 ## System Overview
 
-The framework leverages Claude Code's sub-agent orchestration capabilities to create a self-maintaining development system. Four core components work together to deliver automated, context-aware AI assistance:
+The kit leverages Claude Code's sub-agent orchestration capabilities to create a self-maintaining development system. Four core components work together to deliver automated, context-aware AI assistance:
 
 1. **Documentation System** - Structured context that auto-loads based on task requirements
 2. **Command Templates** - Orchestration patterns for multi-agent workflows
@@ -72,10 +72,14 @@ Every command execution automatically loads critical documentation:
 @/docs/ai-context/docs-overview.md       # Documentation routing map
 ```
 
+The `subagent-context-injector.sh` hook extends auto-loading to all sub-agents:
+- Sub-agents spawned via the Task tool automatically receive the same core documentation
+- No manual context inclusion needed in Task prompts
+- Ensures consistent knowledge across all agents in multi-agent workflows
+
 This ensures:
-- Consistent AI behavior across all sessions
-- Zero manual context management
-- Efficient token usage through targeted loading
+- Consistent AI behavior across all sessions and sub-agents
+- Zero manual context management at any level
 
 ### Component Integration
 
@@ -96,16 +100,18 @@ This ensures:
 
 ### Hooks Integration
 
-The framework includes battle-tested hooks that enhance Claude Code's capabilities:
+The kit includes battle-tested hooks that enhance Claude Code's capabilities:
 
 - **Security Scanner** - Prevents accidental exposure of secrets when using MCP servers
-- **Context Injector** - Automatically includes Tier 1 files in Gemini consultations
-- **Notification System** - Provides audio feedback for task completion and input requests
+- **Gemini Context Injector** - Automatically includes project structure in Gemini consultations
+- **Subagent Context Injector** - Ensures all sub-agents receive core documentation automatically
+- **Notification System** - Provides non-blocking audio feedback for task completion and input requests
 
 These hooks integrate seamlessly with the command and MCP server workflows, providing:
 - Pre-execution security checks for all external AI calls
-- Automatic context enhancement for better AI responses
-- Developer awareness through pleasant audio notifications
+- Automatic context enhancement for both external AI and sub-agents
+- Consistent knowledge across all agents in multi-agent workflows
+- Developer awareness through pleasant, non-blocking audio notifications
 
 ## Quick Start
 
@@ -116,7 +122,7 @@ These hooks integrate seamlessly with the command and MCP server workflows, prov
 
 ### Installation
 
-1. **Copy framework structure**:
+1. **Copy kit structure**:
    ```bash
    cp -r docs/* your-project/docs/
    cp -r commands your-project/.claude/commands/
@@ -192,7 +198,8 @@ your-project/
 │   │   ├── sounds/            # Notification audio files
 │   │   ├── gemini-context-injector.sh
 │   │   ├── mcp-security-scan.sh
-│   │   └── notify.sh
+│   │   ├── notify.sh
+│   │   └── subagent-context-injector.sh
 │   └── settings.json          # Claude Code configuration
 ├── docs/
 │   ├── ai-context/            # Foundation documentation (Tier 1)
@@ -213,7 +220,7 @@ your-project/
 
 ## Configuration
 
-The framework is designed for adaptation:
+The kit is designed for adaptation:
 
 - **Commands** - Modify orchestration patterns in `.claude/commands/`
 - **Documentation** - Adjust tier structure for your architecture
@@ -238,7 +245,7 @@ The framework is designed for adaptation:
 
 ## Contributing
 
-The framework represents one approach to AI-assisted development. Contributions and adaptations are welcome.
+The kit represents one approach to AI-assisted development. Contributions and adaptations are welcome.
 
 ## Connect
 

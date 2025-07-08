@@ -20,6 +20,16 @@
             "description": "Scans for sensitive data before sending to external services"
           }
         ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${WORKSPACE}/.claude/hooks/subagent-context-injector.sh",
+            "description": "Automatically adds project context to sub-agent prompts"
+          }
+        ]
       }
     ],
     "Notification": [

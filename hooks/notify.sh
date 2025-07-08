@@ -1,9 +1,6 @@
 #!/bin/bash
 # Claude Code notification hook script
 # Plays pleasant sounds when Claude needs input or completes tasks
-#
-# This hook provides cross-platform audio feedback to enhance the developer experience
-# with Claude Code, making it clear when attention is needed or tasks are complete.
 
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -16,7 +13,6 @@ play_sound_file() {
     # Check if file exists
     if [[ ! -f "$sound_file" ]]; then
         echo "Warning: Sound file not found: $sound_file" >&2
-        printf '\a'  # Fallback to terminal bell
         return 1
     fi
     
@@ -26,29 +22,34 @@ play_sound_file() {
     case "$os_type" in
         Darwin*)  # macOS
             if command -v afplay &> /dev/null; then
-                afplay "$sound_file" 2>/dev/null && return 0
+                afplay "$sound_file" 2>/dev/null &
+                return 0  # Exit immediately after starting playback
             fi
             ;;
             
         Linux*)   # Linux
             # Try PulseAudio first (most common on modern desktop Linux)
             if command -v paplay &> /dev/null; then
-                paplay "$sound_file" 2>/dev/null && return 0
+                paplay "$sound_file" 2>/dev/null &
+                return 0  # Exit immediately after starting playback
             fi
             
             # Try ALSA
             if command -v aplay &> /dev/null; then
-                aplay -q "$sound_file" 2>/dev/null && return 0
+                aplay -q "$sound_file" 2>/dev/null &
+                return 0  # Exit immediately after starting playback
             fi
             
             # Try PipeWire (newer systems)
             if command -v pw-play &> /dev/null; then
-                pw-play "$sound_file" 2>/dev/null && return 0
+                pw-play "$sound_file" 2>/dev/null &
+                return 0  # Exit immediately after starting playback
             fi
             
             # Try sox play command
             if command -v play &> /dev/null; then
-                play -q "$sound_file" 2>/dev/null && return 0
+                play -q "$sound_file" 2>/dev/null &
+                return 0  # Exit immediately after starting playback
             fi
             ;;
             
@@ -56,29 +57,28 @@ play_sound_file() {
             # Try PowerShell
             if command -v powershell.exe &> /dev/null; then
                 # Use Windows Media Player COM object for better compatibility
+                # Run in background and exit immediately
                 powershell.exe -NoProfile -Command "
-                    \$player = New-Object -ComObject WMPlayer.OCX
-                    \$player.URL = '$sound_file'
-                    \$player.controls.play()
-                    Start-Sleep -Milliseconds 500
-                    \$player.close()
-                " 2>/dev/null && return 0
-                
-                # Fallback to .NET SoundPlayer
-                powershell.exe -NoProfile -Command "
-                    (New-Object System.Media.SoundPlayer '$sound_file').PlaySync()
-                " 2>/dev/null && return 0
+                    Start-Job -ScriptBlock {
+                        \$player = New-Object -ComObject WMPlayer.OCX
+                        \$player.URL = '$sound_file'
+                        \$player.controls.play()
+                        Start-Sleep -Milliseconds 1000
+                        \$player.close()
+                    }
+                " 2>/dev/null
+                return 0  # Exit immediately after starting playback
             fi
             ;;
     esac
     
     # If we have ffplay (cross-platform)
     if command -v ffplay &> /dev/null; then
-        ffplay -nodisp -autoexit -loglevel quiet "$sound_file" 2>/dev/null && return 0
+        ffplay -nodisp -autoexit -loglevel quiet "$sound_file" 2>/dev/null &
+        return 0  # Exit immediately after starting playback
     fi
     
-    # Last resort: terminal bell
-    printf '\a'
+    # No audio player found - fail silently
     return 1
 }
 

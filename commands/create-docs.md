@@ -73,11 +73,9 @@ Task: "As the [Agent_Role], analyze the codebase at `[target_path]` to support d
 Your focus: [role-specific goal, e.g., 'identifying all architectural patterns and dependencies']
 
 Standard workflow:
-1. Read /CLAUDE.md - **CRITICAL:** AI instructions, coding standards, and development protocols
-2. Read /docs/ai-context/project-structure.md - **CRITICAL:** Technology stack and architecture context
-3. Read /docs/ai-context/docs-overview.md - **CRITICAL:** Documentation structure and organization
-4. Analyze the target path for your specialized area
-5. Return structured findings for documentation generation
+1. Review auto-loaded project context (CLAUDE.md, project-structure.md, docs-overview.md)
+2. Analyze the target path for your specialized area
+3. Return structured findings for documentation generation
 
 Return a comprehensive summary of your findings for this role."
 ```

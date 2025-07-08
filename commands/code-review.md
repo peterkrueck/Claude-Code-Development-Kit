@@ -163,7 +163,7 @@ For each dynamically generated agent:
   Focus ONLY on findings that significantly move the needle for a solo developer.
 
   Review workflow:
-  1. Read /CLAUDE.md and /docs/ai-context/project-structure.md
+  1. Review auto-loaded project context (CLAUDE.md, project-structure.md, docs-overview.md)
   2. Analyze your assigned coverage areas with deep focus
   3. For complex issues, use:
      - mcp__gemini__consult_gemini for architectural analysis

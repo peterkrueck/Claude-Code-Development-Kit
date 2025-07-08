@@ -68,11 +68,9 @@ You have complete autonomy to design and launch sub-agents based on the specific
 Task: "Analyze [SPECIFIC_INVESTIGATION_AREA] for safe refactoring of [TARGET_FILE] related to user request '$ARGUMENTS'"
 
 Standard Investigation Workflow:
-1. Read /CLAUDE.md - **CRITICAL:** AI instructions, coding standards, and development protocols
-2. Read /docs/ai-context/project-structure.md - **CRITICAL:** Technology stack and architecture patterns
-3. Read /docs/ai-context/docs-overview.md - **CRITICAL:** Documentation architecture understanding
-4. [CUSTOM_ANALYSIS_STEPS] - Investigate the specific area thoroughly
-5. Return actionable findings that support safe and effective refactoring
+1. Review auto-loaded project context (CLAUDE.md, project-structure.md, docs-overview.md)
+2. [CUSTOM_ANALYSIS_STEPS] - Investigate the specific area thoroughly
+3. Return actionable findings that support safe and effective refactoring
 
 Return comprehensive findings addressing this investigation area."
 ```

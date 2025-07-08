@@ -4,12 +4,20 @@ Orchestration templates that enable Claude Code to coordinate multi-agent workfl
 
 ## Overview
 
-After reading the [main framework documentation](../README.md), you'll understand how these commands fit into the integrated system. Each command:
+After reading the [main kit documentation](../README.md), you'll understand how these commands fit into the integrated system. Each command:
 
 - **Auto-loads** the appropriate documentation tier for its task
 - **Spawns specialized agents** based on complexity 
 - **Integrates MCP servers** when external expertise helps
 - **Maintains documentation** to keep AI context current
+
+### 🚀 Automatic Context Injection
+
+All commands benefit from automatic context injection via the `subagent-context-injector.sh` hook:
+
+- **Core documentation auto-loaded**: Every command and sub-agent automatically receives `@/docs/CLAUDE.md`, `@/docs/ai-context/project-structure.md`, and `@/docs/ai-context/docs-overview.md`
+- **No manual context loading**: Sub-agents spawned by commands automatically have access to essential project documentation
+- **Consistent knowledge**: All agents start with the same foundational understanding
 
 ## Available Commands
 

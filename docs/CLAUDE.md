@@ -129,7 +129,13 @@ def calculate_similarity(text1: str, text2: str) -> float:
   - Error: `{ "data": null, "error": {"message": "...", "code": "..."} }`
 
 
-## 4. MCP Server Integrations
+## 4. Multi-Agent Workflows & Context Injection
+
+### Automatic Context Injection for Sub-Agents
+When using the Task tool to spawn sub-agents, the core project context (CLAUDE.md, project-structure.md, docs-overview.md) is automatically injected into their prompts via the subagent-context-injector hook. This ensures all sub-agents have immediate access to essential project documentation without the need of manual specification in each Task prompt.
+
+
+## 5. MCP Server Integrations
 
 ### Gemini Consultation Server
 **When to use:**
@@ -141,7 +147,7 @@ def calculate_similarity(text1: str, text2: str) -> float:
 - Highly security relevant tasks
 
 **Automatic Context Injection:**
-- The framework's `gemini-context-injector.sh` hook automatically includes `/docs/ai-context/project-structure.md` for new sessions
+- The kit's `gemini-context-injector.sh` hook automatically includes `/docs/ai-context/project-structure.md` for new sessions
 - This ensures Gemini always has comprehensive understanding of your technology stack and architecture
 
 
@@ -204,7 +210,7 @@ mcp__context7__get_library_docs(
 
 
 
-## 5. Post-Task Completion Protocol
+## 6. Post-Task Completion Protocol
 After completing any coding task, follow this checklist:
 
 ### 1. Type Safety & Quality Checks

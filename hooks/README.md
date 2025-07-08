@@ -8,7 +8,8 @@ This directory contains battle-tested hooks that enhance your Claude Code develo
 Claude Code Lifecycle
         │
         ├── PreToolUse ──────► Security Scanner
-        │                      └── Context Injector
+        │                      ├── Context Injector (Gemini)
+        │                      └── Context Injector (Subagents)
         │
         ├── Tool Execution
         │
@@ -58,7 +59,31 @@ These hooks execute at specific points in Claude Code's lifecycle, providing det
 - Update sensitive file patterns
 - Extend the whitelist for your placeholders
 
-### 3. Notification System (`notify.sh`)
+### 3. Subagent Context Injector (`subagent-context-injector.sh`)
+
+**Purpose**: Automatically includes core project documentation in all sub-agent Task prompts, ensuring consistent context across multi-agent workflows.
+
+**Trigger**: `PreToolUse` for `Task` tool
+
+**Features**:
+- Intercepts all Task tool calls before execution
+- Prepends references to three core documentation files:
+  - `docs/CLAUDE.md` - Project overview, coding standards, AI instructions
+  - `docs/ai-context/project-structure.md` - Complete file tree and tech stack
+  - `docs/ai-context/docs-overview.md` - Documentation architecture
+- Passes through non-Task tools unchanged
+- Preserves original task prompt by prepending context
+- Enables consistent knowledge across all sub-agents
+- Eliminates need for manual context inclusion in Task prompts
+
+**Benefits**:
+- Every sub-agent starts with the same foundational knowledge
+- No manual context specification needed in each Task prompt
+- Token-efficient through @ references instead of content duplication
+- Update context in one place, affects all sub-agents
+- Clean operation with simple pass-through for non-Task tools
+
+### 4. Notification System (`notify.sh`)
 
 **Purpose**: Provides pleasant audio feedback when Claude Code needs your attention or completes tasks.
 
@@ -68,9 +93,9 @@ These hooks execute at specific points in Claude Code's lifecycle, providing det
 
 **Features**:
 - Cross-platform audio support (macOS, Linux, Windows)
+- Non-blocking audio playback (runs in background)
 - Multiple audio playback fallbacks
 - Pleasant notification sounds
-- Terminal bell as last resort
 - Two notification types:
   - `input`: When Claude needs user input
   - `complete`: When Claude completes tasks
@@ -122,6 +147,15 @@ Add to your Claude Code `settings.json`:
           {
             "type": "command",
             "command": "${WORKSPACE}/.claude/hooks/mcp-security-scan.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${WORKSPACE}/.claude/hooks/subagent-context-injector.sh"
           }
         ]
       }
@@ -206,7 +240,7 @@ The hooks system complements MCP server integrations:
 - Verify sound files exist in `sounds/` directory
 - Test audio playback: `.claude/hooks/notify.sh input`
 - Check system audio settings
-- The script will fallback to terminal bell if needed
+- Ensure you have an audio player installed (afplay, paplay, aplay, pw-play, play, ffplay, or PowerShell on Windows)
 
 ## Hook Setup Command
 
@@ -220,7 +254,7 @@ This command uses multi-agent orchestration to verify installation, check config
 
 ## Extension Points
 
-The framework is designed for extensibility:
+The kit is designed for extensibility:
 
 1. **Custom Hooks**: Add new scripts following the existing patterns
 2. **Event Handlers**: Configure hooks for any Claude Code event
