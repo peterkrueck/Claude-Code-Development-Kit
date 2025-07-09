@@ -167,16 +167,16 @@ Before updating existing documentation, assess if new documentation files should
 
 ### Guidelines for Creating New Documentation Files
 
-**Create new Component CLAUDE.md when:**
+**Create new Component CONTEXT.md when:**
 - You detect an entirely new top-level component (new directory under `agents/`, `unity-client/`, `supabase-functions/`, etc.)
 - The component has significant functionality (5+ meaningful files)
-- Example: Adding `agents/lesson-generator/` → Create `agents/lesson-generator/CLAUDE.md`
+- Example: Adding `agents/lesson-generator/` → Create `agents/lesson-generator/CONTEXT.md`
 
-**Create new Feature-Specific CLAUDE.md when:**
+**Create new Feature-Specific CONTEXT.md when:**
 - You detect a new complex subsystem within an existing component
 - The subsystem has 3+ files and represents a distinct functional area
-- No existing granular CLAUDE.md file covers this area
-- Example: Adding `agents/tutor-server/src/features/translation/` with multiple files → Create `agents/tutor-server/src/features/CLAUDE.md`
+- No existing granular CONTEXT.md file covers this area
+- Example: Adding `agents/tutor-server/src/features/translation/` with multiple files → Create `agents/tutor-server/src/features/CONTEXT.md`
 
 **When NOT to create new files:**
 - Small additions (1-2 files) that fit existing documentation scope
@@ -184,11 +184,11 @@ Before updating existing documentation, assess if new documentation files should
 - Temporary or experimental code
 
 **File Creation Process:**
-1. **Create the new CLAUDE.md file** with placeholder content following the pattern of existing granular docs
+1. **Create the new CONTEXT.md file** with placeholder content following the pattern of existing granular docs
 2. **Update `/docs/ai-context/docs-overview.md`** to include the new file in the appropriate tier
 3. **Document the addition** in the current update process
 
-### File Content Template for New Granular CLAUDE.md:
+### File Content Template for New Granular CONTEXT.md:
 ```markdown
 # [Feature Area] Documentation
 
@@ -214,17 +214,17 @@ Before updating existing documentation, assess if new documentation files should
 
 ### Tier 3 (Feature-Specific) - START HERE
 **Always begin with the most granular documentation closest to your changes:**
-- **Identify affected Tier 3 files** (feature-specific CLAUDE.md files in subdirectories)
+- **Identify affected Tier 3 files** (feature-specific CONTEXT.md files in subdirectories)
 - **Update these granular files first** with specific implementation details, patterns, and integration points
-- **Examples**: `agents/tutor-server/src/core/pipelines/CLAUDE.md`, `web-dashboard/src/lib/api/CLAUDE.md`, `agents/tutor-server/src/features/*/CLAUDE.md`
+- **Examples**: `agents/tutor-server/src/core/pipelines/CONTEXT.md`, `web-dashboard/src/lib/api/CONTEXT.md`, `agents/tutor-server/src/features/*/CONTEXT.md`
 - **Update guidelines**: Be specific about file names, technologies, implementation patterns
 
 ### Tier 2 (Component-Level) - CASCADE UP
 **After completing Tier 3 updates, evaluate if component-level changes are needed:**
-- **Check parent component CLAUDE.md files** (e.g., `agents/tutor-server/CLAUDE.md` for changes in `agents/tutor-server/src/*/`)
+- **Check parent component CONTEXT.md files** (e.g., `agents/tutor-server/CONTEXT.md` for changes in `agents/tutor-server/src/*/`)
 - **Update if changes represent significant architectural shifts** affecting the overall component
 - **Focus on**: How granular changes affect component architecture, new integration patterns, major feature additions
-- **Examples**: `agents/tutor-server/CLAUDE.md`, `web-dashboard/CLAUDE.md`, `unity-client/CLAUDE.md`
+- **Examples**: `agents/tutor-server/CONTEXT.md`, `web-dashboard/CONTEXT.md`, `unity-client/CONTEXT.md`
 
 ### Tier 1 (Foundational) - CASCADE UP
 **Finally, check if foundational documentation needs updates for system-wide impacts:**
@@ -259,12 +259,12 @@ Update other `/docs/ai-context/` files if changes affect:
 
 **IMPORTANT:** After updating any documentation files in steps 1-8, check if the documentation overview needs updates:
 - Reference the auto-loaded `/docs/ai-context/docs-overview.md`
-- If you added new documentation files (especially new CLAUDE.md files), update the overview to include them in the appropriate tier
+- If you added new documentation files (especially new CONTEXT.md files), update the overview to include them in the appropriate tier
 - If you significantly changed the structure/purpose of existing documentation, update the overview to reflect these changes
 - Keep the overview accurate and current so it serves as a reliable guide to the documentation architecture
 
-### Special Note for New CLAUDE.md Files:
-When you create new granular CLAUDE.md files, you MUST add them to the appropriate section in docs-overview.md:
+### Special Note for New CONTEXT.md Files:
+When you create new granular CONTEXT.md files, you MUST add them to the appropriate section in docs-overview.md:
 - **Tier 2 (Component-Level)**: For new top-level components
 - **Tier 3 (Feature-Specific)**: For new subsystem documentation within existing components
 

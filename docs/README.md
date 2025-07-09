@@ -31,16 +31,19 @@ The kit solves these problems through hierarchical organization:
 - Project-wide standards, architecture decisions, technology stack
 - Auto-loads for every AI session
 - Provides consistent baseline without redundancy
+- Uses CLAUDE.md as the master context file
 
 **Tier 2: Component (Occasionally Changes)**
 - Component boundaries, architectural patterns, integration points
 - Loads only when working within specific components
 - Isolates architectural decisions from implementation details
+- Uses CONTEXT.md files at component roots
 
 **Tier 3: Feature (Frequently Changes)**
 - Implementation specifics, technical details, local patterns
 - Co-located with code for immediate updates
 - Minimizes documentation cascade when code changes
+- Uses CONTEXT.md files within feature directories
 
 ## Benefits vs Traditional Systems
 
@@ -141,13 +144,13 @@ The documentation structure determines agent behavior:
 - Project-wide instructions and patterns
 - [View Template](CLAUDE.md)
 
-**claude-tier2-component.md**rh
+**CONTEXT-tier2-component.md**
 - Component-level architectural context
-- [View Template](claude-tier2-component.md)
+- [View Template](CONTEXT-tier2-component.md)
 
-**claude-tier3-feature.md**
+**CONTEXT-tier3-feature.md**
 - Feature-specific implementation details
-- [View Template](claude-tier3-feature.md)
+- [View Template](CONTEXT-tier3-feature.md)
 
 ## Implementation Strategy
 
@@ -167,13 +170,13 @@ Let your architecture guide tier placement:
 
 ### 3. Co-locate Documentation
 
-Place CLAUDE.md files with related code:
+Place CONTEXT.md files with related code:
 ```
 backend/
-├── CLAUDE.md          # Backend architecture (Tier 2)
+├── CONTEXT.md         # Backend architecture (Tier 2)
 └── src/
     └── api/
-        └── CLAUDE.md  # API implementation (Tier 3)
+        └── CONTEXT.md # API implementation (Tier 3)
 ```
 
 ### 4. Maintain Hierarchy

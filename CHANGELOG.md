@@ -34,6 +34,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - More consistent multi-agent workflow patterns across all commands
 - Simplified sub-agent prompts by removing manual context loading
 
+### Changed
+- Tier 2 and Tier 3 documentation files renamed from CLAUDE.md to CONTEXT.md
+- Updated all documentation and templates to reflect new naming convention
+- Clarified that only Tier 1 (master context) remains as CLAUDE.md
+
 
 ## [1.0.0] - 2025-07-01
 

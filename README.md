@@ -213,9 +213,9 @@ your-project/
 │   └── README.md              # Documentation system guide
 ├── CLAUDE.md                  # Master AI context (Tier 1)
 ├── backend/
-│   └── CLAUDE.md              # Backend context (Tier 2)
+│   └── CONTEXT.md              # Backend context (Tier 2)
 └── backend/src/api/
-    └── CLAUDE.md              # API context (Tier 3)
+    └── CONTEXT.md              # API context (Tier 3)
 ```
 
 ## Configuration

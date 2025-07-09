@@ -24,8 +24,8 @@ Using the auto-loaded project context, analyze the user's request and determine 
 **Action**: Analyze `$ARGUMENTS` to identify the `target_path` and its documentation tier.
 
 **Target Classification:**
-- **Tier 3 (Feature-Specific)**: Paths containing `/src/` and ending in `/CLAUDE.md`
-- **Tier 2 (Component-Level)**: Paths ending in component root `/CLAUDE.md`
+- **Tier 3 (Feature-Specific)**: Paths containing `/src/` and ending in `/CONTEXT.md`
+- **Tier 2 (Component-Level)**: Paths ending in component root `/CONTEXT.md`
 
 **Complexity Assessment Criteria:**
 - **Codebase Size**: File count and lines of code in target directory

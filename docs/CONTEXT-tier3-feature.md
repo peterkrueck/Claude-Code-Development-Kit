@@ -159,4 +159,4 @@
 
 ---
 
-*This feature documentation provides detailed implementation context for AI-assisted development. For broader component context, see the component-level CLAUDE.md file.*
+*This feature documentation provides detailed implementation context for AI-assisted development. For broader component context, see the component-level CONTEXT.md file.*

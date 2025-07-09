@@ -66,12 +66,12 @@ Document planned technology additions:
 │   ├── extensions.[ext]                # Recommended extensions
 │   └── launch.[ext]                    # Debug configurations
 ├── [BACKEND-DIR]/                      # Backend application
-│   ├── CLAUDE.md                       # Backend-specific AI context
+│   ├── CONTEXT.md                      # Backend-specific AI context
 │   ├── src/                            # Source code
 │   │   ├── config/                     # Configuration management
 │   │   │   └── settings.[ext]          # Application settings
 │   │   ├── core/                       # Core business logic
-│   │   │   ├── CLAUDE.md               # Core logic patterns
+│   │   │   ├── CONTEXT.md              # Core logic patterns
 │   │   │   ├── services/               # Business services
 │   │   │   │   ├── [service1].[ext]    # Service implementations
 │   │   │   │   └── [service2].[ext]
@@ -83,7 +83,7 @@ Document planned technology additions:
 │   │   │       ├── validation.[ext]    # Input validation
 │   │   │       └── helpers.[ext]       # Helper functions
 │   │   ├── api/                        # API layer
-│   │   │   ├── CLAUDE.md               # API patterns and conventions
+│   │   │   ├── CONTEXT.md              # API patterns and conventions
 │   │   │   ├── routes/                 # API route definitions
 │   │   │   │   ├── [resource1].[ext]   # Resource-specific routes
 │   │   │   │   └── [resource2].[ext]
@@ -95,7 +95,7 @@ Document planned technology additions:
 │   │   │       ├── [schema1].[ext]     # Data schemas
 │   │   │       └── [schema2].[ext]
 │   │   └── integrations/               # External service integrations
-│   │       ├── CLAUDE.md               # Integration patterns
+│   │       ├── CONTEXT.md              # Integration patterns
 │   │       ├── [service1]/             # Service-specific integration
 │   │       │   ├── client.[ext]        # API client
 │   │       │   ├── models.[ext]        # Integration models
@@ -108,21 +108,21 @@ Document planned technology additions:
 │   ├── [PACKAGE-FILE]                  # Package configuration
 │   └── [ENV-FILE]                      # Environment configuration
 ├── [FRONTEND-DIR]/                     # Frontend application (if applicable)
-│   ├── CLAUDE.md                       # Frontend-specific AI context
+│   ├── CONTEXT.md                      # Frontend-specific AI context
 │   ├── src/                            # Source code
 │   │   ├── components/                 # UI components
-│   │   │   ├── CLAUDE.md               # Component patterns
+│   │   │   ├── CONTEXT.md              # Component patterns
 │   │   │   ├── common/                 # Shared components
 │   │   │   └── [feature]/              # Feature-specific components
 │   │   ├── pages/                      # Page components/routes
 │   │   │   ├── [page1].[ext]           # Page implementations
 │   │   │   └── [page2].[ext]
 │   │   ├── stores/                     # State management
-│   │   │   ├── CLAUDE.md               # State management patterns
+│   │   │   ├── CONTEXT.md              # State management patterns
 │   │   │   ├── [store1].[ext]          # Store implementations
 │   │   │   └── [store2].[ext]
 │   │   ├── api/                        # API client layer
-│   │   │   ├── CLAUDE.md               # Client patterns
+│   │   │   ├── CONTEXT.md              # Client patterns
 │   │   │   ├── client.[ext]            # HTTP client setup
 │   │   │   └── endpoints/              # API endpoint definitions
 │   │   ├── utils/                      # Utility functions
