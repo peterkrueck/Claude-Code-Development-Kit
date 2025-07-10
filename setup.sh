@@ -85,6 +85,55 @@ safe_read() {
     printf -v "$var_name" '%s' "$user_input"
 }
 
+# Safe read function for yes/no questions with validation
+# Usage: safe_read_yn <variable_name> <prompt_string>
+safe_read_yn() {
+    local var_name="$1"
+    local prompt="$2"
+    local user_input
+    local valid_input=false
+
+    while [ "$valid_input" = false ]; do
+        if ! safe_read user_input "$prompt"; then
+            return 1
+        fi
+
+        case "$user_input" in
+            y|n)
+                valid_input=true
+                printf -v "$var_name" '%s' "$user_input"
+                ;;
+            *)
+                print_color "$YELLOW" "Please enter 'y' for yes or 'n' for no."
+                ;;
+        esac
+    done
+}
+
+# Safe read function for file conflict choices with validation
+# Usage: safe_read_conflict <variable_name>
+safe_read_conflict() {
+    local var_name="$1"
+    local user_input
+    local valid_input=false
+
+    while [ "$valid_input" = false ]; do
+        if ! safe_read user_input "   Your choice: "; then
+            return 1
+        fi
+
+        case "$user_input" in
+            o|s|a|n)
+                valid_input=true
+                printf -v "$var_name" '%s' "$user_input"
+                ;;
+            *)
+                print_color "$YELLOW" "   Invalid choice. Please enter o, s, a, or n."
+                ;;
+        esac
+    done
+}
+
 # Check if Claude Code is installed
 check_claude_code() {
     print_color "$YELLOW" "Checking prerequisites..."
@@ -196,7 +245,7 @@ prompt_optional_components() {
     # Context7 MCP
     print_color "$CYAN" "Context7 MCP Server (Highly Recommended)"
     echo "  Provides up-to-date documentation for external libraries (React, FastAPI, etc.)"
-    if ! safe_read INSTALL_CONTEXT7 "  Install Context7 integration? (y/n): "; then
+    if ! safe_read_yn INSTALL_CONTEXT7 "  Install Context7 integration? (y/n): "; then
         exit 1
     fi
     echo
@@ -204,7 +253,7 @@ prompt_optional_components() {
     # Gemini MCP
     print_color "$CYAN" "Gemini Assistant MCP Server (Highly Recommended)"
     echo "  Enables architectural consultation and advanced code review capabilities"
-    if ! safe_read INSTALL_GEMINI "  Install Gemini integration? (y/n): "; then
+    if ! safe_read_yn INSTALL_GEMINI "  Install Gemini integration? (y/n): "; then
         exit 1
     fi
     echo
@@ -212,7 +261,7 @@ prompt_optional_components() {
     # Notifications
     print_color "$CYAN" "Notification System (Convenience Feature)"
     echo "  Plays audio alerts when tasks complete or input is needed"
-    if ! safe_read INSTALL_NOTIFICATIONS "  Set up notification hooks? (y/n): "; then
+    if ! safe_read_yn INSTALL_NOTIFICATIONS "  Set up notification hooks? (y/n): "; then
         exit 1
     fi
     
@@ -265,13 +314,13 @@ handle_file_conflict() {
     echo "   Type: $file_type"
     echo "   Location: $dest_file"
     echo
-    echo "   Options:"
-    echo "   [o] Overwrite this file"
-    echo "   [s] Skip this file"
-    echo "   [a] Overwrite all remaining files"
-    echo "   [n] Skip all remaining files"
+    echo "   What would you like to do?"
+    echo "   [o] Overwrite - Replace the existing file with the new one"
+    echo "   [s] Skip - Keep the existing file, don't copy the new one"
+    echo "   [a] Always overwrite - Replace this and all future existing files"
+    echo "   [n] Never overwrite - Skip this and all future existing files"
     echo
-    if ! safe_read choice "   Your choice (o/s/a/n): "; then
+    if ! safe_read_conflict choice; then
         return 1
     fi
     
@@ -288,12 +337,12 @@ handle_file_conflict() {
         a)
             OVERWRITE_ALL="y"
             cp "$source_file" "$dest_file"
-            print_color "$GREEN" "   ✓ Overwritten (and will overwrite all)"
+            print_color "$GREEN" "   ✓ Overwritten (will automatically overwrite all future conflicts)"
             return 0
             ;;
         n)
             SKIP_ALL="y"
-            print_color "$YELLOW" "   → Skipped (and will skip all)"
+            print_color "$YELLOW" "   → Skipped (will automatically skip all future conflicts)"
             return 1
             ;;
         *)
@@ -443,6 +492,19 @@ copy_framework_files() {
             copy_with_check "$SCRIPT_DIR/docs/README.md" \
                           "$TARGET_DIR/docs/README.md" \
                           "Documentation guide"
+        fi
+        
+        # Copy CONTEXT template files
+        if [ -f "$SCRIPT_DIR/docs/CONTEXT-tier2-component.md" ]; then
+            copy_with_check "$SCRIPT_DIR/docs/CONTEXT-tier2-component.md" \
+                          "$TARGET_DIR/docs/CONTEXT-tier2-component.md" \
+                          "Tier 2 documentation template"
+        fi
+        
+        if [ -f "$SCRIPT_DIR/docs/CONTEXT-tier3-feature.md" ]; then
+            copy_with_check "$SCRIPT_DIR/docs/CONTEXT-tier3-feature.md" \
+                          "$TARGET_DIR/docs/CONTEXT-tier3-feature.md" \
+                          "Tier 3 documentation template"
         fi
     fi
     
@@ -620,7 +682,18 @@ show_next_steps() {
         echo "${step_num}. Test notifications:"
         echo "   - Run: bash $TARGET_DIR/hooks/notify.sh"
         echo
+        ((step_num++))
     fi
+    
+    echo "${step_num}. Documentation Templates:"
+    print_color "$CYAN" "   The framework includes documentation templates:"
+    echo "   - $TARGET_DIR/docs/CONTEXT-tier2-component.md"
+    echo "   - $TARGET_DIR/docs/CONTEXT-tier3-feature.md"
+    echo
+    echo "   These are TEMPLATES. To use them:"
+    echo "   • Copy to your component/feature directories and rename to CONTEXT.md"
+    echo "   • OR use the /create-docs command to generate documentation automatically"
+    echo
     
     print_color "$BLUE" "For documentation and examples, see:"
     echo "  - Commands: $TARGET_DIR/commands/README.md"
@@ -645,7 +718,7 @@ main() {
     print_color "$YELLOW" "Ready to install Claude Code Development Kit to:"
     echo "  $TARGET_DIR"
     echo
-    if ! safe_read confirm "Continue? (y/n): "; then
+    if ! safe_read_yn confirm "Continue? (y/n): "; then
         exit 1
     fi
     
