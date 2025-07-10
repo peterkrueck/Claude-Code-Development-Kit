@@ -75,6 +75,11 @@ Claude Code's output quality directly depends on what it knows about your projec
 > **Claude Code transforms from a helpful tool into a reliable development partner that remembers your project context, validates its own work, and handles the tedious stuff automatically.**
 
 
+[![Demo-Video auf YouTube](https://img.youtube.com/vi/kChalBbMs4g/0.jpg)](https://youtu.be/kChalBbMs4g)
+
+
+
+
 ## Quick Start
 
 ### Prerequisites
