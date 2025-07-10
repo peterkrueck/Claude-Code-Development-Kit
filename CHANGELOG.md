@@ -8,9 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### What's New in v2.0.0:
 - **Security**: Automatic scanning prevents accidental exposure of API keys and secrets
-- **Context Enhancement**: Project structure automatically included in Gemini consultations
+- **Context Enhancement**: Project structure and MCP assistant rules automatically included in Gemini consultations
 - **Sub-Agent Context**: All sub-agents now automatically receive core project documentation
 - **Developer Experience**: Audio notifications for task completion and input requests
+- **MCP Assistant Rules**: Define project-specific coding standards for MCP assistants
 - **No Breaking Changes**: All v1.0.0 features remain unchanged and fully compatible
 
 
@@ -19,9 +20,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Comprehensive hooks system as 4th core framework component
   - Security scanner hook to prevent accidental exposure of secrets when using MCP servers
-  - Gemini context injector for automatic project structure inclusion in consultations
+  - Gemini context injector for automatic project structure and MCP assistant rules inclusion in consultations
   - Subagent context injector for automatic documentation inclusion in all sub-agent tasks
   - Cross-platform notification system with audio feedback
+- MCP-ASSISTANT-RULES.md support for project-specific coding standards
+  - Template in `docs/MCP-ASSISTANT-RULES.md` for customization
+  - Automatic injection into Gemini consultations via updated hook
+  - Example implementation in framework root (gitignored)
 - Hook setup command (`/hook-setup`) for easy configuration verification
 - Settings template for Claude Code configuration with all hooks pre-configured
 - Hook configuration examples and comprehensive documentation

@@ -147,9 +147,10 @@ When using the Task tool to spawn sub-agents, the core project context (CLAUDE.m
 - Highly security relevant tasks
 
 **Automatic Context Injection:**
-- The kit's `gemini-context-injector.sh` hook automatically includes `/docs/ai-context/project-structure.md` for new sessions
-- This ensures Gemini always has comprehensive understanding of your technology stack and architecture
-
+- The kit's `gemini-context-injector.sh` hook automatically includes two key files for new sessions:
+  - `/docs/ai-context/project-structure.md` - Complete project structure and tech stack
+  - `/MCP-ASSISTANT-RULES.md` - Your project-specific coding standards and guidelines
+- This ensures Gemini always has comprehensive understanding of your technology stack, architecture, and project standards
 
 **Usage patterns:**
 ```python

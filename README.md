@@ -18,6 +18,7 @@ The kit leverages Claude Code's sub-agent orchestration capabilities to create a
 ## Terminology
 
 - **CLAUDE.md** - Master context files containing project-specific AI instructions, coding standards, and integration patterns
+- **CONTEXT.md** - Component and feature-level documentation files (Tier 2 and Tier 3) that provide specific implementation details and patterns
 - **MCP (Model Context Protocol)** - Standard for integrating external AI services with Claude Code
 - **Sub-agents** - Specialized AI agents spawned by Claude Code to work on specific aspects of a task in parallel
 - **3-Tier Documentation** - Hierarchical organization (Foundation/Component/Feature) that minimizes maintenance while maximizing AI effectiveness
@@ -94,9 +95,9 @@ This ensures:
 - Integration happens seamlessly within command workflows
 
 **Documentation → MCP Servers**
-- Project structure auto-attaches to Gemini consultations
-- Ensures external AI understands specific architecture
-- Makes all recommendations project-relevant
+- Project structure and MCP assistant rules auto-attach to Gemini consultations
+- Ensures external AI understands specific architecture and coding standards
+- Makes all recommendations project-relevant and standards-compliant
 
 ### Hooks Integration
 
@@ -118,7 +119,7 @@ These hooks integrate seamlessly with the command and MCP server workflows, prov
 ### Prerequisites
 
 - **Required**: [Claude Code](https://claude.ai/code)
-- **Recommended**: MCP servers like [Context7](https://github.com/upstash/context7) or [Gemini Assistant](https://github.com/peterkrueck/mcp-gemini-assistant)
+- **Recommended**: MCP servers like [Context7](https://github.com/upstash/context7) and [Gemini Assistant](https://github.com/peterkrueck/mcp-gemini-assistant)
 
 ### Installation
 
@@ -146,6 +147,19 @@ These hooks integrate seamlessly with the command and MCP server workflows, prov
    cp hooks/setup/settings.json.template your-project/.claude/settings.json
    # See [hooks/README.md](hooks/) for detailed setup
    ```
+
+4. **If using Gemini MCP server** (recommended):
+   ```bash
+   # Copy and customize MCP assistant rules
+   cp docs/MCP-ASSISTANT-RULES.md your-project/MCP-ASSISTANT-RULES.md
+   
+   # Edit to include your project-specific:
+   # - Coding standards and conventions
+   # - Security requirements
+   # - Domain-specific guidelines
+   # - Performance considerations
+   ```
+   This file will be automatically included in all Gemini consultations to ensure the AI understands your project's specific requirements.
 
 
 ## Common Tasks
@@ -226,6 +240,7 @@ The kit is designed for adaptation:
 - **Documentation** - Adjust tier structure for your architecture
 - **MCP Integration** - Add additional servers for specialized expertise
 - **Hooks** - Customize security patterns, add new hooks, or modify notifications in `.claude/hooks/`
+- **MCP Assistant Rules** - Copy `docs/MCP-ASSISTANT-RULES.md` template to project root and customize for project-specific standards
 
 ## Best Practices
 

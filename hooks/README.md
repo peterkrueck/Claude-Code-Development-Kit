@@ -26,17 +26,25 @@ These hooks execute at specific points in Claude Code's lifecycle, providing det
 
 ### 1. Gemini Context Injector (`gemini-context-injector.sh`)
 
-**Purpose**: Automatically includes your project structure documentation when starting new Gemini consultation sessions, ensuring the AI has complete context about your codebase.
+**Purpose**: Automatically includes your project documentation and assistant rules when starting new Gemini consultation sessions, ensuring the AI has complete context about your codebase and project standards.
 
 **Trigger**: `PreToolUse` for `mcp__gemini__consult_gemini`
 
 **Features**:
 - Detects new Gemini consultation sessions (no session_id)
-- Automatically attaches `docs/ai-context/project-structure.md`
+- Automatically attaches two key files:
+  - `docs/ai-context/project-structure.md` - Complete project structure and tech stack
+  - `MCP-ASSISTANT-RULES.md` - Project-specific coding standards and guidelines
 - Preserves existing file attachments
 - Session-aware (only injects on new sessions)
 - Logs all injection events for debugging
-- Fails gracefully if documentation is missing
+- Fails gracefully if either file is missing
+- Handles partial availability (will attach whichever files exist)
+
+**Customization**: 
+- Copy `docs/MCP-ASSISTANT-RULES.md` template to your project root
+- Customize it with your project-specific standards, principles, and constraints
+- The hook will automatically include it in Gemini consultations
 
 ### 2. MCP Security Scanner (`mcp-security-scan.sh`)
 
@@ -200,7 +208,7 @@ See `hooks/setup/settings.json.template` for the complete configuration includin
 
 The hooks system complements MCP server integrations:
 
-- **Gemini Consultation**: Context injector ensures project structure is included
+- **Gemini Consultation**: Context injector ensures both project structure and MCP assistant rules are included
 - **Context7 Documentation**: Security scanner protects library ID inputs
 - **All MCP Tools**: Universal security scanning before external calls
 
