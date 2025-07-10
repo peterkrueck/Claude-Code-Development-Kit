@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# AI Development Framework Setup Script
+# Claude Code Development Kit Setup Script
 # 
-# This script installs the AI Development Framework into a target project,
+# This script installs the Claude Code Development Kit into a target project,
 # providing automated context management and multi-agent workflows for Claude Code.
 
 set -euo pipefail
@@ -47,9 +47,9 @@ print_header() {
     echo
     print_color "$BLUE" "==========================================="
     if [ -n "$VERSION" ]; then
-        print_color "$BLUE" "   AI Development Framework Setup v$VERSION"
+        print_color "$BLUE" "   Claude Code Development Kit Setup v$VERSION"
     else
-        print_color "$BLUE" "   AI Development Framework Setup"
+        print_color "$BLUE" "   Claude Code Development Kit Setup"
     fi
     print_color "$BLUE" "==========================================="
     echo
@@ -132,7 +132,7 @@ detect_os() {
 # Get target directory
 get_target_directory() {
     echo
-    print_color "$YELLOW" "Where would you like to install the AI Development Framework?"
+    print_color "$YELLOW" "Where would you like to install the Claude Code Development Kit?"
     echo "Enter target project directory (or . for current directory):"
     read -r input_dir
     
@@ -606,7 +606,7 @@ main() {
     
     # Confirm installation
     echo
-    print_color "$YELLOW" "Ready to install AI Development Framework to:"
+    print_color "$YELLOW" "Ready to install Claude Code Development Kit to:"
     echo "  $TARGET_DIR"
     echo
     echo -n "Continue? (y/n): "

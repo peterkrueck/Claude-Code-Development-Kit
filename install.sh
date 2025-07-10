@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# AI Development Framework Remote Installer
+# Claude Code Development Kit Remote Installer
 #
-# This script downloads and installs the AI Development Framework
+# This script downloads and installs the Claude Code Development Kit
 # Usage: curl -fsSL https://raw.githubusercontent.com/username/repo/main/install.sh | bash
 
 set -euo pipefail
@@ -46,7 +46,7 @@ spinner() {
 clear
 print_color "$BLUE" "╔═══════════════════════════════════════════════╗"
 print_color "$BLUE" "║                                               ║"
-print_color "$BLUE" "║    🚀 AI Development Framework Installer     ║"
+print_color "$BLUE" "║    🚀 Claude Code Development Kit Installer  ║"
 print_color "$BLUE" "║                                               ║"
 print_color "$BLUE" "╚═══════════════════════════════════════════════╝"
 echo
@@ -82,7 +82,7 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 # Download framework
-print_color "$CYAN" "📥 Downloading AI Development Framework..."
+print_color "$CYAN" "📥 Downloading Claude Code Development Kit..."
 DOWNLOAD_URL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/tarball/${BRANCH}"
 
 # Download with progress indication
@@ -195,5 +195,5 @@ fi
 # Success! Cleanup will happen automatically via trap
 echo
 print_color "$GREEN" "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-print_color "$GREEN" "🎉 AI Development Framework installation complete!"
+print_color "$GREEN" "🎉 Claude Code Development Kit installation complete!"
 print_color "$GREEN" "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
