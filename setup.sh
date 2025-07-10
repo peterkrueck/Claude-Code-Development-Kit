@@ -60,7 +60,7 @@ print_header() {
 safe_read() {
     local var_name="$1"
     local prompt="$2"
-    local user_input
+    local temp_input  # Renamed to avoid scope collision
 
     # Check if a TTY is available for interactive input
     if [ ! -t 0 ] && [ ! -c /dev/tty ]; then
@@ -78,11 +78,11 @@ safe_read() {
 
     # Use read -p for the prompt. The prompt is sent to stderr by default
     # when reading from a source other than the terminal, so it's visible.
-    read -r -p "$prompt" user_input < "$input_source"
+    read -r -p "$prompt" temp_input < "$input_source"
 
     # Assign the value to the variable name passed as the first argument
     # using `printf -v`. This is a safer way to do indirect assignment.
-    printf -v "$var_name" '%s' "$user_input"
+    printf -v "$var_name" '%s' "$temp_input"
 }
 
 # Safe read function for yes/no questions with validation
@@ -91,6 +91,7 @@ safe_read_yn() {
     local var_name="$1"
     local prompt="$2"
     local user_input
+    local sanitized_input
     local valid_input=false
 
     while [ "$valid_input" = false ]; do
@@ -98,10 +99,14 @@ safe_read_yn() {
             return 1
         fi
 
-        case "$user_input" in
+        # Sanitize input: remove carriage returns and whitespace
+        sanitized_input="${user_input//$'\r'/}"  # Remove \r
+        sanitized_input="$(echo "$sanitized_input" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')"
+
+        case "$sanitized_input" in
             y|n)
                 valid_input=true
-                printf -v "$var_name" '%s' "$user_input"
+                printf -v "$var_name" '%s' "$sanitized_input"
                 ;;
             *)
                 print_color "$YELLOW" "Please enter 'y' for yes or 'n' for no."
@@ -115,6 +120,7 @@ safe_read_yn() {
 safe_read_conflict() {
     local var_name="$1"
     local user_input
+    local sanitized_input
     local valid_input=false
 
     while [ "$valid_input" = false ]; do
@@ -122,10 +128,14 @@ safe_read_conflict() {
             return 1
         fi
 
-        case "$user_input" in
+        # Sanitize input: remove carriage returns and whitespace
+        sanitized_input="${user_input//$'\r'/}"  # Remove \r
+        sanitized_input="$(echo "$sanitized_input" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')"
+
+        case "$sanitized_input" in
             o|s|a|n)
                 valid_input=true
-                printf -v "$var_name" '%s' "$user_input"
+                printf -v "$var_name" '%s' "$sanitized_input"
                 ;;
             *)
                 print_color "$YELLOW" "   Invalid choice. Please enter o, s, a, or n."
