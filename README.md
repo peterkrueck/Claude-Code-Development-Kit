@@ -98,6 +98,10 @@ This will:
 3. Install everything in your chosen project directory
 4. Provide links to optional MCP server installations
 
+
+https://github.com/user-attachments/assets/0b4a1e69-bddb-4b58-8de9-35f97919bf44
+
+
 #### Option 2: Clone and Install
 
 ```bash
