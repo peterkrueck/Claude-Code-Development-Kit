@@ -305,23 +305,3 @@ The kit represents one approach to AI-assisted development. Contributions and ad
 ## Connect
 
 Feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/peterkrueck/) if you have questions, need clarification, or wish to provide feedback.
-
----
-
-
-## ADDITIONAL DISCLAIMER:
-
-This AI Development Framework is provided as an educational and development tool.
-Users are solely responsible for:
-- The security and safety of their own systems
-- Any code generated or modified using this framework
-- Compliance with all applicable laws and regulations
-- Validation and testing of any implementations
-
-The author assumes no liability for:
-- Data loss or system damage
-- Security vulnerabilities introduced through use
-- Costs incurred from AI service usage
-- Any direct or indirect consequences of using this framework
-
-USE AT YOUR OWN RISK. Always review and understand code before execution.
