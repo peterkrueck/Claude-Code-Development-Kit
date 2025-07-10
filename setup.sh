@@ -228,7 +228,13 @@ get_target_directory() {
     fi
     
     if [ "$input_dir" = "." ]; then
-        TARGET_DIR="$(pwd)"
+        # If run from installer, use the original directory
+        if [ -n "${INSTALLER_ORIGINAL_PWD:-}" ]; then
+            TARGET_DIR="$INSTALLER_ORIGINAL_PWD"
+        else
+            # Otherwise use current directory (for manual runs)
+            TARGET_DIR="$(pwd)"
+        fi
     else
         TARGET_DIR="$(cd "$input_dir" 2>/dev/null && pwd)" || {
             print_color "$RED" "❌ Directory '$input_dir' does not exist"

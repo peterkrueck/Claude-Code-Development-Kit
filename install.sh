@@ -174,6 +174,9 @@ fi
 # Make setup.sh executable
 chmod +x "$EXTRACT_DIR/setup.sh"
 
+# Save the original directory before changing
+ORIGINAL_PWD="$(pwd)"
+
 # Change to extract directory and run setup
 cd "$EXTRACT_DIR"
 
@@ -181,8 +184,8 @@ print_color "$CYAN" "🔧 Starting framework setup..."
 print_color "$CYAN" "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo
 
-# Run the actual setup script, passing all arguments
-if ! ./setup.sh "$@"; then
+# Run the actual setup script, passing original directory via environment variable
+if ! INSTALLER_ORIGINAL_PWD="$ORIGINAL_PWD" ./setup.sh "$@"; then
     echo
     print_color "$RED" "❌ Setup failed"
     print_color "$YELLOW" "You can try manual installation:"
