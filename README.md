@@ -6,14 +6,24 @@
 
 An integrated system that transforms Claude Code into an orchestrated development environment through automated documentation management, multi-agent workflows, and external AI expertise.
 
-## System Overview
+## Why This Kit?
 
-The kit leverages Claude Code's sub-agent orchestration capabilities to create a self-maintaining development system. Four core components work together to deliver automated, context-aware AI assistance:
+Ever tried to build a large project with AI assistance, only to watch it struggle as your codebase grows? As AI-assisted development scales, three critical challenges emerge:
 
-1. **Documentation System** - Structured context that auto-loads based on task requirements
-2. **Command Templates** - Orchestration patterns for multi-agent workflows
-3. **MCP Servers** - External AI services providing current documentation and consultation
-4. **Hooks System** - Automated security scanning, context injection, and developer experience enhancements
+### 1. Context Management
+Your AI's output quality directly depends on what it knows about your project. In growing codebases, Claude Code can lose track of your architecture, forget your coding standards, or miss critical dependencies. This kit solves this with a structured 3-tier documentation system that automatically loads the right context at the right time - no more copy-pasting the same context over and over.
+
+### 2. AI Reliability 
+Even advanced AI models hallucinate and make mistakes. The kit implements a "four eyes principle" through MCP integration:
+- **Context7** provides real-time, up-to-date library documentation beyond Claude's training cutoff
+- **Gemini** offers architectural consultation and cross-validation for complex problems
+- Together, they catch errors, reduce hallucinations, and ensure your code follows current best practices
+
+### 3. Automation Without Complexity
+Manual context loading, repetitive commands, and workflow management slow you down. The kit automates everything through intelligent hooks and command orchestration - from security scanning to context injection - delivering faster, more accurate results without the overhead.
+
+**The result**: Claude Code transforms from a helpful tool into a reliable development partner that remembers your project context, validates its own work, and handles the tedious stuff automatically.
+
 
 ## Terminology
 
@@ -89,12 +99,12 @@ This ensures:
 - Documentation structure guides agent spawning patterns
 - Commands update documentation to maintain current context
 
-**Commands → MCP Servers**
+**Commands ↔️ MCP Servers**
 - Context7 provides up-to-date library documentation
 - Gemini offers architectural consultation for complex problems
 - Integration happens seamlessly within command workflows
 
-**Documentation → MCP Servers**
+**Documentation ↔️ MCP Servers**
 - Project structure and MCP assistant rules auto-attach to Gemini consultations
 - Ensures external AI understands specific architecture and coding standards
 - Makes all recommendations project-relevant and standards-compliant
@@ -106,7 +116,7 @@ The kit includes battle-tested hooks that enhance Claude Code's capabilities:
 - **Security Scanner** - Prevents accidental exposure of secrets when using MCP servers
 - **Gemini Context Injector** - Automatically includes project structure in Gemini consultations
 - **Subagent Context Injector** - Ensures all sub-agents receive core documentation automatically
-- **Notification System** - Provides non-blocking audio feedback for task completion and input requests
+- **Notification System** - Provides non-blocking audio feedback for task completion and input requests (optional)
 
 These hooks integrate seamlessly with the command and MCP server workflows, providing:
 - Pre-execution security checks for all external AI calls
@@ -151,14 +161,23 @@ The setup script will create the following structure in your project:
 
 ```
 your-project/
-├── commands/              # AI orchestration templates
+├── commands/              # AI orchestration templates (.md files)
 ├── hooks/                 # Automation scripts
-├── docs/                  # Documentation templates
-├── logs/                  # Hook execution logs
-├── .claude/               # Claude Code configuration
-├── CLAUDE.md              # Your project's AI context
-└── MCP-ASSISTANT-RULES.md # MCP coding standards
+│   ├── config/            # Security patterns configuration
+│   ├── sounds/            # Notification sounds (if notifications enabled)
+│   └── *.sh               # Hook scripts (based on your selections)
+├── docs/                  # Documentation templates and examples
+│   ├── ai-context/        # Core documentation files
+│   ├── open-issues/       # Issue tracking examples
+│   └── specs/             # Specification templates
+├── logs/                  # Hook execution logs (created at runtime)
+├── .claude/               
+│   └── settings.local.json # Generated Claude Code configuration
+├── CLAUDE.md              # Your project's AI context (from template)
+└── MCP-ASSISTANT-RULES.md # MCP coding standards (if Gemini-Assistant-MCP selected)
 ```
+
+**Note**: The exact files installed depend on your choices during setup (MCP servers, notifications, etc.)
 
 ### Post-Installation Setup
 
@@ -216,7 +235,9 @@ Automatically:
 - Maintains context for future AI sessions
 - Ensures documentation matches implementation
 
-## Example Project Structure
+## Creating Your Project Structure
+
+After installation, you'll add your own project-specific documentation:
 
 ```
 your-project/
@@ -242,10 +263,14 @@ your-project/
 │   └── README.md              # Documentation system guide
 ├── CLAUDE.md                  # Master AI context (Tier 1)
 ├── backend/
-│   └── CONTEXT.md              # Backend context (Tier 2)
+│   └── CONTEXT.md              # Backend context (Tier 2) - create this
 └── backend/src/api/
-    └── CONTEXT.md              # API context (Tier 3)
+    └── CONTEXT.md              # API context (Tier 3) - create this
 ```
+
+The framework provides templates for CONTEXT.md files in `docs/`:
+- `docs/CONTEXT-tier2-component.md` - Use as template for component-level docs
+- `docs/CONTEXT-tier3-feature.md` - Use as template for feature-level docs
 
 ## Configuration
 
@@ -283,4 +308,20 @@ Feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/peterkrue
 
 ---
 
-*Built for developers seeking automated, context-aware AI assistance without manual overhead.*
+
+## ADDITIONAL DISCLAIMER:
+
+This AI Development Framework is provided as an educational and development tool.
+Users are solely responsible for:
+- The security and safety of their own systems
+- Any code generated or modified using this framework
+- Compliance with all applicable laws and regulations
+- Validation and testing of any implementations
+
+The author assumes no liability for:
+- Data loss or system damage
+- Security vulnerabilities introduced through use
+- Costs incurred from AI service usage
+- Any direct or indirect consequences of using this framework
+
+USE AT YOUR OWN RISK. Always review and understand code before execution.
