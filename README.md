@@ -118,48 +118,63 @@ These hooks integrate seamlessly with the command and MCP server workflows, prov
 
 ### Prerequisites
 
-- **Required**: [Claude Code](https://claude.ai/code)
+- **Required**: [Claude Code](https://github.com/anthropics/claude-code)
 - **Recommended**: MCP servers like [Context7](https://github.com/upstash/context7) and [Gemini Assistant](https://github.com/peterkrueck/mcp-gemini-assistant)
 
 ### Installation
 
-1. **Copy kit structure**:
-   ```bash
-   cp -r docs/* your-project/docs/
-   cp -r commands your-project/.claude/commands/
-   cp -r hooks your-project/.claude/hooks/
-   ```
+#### Option 1: Quick Install (Recommended)
 
-2. **Configure foundation files**:
-   ```bash
-   # Update with your technology stack
-   docs/ai-context/project-structure.md
-   
-   # Customize for your directory layout
-   docs/ai-context/docs-overview.md
-   
-   # Set project-specific standards
-   CLAUDE.md
-   ```
+Run this single command in your terminal:
 
-3. **Install hooks**
-   ```bash
-   cp hooks/setup/settings.json.template your-project/.claude/settings.json
-   # See [hooks/README.md](hooks/) for detailed setup
-   ```
+```bash
+curl -fsSL https://raw.githubusercontent.com/peterkrueck/Claude-Code-Development-Kit/main/install.sh | bash
+```
 
-4. **If using Gemini MCP server** (recommended):
+This will:
+1. Download the framework
+2. Guide you through an interactive setup
+3. Install everything in your chosen project directory
+4. Provide links to optional MCP server installations
+
+#### Option 2: Clone and Install
+
+```bash
+git clone https://github.com/peterkrueck/Claude-Code-Development-Kit.git
+cd Claude-Code-Development-Kit
+./setup.sh
+```
+
+### What Gets Installed
+
+The setup script will create the following structure in your project:
+
+```
+your-project/
+├── commands/              # AI orchestration templates
+├── hooks/                 # Automation scripts
+├── docs/                  # Documentation templates
+├── logs/                  # Hook execution logs
+├── .claude/               # Claude Code configuration
+├── CLAUDE.md              # Your project's AI context
+└── MCP-ASSISTANT-RULES.md # MCP coding standards
+```
+
+### Post-Installation Setup
+
+1. **Customize your AI context**:
+   - Edit `CLAUDE.md` with your project standards
+   - Update `docs/ai-context/project-structure.md` with your tech stack
+
+2. **Install MCP servers** (if selected during setup):
+   - Follow the links provided by the installer
+   - Configure in `.claude/settings.local.json`
+
+3. **Test your installation**:
    ```bash
-   # Copy and customize MCP assistant rules
-   cp docs/MCP-ASSISTANT-RULES.md your-project/MCP-ASSISTANT-RULES.md
-   
-   # Edit to include your project-specific:
-   # - Coding standards and conventions
-   # - Security requirements
-   # - Domain-specific guidelines
-   # - Performance considerations
+   claude
+   /full-context "analyze my project structure"
    ```
-   This file will be automatically included in all Gemini consultations to ensure the AI understands your project's specific requirements.
 
 
 ## Common Tasks

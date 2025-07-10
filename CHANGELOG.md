@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **No Breaking Changes**: All v1.0.0 features remain unchanged and fully compatible
 
 
-## [2.0.0] - 2025-07-08
+## [2.0.0] - 2025-07-10
 
 ### Added
 - Comprehensive hooks system as 4th core framework component
@@ -32,12 +32,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hook configuration examples and comprehensive documentation
 - Multi-Agent Workflows documentation section in `docs/CLAUDE.md`
 - Automatic context injection documentation in `commands/README.md`
+- Remote installation capability via curl command
+  - New `install.sh` script for one-command installation
+  - Downloads framework from GitHub without cloning
+  - Professional installer with progress indicators
+  - Automatic cleanup of temporary files
+- Interactive `setup.sh` script for framework installation
+  - Prerequisite checking with clear explanations for required tools
+  - Interactive prompts for optional components with descriptions
+  - Conditional file copying based on user selections
+  - Conflict resolution for existing files (skip/overwrite/all)
+  - Dynamic OS detection only when notifications are selected
+  - Configuration file generation with selected components only
+  - Cross-platform support (macOS, Linux, Windows via WSL)
 
 
 ### Improved
 - Developer experience with automatic sub-agent context injection
 - More consistent multi-agent workflow patterns across all commands
 - Simplified sub-agent prompts by removing manual context loading
+- Installation experience with two methods: quick install (curl) or manual (git clone)
+- Documentation with clearer installation instructions and correct MCP server links
+- User onboarding with step-by-step setup guidance and component descriptions
+- Setup safety with file conflict resolution instead of automatic overwrites
 
 ### Changed
 - Tier 2 and Tier 3 documentation files renamed from CLAUDE.md to CONTEXT.md
