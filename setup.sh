@@ -55,6 +55,36 @@ print_header() {
     echo
 }
 
+# Safe read function that works in piped contexts
+# Usage: safe_read <variable_name> <prompt_string>
+safe_read() {
+    local var_name="$1"
+    local prompt="$2"
+    local user_input
+
+    # Check if a TTY is available for interactive input
+    if [ ! -t 0 ] && [ ! -c /dev/tty ]; then
+        print_color "$RED" "❌ Cannot prompt for input: No TTY available."
+        return 1
+    fi
+
+    # Determine the input source
+    local input_source
+    if [ -t 0 ]; then
+        input_source="/dev/stdin" # Standard input is the terminal
+    else
+        input_source="/dev/tty"   # Standard input is piped, use the terminal
+    fi
+
+    # Use read -p for the prompt. The prompt is sent to stderr by default
+    # when reading from a source other than the terminal, so it's visible.
+    read -r -p "$prompt" user_input < "$input_source"
+
+    # Assign the value to the variable name passed as the first argument
+    # using `printf -v`. This is a safer way to do indirect assignment.
+    printf -v "$var_name" '%s' "$user_input"
+}
+
 # Check if Claude Code is installed
 check_claude_code() {
     print_color "$YELLOW" "Checking prerequisites..."
@@ -133,8 +163,10 @@ detect_os() {
 get_target_directory() {
     echo
     print_color "$YELLOW" "Where would you like to install the Claude Code Development Kit?"
-    echo "Enter target project directory (or . for current directory):"
-    read -r input_dir
+    local prompt="Enter target project directory (or . for current directory): "
+    if ! safe_read input_dir "$prompt"; then
+        exit 1
+    fi
     
     if [ "$input_dir" = "." ]; then
         TARGET_DIR="$(pwd)"
@@ -164,22 +196,25 @@ prompt_optional_components() {
     # Context7 MCP
     print_color "$CYAN" "Context7 MCP Server (Highly Recommended)"
     echo "  Provides up-to-date documentation for external libraries (React, FastAPI, etc.)"
-    echo -n "  Install Context7 integration? (y/n): "
-    read -r INSTALL_CONTEXT7
+    if ! safe_read INSTALL_CONTEXT7 "  Install Context7 integration? (y/n): "; then
+        exit 1
+    fi
     echo
     
     # Gemini MCP
     print_color "$CYAN" "Gemini Assistant MCP Server (Highly Recommended)"
     echo "  Enables architectural consultation and advanced code review capabilities"
-    echo -n "  Install Gemini integration? (y/n): "
-    read -r INSTALL_GEMINI
+    if ! safe_read INSTALL_GEMINI "  Install Gemini integration? (y/n): "; then
+        exit 1
+    fi
     echo
     
     # Notifications
     print_color "$CYAN" "Notification System (Convenience Feature)"
     echo "  Plays audio alerts when tasks complete or input is needed"
-    echo -n "  Set up notification hooks? (y/n): "
-    read -r INSTALL_NOTIFICATIONS
+    if ! safe_read INSTALL_NOTIFICATIONS "  Set up notification hooks? (y/n): "; then
+        exit 1
+    fi
     
     # Only detect OS if notifications are enabled
     if [ "$INSTALL_NOTIFICATIONS" = "y" ]; then
@@ -236,8 +271,9 @@ handle_file_conflict() {
     echo "   [a] Overwrite all remaining files"
     echo "   [n] Skip all remaining files"
     echo
-    echo -n "   Your choice (o/s/a/n): "
-    read -r choice
+    if ! safe_read choice "   Your choice (o/s/a/n): "; then
+        return 1
+    fi
     
     case "$choice" in
         o)
@@ -609,8 +645,9 @@ main() {
     print_color "$YELLOW" "Ready to install Claude Code Development Kit to:"
     echo "  $TARGET_DIR"
     echo
-    echo -n "Continue? (y/n): "
-    read -r confirm
+    if ! safe_read confirm "Continue? (y/n): "; then
+        exit 1
+    fi
     
     if [ "$confirm" != "y" ]; then
         print_color "$RED" "Installation cancelled"

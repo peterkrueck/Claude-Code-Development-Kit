@@ -6,23 +6,145 @@
 
 An integrated system that transforms Claude Code into an orchestrated development environment through automated documentation management, multi-agent workflows, and external AI expertise.
 
-## Why This Kit?
+## 🎯 Why This Kit?
 
-Ever tried to build a large project with AI assistance, only to watch it struggle as your codebase grows? As AI-assisted development scales, three critical challenges emerge:
+> *Ever tried to build a large project with AI assistance, only to watch it struggle as your codebase grows?*
 
-### 1. Context Management
-Your AI's output quality directly depends on what it knows about your project. In growing codebases, Claude Code can lose track of your architecture, forget your coding standards, or miss critical dependencies. This kit solves this with a structured 3-tier documentation system that automatically loads the right context at the right time - no more copy-pasting the same context over and over.
+Claude Code's output quality directly depends on what it knows about your project. As AI-assisted development scales, three critical challenges emerge:
 
-### 2. AI Reliability 
-Even advanced AI models hallucinate and make mistakes. The kit implements a "four eyes principle" through MCP integration:
-- **Context7** provides real-time, up-to-date library documentation beyond Claude's training cutoff
-- **Gemini** offers architectural consultation and cross-validation for complex problems
-- Together, they catch errors, reduce hallucinations, and ensure your code follows current best practices
+---
 
-### 3. Automation Without Complexity
-Manual context loading, repetitive commands, and workflow management slow you down. The kit automates everything through intelligent hooks and command orchestration - from security scanning to context injection - delivering faster, more accurate results without the overhead.
+### Challenge 1: Context Management
 
-**The result**: Claude Code transforms from a helpful tool into a reliable development partner that remembers your project context, validates its own work, and handles the tedious stuff automatically.
+**The Problem:**
+```
+❌ Loses track of your architecture patterns and design decisions
+❌ Forgets your coding standards and team conventions
+❌ No guidance on where to find the right context in large codebases
+```
+
+**The Solution:**
+✅ **Automated context delivery** through two integrated systems:
+- **3-tier documentation system** - Auto-loads the right docs at the right time
+- **Custom commands with sub-agents** - Orchestrates specialized agents that already know your project
+- Result: No manual context loading, consistent knowledge across all agents
+
+---
+
+### Challenge 2: AI Reliability 
+
+**The Problem:**
+```
+❌ Outdated library documentation
+❌ Hallucinated API methods
+❌ Inconsistent architectural decisions
+```
+
+**The Solution:**
+✅ **"Four eyes principle"** through MCP integration:
+
+| Service | Purpose | Benefit |
+|---------|---------|---------|
+| **Context7** | Real-time library docs | Current APIs, not training data |
+| **Gemini** | Architecture consultation | Cross-validation & best practices |
+
+*Result: Fewer errors, better code, current standards*
+
+---
+
+### Challenge 3: Automation Without Complexity
+
+**The Problem:**
+```
+❌ Manual context loading for every session
+❌ Repetitive command sequences
+❌ No feedback when tasks complete
+```
+
+**The Solution:**
+✅ **Intelligent automation** through hooks and commands:
+- Automatic updates of documentation through custom commands
+- Context injection for all Sub-agents and Gemini MCP calls 
+- Audio notifications for task completion (optional)
+- One-command workflows for complex tasks
+
+---
+
+### 🎉 The Result
+
+> **Claude Code transforms from a helpful tool into a reliable development partner that remembers your project context, validates its own work, and handles the tedious stuff automatically.**
+
+
+## Quick Start
+
+### Prerequisites
+
+- **Required**: [Claude Code](https://github.com/anthropics/claude-code)
+- **Recommended**: MCP servers like [Context7](https://github.com/upstash/context7) and [Gemini Assistant](https://github.com/peterkrueck/mcp-gemini-assistant)
+
+### Installation
+
+#### Option 1: Quick Install (Recommended)
+
+Run this single command in your terminal:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/peterkrueck/Claude-Code-Development-Kit/main/install.sh | bash
+```
+
+This will:
+1. Download the framework
+2. Guide you through an interactive setup
+3. Install everything in your chosen project directory
+4. Provide links to optional MCP server installations
+
+#### Option 2: Clone and Install
+
+```bash
+git clone https://github.com/peterkrueck/Claude-Code-Development-Kit.git
+cd Claude-Code-Development-Kit
+./setup.sh
+```
+
+### What Gets Installed
+
+The setup script will create the following structure in your project:
+
+```
+your-project/
+├── commands/              # AI orchestration templates (.md files)
+├── hooks/                 # Automation scripts
+│   ├── config/            # Security patterns configuration
+│   ├── sounds/            # Notification sounds (if notifications enabled)
+│   └── *.sh               # Hook scripts (based on your selections)
+├── docs/                  # Documentation templates and examples
+│   ├── ai-context/        # Core documentation files
+│   ├── open-issues/       # Issue tracking examples
+│   └── specs/             # Specification templates
+├── logs/                  # Hook execution logs (created at runtime)
+├── .claude/               
+│   └── settings.local.json # Generated Claude Code configuration
+├── CLAUDE.md              # Your project's AI context (from template)
+└── MCP-ASSISTANT-RULES.md # MCP coding standards (if Gemini-Assistant-MCP selected)
+```
+
+**Note**: The exact files installed depend on your choices during setup (MCP servers, notifications, etc.)
+
+### Post-Installation Setup
+
+1. **Customize your AI context**:
+   - Edit `CLAUDE.md` with your project standards
+   - Update `docs/ai-context/project-structure.md` with your tech stack
+
+2. **Install MCP servers** (if selected during setup):
+   - Follow the links provided by the installer
+   - Configure in `.claude/settings.local.json`
+
+3. **Test your installation**:
+   ```bash
+   claude
+   /full-context "analyze my project structure"
+   ```
 
 
 ## Terminology
@@ -123,78 +245,6 @@ These hooks integrate seamlessly with the command and MCP server workflows, prov
 - Automatic context enhancement for both external AI and sub-agents
 - Consistent knowledge across all agents in multi-agent workflows
 - Developer awareness through pleasant, non-blocking audio notifications
-
-## Quick Start
-
-### Prerequisites
-
-- **Required**: [Claude Code](https://github.com/anthropics/claude-code)
-- **Recommended**: MCP servers like [Context7](https://github.com/upstash/context7) and [Gemini Assistant](https://github.com/peterkrueck/mcp-gemini-assistant)
-
-### Installation
-
-#### Option 1: Quick Install (Recommended)
-
-Run this single command in your terminal:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/peterkrueck/Claude-Code-Development-Kit/main/install.sh | bash
-```
-
-This will:
-1. Download the framework
-2. Guide you through an interactive setup
-3. Install everything in your chosen project directory
-4. Provide links to optional MCP server installations
-
-#### Option 2: Clone and Install
-
-```bash
-git clone https://github.com/peterkrueck/Claude-Code-Development-Kit.git
-cd Claude-Code-Development-Kit
-./setup.sh
-```
-
-### What Gets Installed
-
-The setup script will create the following structure in your project:
-
-```
-your-project/
-├── commands/              # AI orchestration templates (.md files)
-├── hooks/                 # Automation scripts
-│   ├── config/            # Security patterns configuration
-│   ├── sounds/            # Notification sounds (if notifications enabled)
-│   └── *.sh               # Hook scripts (based on your selections)
-├── docs/                  # Documentation templates and examples
-│   ├── ai-context/        # Core documentation files
-│   ├── open-issues/       # Issue tracking examples
-│   └── specs/             # Specification templates
-├── logs/                  # Hook execution logs (created at runtime)
-├── .claude/               
-│   └── settings.local.json # Generated Claude Code configuration
-├── CLAUDE.md              # Your project's AI context (from template)
-└── MCP-ASSISTANT-RULES.md # MCP coding standards (if Gemini-Assistant-MCP selected)
-```
-
-**Note**: The exact files installed depend on your choices during setup (MCP servers, notifications, etc.)
-
-### Post-Installation Setup
-
-1. **Customize your AI context**:
-   - Edit `CLAUDE.md` with your project standards
-   - Update `docs/ai-context/project-structure.md` with your tech stack
-
-2. **Install MCP servers** (if selected during setup):
-   - Follow the links provided by the installer
-   - Configure in `.claude/settings.local.json`
-
-3. **Test your installation**:
-   ```bash
-   claude
-   /full-context "analyze my project structure"
-   ```
-
 
 ## Common Tasks
 
