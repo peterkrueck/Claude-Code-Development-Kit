@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [2.1.0] - 2025-07-11
+
+### Added
+- New `/gemini-consult` command for deep, iterative conversations with Gemini MCP
+  - Persistent session support for complex problem-solving
+  - Context-aware problem detection when no arguments provided
+  - Automatic attachment of project documentation and MCP-ASSISTANT-RULES.md
+  - Support for follow-up questions with session continuity
+- Core Documentation Principle section in `/update-docs` command
+  - Emphasizes documenting current "is" state only
+  - Provides anti-patterns to avoid and best practices to follow
+  - Ensures documentation reads as if current implementation always existed
+
+### Improved
+- Enhanced setup script with conditional command installation
+  - `/gemini-consult` command only installed when Gemini MCP is selected
+  - Better user experience with relevant commands based on chosen components
+- Updated commands README with comprehensive `/gemini-consult` documentation
+  - Added use cases and workflow examples
+  - Integrated into typical development patterns
+
 ### What's New in v2.0.0:
 - **Security**: Automatic scanning prevents accidental exposure of API keys and secrets
 - **Context Enhancement**: Project structure and MCP assistant rules automatically included in Gemini consultations

@@ -5,6 +5,22 @@ You have just completed work on the VR Language Learning App project. Analyze ch
 @/docs/ai-context/project-structure.md
 @/docs/ai-context/docs-overview.md
 
+## Core Documentation Principle: Document Current State Only
+
+**CRITICAL: Always document the current "is" state of the system. Never reference legacy implementations, describe improvements made, or explain what changed. Documentation should read as if the current implementation has always existed.**
+
+### Documentation Anti-Patterns to Avoid:
+- ❌ "Refactored the voice pipeline to use streaming instead of batch processing"
+- ❌ "Improved performance by implementing caching"
+- ❌ "Previously used X, now uses Y for better results"
+- ❌ "Legacy implementation has been replaced with..."
+
+### Documentation Best Practices:
+- ✅ "The voice pipeline uses streaming for real-time processing"
+- ✅ "Implements caching for frequently accessed data"
+- ✅ "Uses Y for optimal results"
+- ✅ "The system architecture follows..."
+
 ## Step 1: Analyze Changes Based on Input
 
 ### Determine Analysis Mode:

@@ -390,7 +390,12 @@ copy_framework_files() {
     if [ -d "$SCRIPT_DIR/commands" ]; then
         for cmd in "$SCRIPT_DIR/commands/"*.md; do
             if [ -f "$cmd" ]; then
-                dest="$TARGET_DIR/commands/$(basename "$cmd")"
+                basename_cmd="$(basename "$cmd")"
+                # Skip gemini-consult.md unless Gemini is selected
+                if [ "$basename_cmd" = "gemini-consult.md" ] && [ "$INSTALL_GEMINI" != "y" ]; then
+                    continue
+                fi
+                dest="$TARGET_DIR/commands/$basename_cmd"
                 copy_with_check "$cmd" "$dest" "Command template"
             fi
         done

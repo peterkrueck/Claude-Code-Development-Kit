@@ -43,6 +43,24 @@ All commands benefit from automatic context injection via the `subagent-context-
 
 **How it works**: Spawns specialized agents (security, performance, architecture) that analyze in parallel. Each agent focuses on critical issues that matter for production code.
 
+### 🧠 `/gemini-consult` *(Requires Gemini MCP Server)*
+**Purpose**: Engage in deep, iterative conversations with Gemini for complex problem-solving and architectural guidance.
+
+**When to use**:
+- Tackling complex architectural decisions
+- Need expert guidance on implementation approaches
+- Debugging intricate issues across multiple files
+- Exploring optimization strategies
+- When you need a thinking partner for difficult problems
+
+**How it works**: Creates persistent conversation sessions with Gemini, automatically attaching project context and MCP-ASSISTANT-RULES.md. Supports iterative refinement through follow-up questions and implementation feedback.
+
+**Key features**:
+- Context-aware problem detection when no arguments provided
+- Persistent sessions maintained throughout problem lifecycle
+- Automatic attachment of foundational project documentation
+- Support for follow-up questions with session continuity
+
 ### 📝 `/update-docs`
 **Purpose**: Keep documentation synchronized with code changes, ensuring AI context remains current.
 
@@ -111,6 +129,14 @@ All commands benefit from automatic context injection via the `subagent-context-
 /refactor "@auth/large-auth-file.ts"          # Restructure
 /code-review "review refactored auth"          # Verify quality
 /update-docs "document new auth structure"     # Keep docs current
+```
+
+### Complex Problem Solving
+```bash
+/gemini-consult "optimize real-time data pipeline" # Start consultation
+# ... implement suggested approach ...
+/gemini-consult                                    # Follow up with results
+/update-docs "document optimization approach"      # Capture insights
 ```
 
 ## Customization
