@@ -10,13 +10,6 @@ set -euo pipefail
 # Script directory (where this script lives)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Read version from VERSION file if it exists
-if [ -f "$SCRIPT_DIR/VERSION" ]; then
-    VERSION=$(cat "$SCRIPT_DIR/VERSION" | tr -d '\n')
-else
-    VERSION=""
-fi
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -46,11 +39,7 @@ print_color() {
 print_header() {
     echo
     print_color "$BLUE" "==========================================="
-    if [ -n "$VERSION" ]; then
-        print_color "$BLUE" "   Claude Code Development Kit Setup v$VERSION"
-    else
-        print_color "$BLUE" "   Claude Code Development Kit Setup"
-    fi
+    print_color "$BLUE" "   Claude Code Development Kit Setup"
     print_color "$BLUE" "==========================================="
     echo
 }
