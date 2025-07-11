@@ -120,18 +120,18 @@ The setup script will create the following structure in your project:
 
 ```
 your-project/
-├── commands/              # AI orchestration templates (.md files)
-├── hooks/                 # Automation scripts
-│   ├── config/            # Security patterns configuration
-│   ├── sounds/            # Notification sounds (if notifications enabled)
-│   └── *.sh               # Hook scripts (based on your selections)
+├── .claude/
+│   ├── commands/          # AI orchestration templates (.md files)
+│   ├── hooks/             # Automation scripts
+│   │   ├── config/        # Security patterns configuration
+│   │   ├── sounds/        # Notification sounds (if notifications enabled)
+│   │   └── *.sh           # Hook scripts (based on your selections)
+│   └── settings.local.json # Generated Claude Code configuration
 ├── docs/                  # Documentation templates and examples
 │   ├── ai-context/        # Core documentation files
 │   ├── open-issues/       # Issue tracking examples
 │   └── specs/             # Specification templates
 ├── logs/                  # Hook execution logs (created at runtime)
-├── .claude/               
-│   └── settings.local.json # Generated Claude Code configuration
 ├── CLAUDE.md              # Your project's AI context (from template)
 └── MCP-ASSISTANT-RULES.md # MCP coding standards (if Gemini-Assistant-MCP selected)
 ```

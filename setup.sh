@@ -284,17 +284,16 @@ create_directories() {
     print_color "$YELLOW" "Creating directory structure..."
     
     # Main directories
-    mkdir -p "$TARGET_DIR/commands"
-    mkdir -p "$TARGET_DIR/hooks/config"
+    mkdir -p "$TARGET_DIR/.claude/commands"
+    mkdir -p "$TARGET_DIR/.claude/hooks/config"
     mkdir -p "$TARGET_DIR/docs/ai-context"
     mkdir -p "$TARGET_DIR/docs/open-issues"
     mkdir -p "$TARGET_DIR/docs/specs"
     mkdir -p "$TARGET_DIR/logs"
-    mkdir -p "$TARGET_DIR/.claude"
     
     # Only create sounds directory if notifications are enabled
     if [ "$INSTALL_NOTIFICATIONS" = "y" ]; then
-        mkdir -p "$TARGET_DIR/hooks/sounds"
+        mkdir -p "$TARGET_DIR/.claude/hooks/sounds"
     fi
     
     print_color "$GREEN" "✓ Directory structure created"
@@ -384,7 +383,7 @@ copy_framework_files() {
                 if [ "$basename_cmd" = "gemini-consult.md" ] && [ "$INSTALL_GEMINI" != "y" ]; then
                     continue
                 fi
-                dest="$TARGET_DIR/commands/$basename_cmd"
+                dest="$TARGET_DIR/.claude/commands/$basename_cmd"
                 copy_with_check "$cmd" "$dest" "Command template"
             fi
         done
@@ -395,7 +394,7 @@ copy_framework_files() {
         # Always copy subagent context injector (core feature)
         if [ -f "$SCRIPT_DIR/hooks/subagent-context-injector.sh" ]; then
             copy_with_check "$SCRIPT_DIR/hooks/subagent-context-injector.sh" \
-                          "$TARGET_DIR/hooks/subagent-context-injector.sh" \
+                          "$TARGET_DIR/.claude/hooks/subagent-context-injector.sh" \
                           "Hook script (core feature)"
         fi
         
@@ -403,7 +402,7 @@ copy_framework_files() {
         if [ "$INSTALL_CONTEXT7" = "y" ] || [ "$INSTALL_GEMINI" = "y" ]; then
             if [ -f "$SCRIPT_DIR/hooks/mcp-security-scan.sh" ]; then
                 copy_with_check "$SCRIPT_DIR/hooks/mcp-security-scan.sh" \
-                              "$TARGET_DIR/hooks/mcp-security-scan.sh" \
+                              "$TARGET_DIR/.claude/hooks/mcp-security-scan.sh" \
                               "MCP security scanner hook"
             fi
         fi
@@ -412,7 +411,7 @@ copy_framework_files() {
         if [ "$INSTALL_GEMINI" = "y" ]; then
             if [ -f "$SCRIPT_DIR/hooks/gemini-context-injector.sh" ]; then
                 copy_with_check "$SCRIPT_DIR/hooks/gemini-context-injector.sh" \
-                              "$TARGET_DIR/hooks/gemini-context-injector.sh" \
+                              "$TARGET_DIR/.claude/hooks/gemini-context-injector.sh" \
                               "Gemini context injector hook"
             fi
         fi
@@ -421,7 +420,7 @@ copy_framework_files() {
         if [ "$INSTALL_NOTIFICATIONS" = "y" ]; then
             if [ -f "$SCRIPT_DIR/hooks/notify.sh" ]; then
                 copy_with_check "$SCRIPT_DIR/hooks/notify.sh" \
-                              "$TARGET_DIR/hooks/notify.sh" \
+                              "$TARGET_DIR/.claude/hooks/notify.sh" \
                               "Notification hook"
             fi
             
@@ -429,7 +428,7 @@ copy_framework_files() {
             if [ -d "$SCRIPT_DIR/hooks/sounds" ]; then
                 for sound in "$SCRIPT_DIR/hooks/sounds/"*; do
                     if [ -f "$sound" ]; then
-                        dest="$TARGET_DIR/hooks/sounds/$(basename "$sound")"
+                        dest="$TARGET_DIR/.claude/hooks/sounds/$(basename "$sound")"
                         copy_with_check "$sound" "$dest" "Notification sound"
                     fi
                 done
@@ -440,7 +439,7 @@ copy_framework_files() {
         if [ -d "$SCRIPT_DIR/hooks/config" ]; then
             for config in "$SCRIPT_DIR/hooks/config/"*; do
                 if [ -f "$config" ]; then
-                    dest="$TARGET_DIR/hooks/config/$(basename "$config")"
+                    dest="$TARGET_DIR/.claude/hooks/config/$(basename "$config")"
                     copy_with_check "$config" "$dest" "Configuration file"
                 fi
             done
@@ -449,16 +448,16 @@ copy_framework_files() {
         # Copy README for reference
         if [ -f "$SCRIPT_DIR/hooks/README.md" ]; then
             copy_with_check "$SCRIPT_DIR/hooks/README.md" \
-                          "$TARGET_DIR/hooks/README.md" \
+                          "$TARGET_DIR/.claude/hooks/README.md" \
                           "Hooks documentation"
         fi
         
         # Copy setup files
         if [ -d "$SCRIPT_DIR/hooks/setup" ]; then
-            mkdir -p "$TARGET_DIR/hooks/setup"
+            mkdir -p "$TARGET_DIR/.claude/hooks/setup"
             for setup_file in "$SCRIPT_DIR/hooks/setup/"*; do
                 if [ -f "$setup_file" ]; then
-                    dest="$TARGET_DIR/hooks/setup/$(basename "$setup_file")"
+                    dest="$TARGET_DIR/.claude/hooks/setup/$(basename "$setup_file")"
                     copy_with_check "$setup_file" "$dest" "Setup file"
                 fi
             done
@@ -550,8 +549,8 @@ set_permissions() {
     print_color "$YELLOW" "Setting file permissions..."
     
     # Make only copied shell scripts executable
-    if [ -d "$TARGET_DIR/hooks" ]; then
-        for script in "$TARGET_DIR/hooks/"*.sh; do
+    if [ -d "$TARGET_DIR/.claude/hooks" ]; then
+        for script in "$TARGET_DIR/.claude/hooks/"*.sh; do
             if [ -f "$script" ]; then
                 chmod +x "$script"
             fi
@@ -580,8 +579,8 @@ EOF
     if [ "$INSTALL_NOTIFICATIONS" = "y" ]; then
         cat >> "$config_file" << EOF
     "notify": {
-      "commandAfterRun": "bash $TARGET_DIR/hooks/notify.sh",
-      "commandAfterUserInput": "bash $TARGET_DIR/hooks/notify.sh input"
+      "commandAfterRun": "bash $TARGET_DIR/.claude/hooks/notify.sh",
+      "commandAfterUserInput": "bash $TARGET_DIR/.claude/hooks/notify.sh input"
     }
 EOF
     fi
@@ -597,7 +596,7 @@ EOF
     # Security scan hook (always enabled if MCP is used)
     if [ "$INSTALL_CONTEXT7" = "y" ] || [ "$INSTALL_GEMINI" = "y" ]; then
         cat >> "$config_file" << EOF
-    "preToolUse": "bash $TARGET_DIR/hooks/mcp-security-scan.sh",
+    "preToolUse": "bash $TARGET_DIR/.claude/hooks/mcp-security-scan.sh",
 EOF
         hooks_added=true
     fi
@@ -605,14 +604,14 @@ EOF
     # Gemini context injector
     if [ "$INSTALL_GEMINI" = "y" ]; then
         cat >> "$config_file" << EOF
-    "preToolUse_gemini": "bash $TARGET_DIR/hooks/gemini-context-injector.sh",
+    "preToolUse_gemini": "bash $TARGET_DIR/.claude/hooks/gemini-context-injector.sh",
 EOF
         hooks_added=true
     fi
     
     # Sub-agent context injector
     cat >> "$config_file" << EOF
-    "preToolUse_task": "bash $TARGET_DIR/hooks/subagent-context-injector.sh"
+    "preToolUse_task": "bash $TARGET_DIR/.claude/hooks/subagent-context-injector.sh"
 EOF
     
     cat >> "$config_file" << EOF
@@ -677,7 +676,7 @@ show_next_steps() {
     
     if [ "$INSTALL_CONTEXT7" = "y" ] || [ "$INSTALL_GEMINI" = "y" ]; then
         echo "${step_num}. Configure security patterns:"
-        echo "   - Edit: $TARGET_DIR/hooks/config/sensitive-patterns.json"
+        echo "   - Edit: $TARGET_DIR/.claude/hooks/config/sensitive-patterns.json"
         echo
         ((step_num++))
     fi
@@ -690,7 +689,7 @@ show_next_steps() {
     
     if [ "$INSTALL_NOTIFICATIONS" = "y" ]; then
         echo "${step_num}. Test notifications:"
-        echo "   - Run: bash $TARGET_DIR/hooks/notify.sh"
+        echo "   - Run: bash $TARGET_DIR/.claude/hooks/notify.sh"
         echo
         ((step_num++))
     fi
@@ -706,8 +705,8 @@ show_next_steps() {
     echo
     
     print_color "$BLUE" "For documentation and examples, see:"
-    echo "  - Commands: $TARGET_DIR/commands/README.md"
-    echo "  - Hooks: $TARGET_DIR/hooks/README.md"
+    echo "  - Commands: $TARGET_DIR/.claude/commands/README.md"
+    echo "  - Hooks: $TARGET_DIR/.claude/hooks/README.md"
     echo "  - Docs: $TARGET_DIR/docs/README.md"
 }
 
