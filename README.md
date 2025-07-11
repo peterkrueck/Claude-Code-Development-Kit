@@ -320,10 +320,15 @@ your-project/
 │   ├── specs/                 # Feature specifications
 │   └── README.md              # Documentation system guide
 ├── CLAUDE.md                  # Master AI context (Tier 1)
+├── MCP-ASSISTANT-RULES.md     # MCP coding standards (if Gemini selected)
 ├── backend/
-│   └── CONTEXT.md              # Backend context (Tier 2) - create this
-└── backend/src/api/
-    └── CONTEXT.md              # API context (Tier 3) - create this
+│   ├── **`CONTEXT.md`**       # Backend context (Tier 2) - 🔴 create this
+│   └── src/api/
+│       └── **`CONTEXT.md`**   # API context (Tier 3) - 🔴 create this
+└── frontend/
+    ├── **`CONTEXT.md`**       # Frontend context (Tier 2) - 🔴 create this
+    └── src/components/
+        └── **`CONTEXT.md`**   # Components context (Tier 3) - 🔴 create this
 ```
 
 The framework provides templates for CONTEXT.md files in `docs/`:
