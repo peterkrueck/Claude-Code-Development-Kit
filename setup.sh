@@ -566,53 +566,117 @@ generate_config() {
     
     local config_file="$TARGET_DIR/.claude/settings.local.json"
     
-    # Start building the configuration
+    # Start building the configuration with new hooks format
     cat > "$config_file" << EOF
 {
-  "environment": {
-    "WORKSPACE": "$TARGET_DIR"
-  },
-  "experimentalTools": {
+  "hooks": {
 EOF
 
-    # Add notification configuration if enabled
-    if [ "$INSTALL_NOTIFICATIONS" = "y" ]; then
-        cat >> "$config_file" << EOF
-    "notify": {
-      "commandAfterRun": "bash $TARGET_DIR/.claude/hooks/notify.sh",
-      "commandAfterUserInput": "bash $TARGET_DIR/.claude/hooks/notify.sh input"
-    }
-EOF
-    fi
+    # PreToolUse hooks
+    local pretooluse_hooks=()
     
-    cat >> "$config_file" << EOF
-  },
-  "experimentalHooks": {
-EOF
-
-    # Add hooks configuration
-    local hooks_added=false
-    
-    # Security scan hook (always enabled if MCP is used)
+    # Security scan hook for MCP tools
     if [ "$INSTALL_CONTEXT7" = "y" ] || [ "$INSTALL_GEMINI" = "y" ]; then
-        cat >> "$config_file" << EOF
-    "preToolUse": "bash $TARGET_DIR/.claude/hooks/mcp-security-scan.sh",
-EOF
-        hooks_added=true
+        pretooluse_hooks+=("mcp-security")
     fi
     
     # Gemini context injector
     if [ "$INSTALL_GEMINI" = "y" ]; then
-        cat >> "$config_file" << EOF
-    "preToolUse_gemini": "bash $TARGET_DIR/.claude/hooks/gemini-context-injector.sh",
-EOF
-        hooks_added=true
+        pretooluse_hooks+=("gemini-context")
     fi
     
-    # Sub-agent context injector
-    cat >> "$config_file" << EOF
-    "preToolUse_task": "bash $TARGET_DIR/.claude/hooks/subagent-context-injector.sh"
+    # Always add sub-agent context injector
+    pretooluse_hooks+=("subagent-context")
+    
+    # Write PreToolUse hooks
+    if [ ${#pretooluse_hooks[@]} -gt 0 ]; then
+        cat >> "$config_file" << EOF
+    "PreToolUse": [
 EOF
+        
+        local first_hook=true
+        
+        # MCP security scanner
+        if [[ " ${pretooluse_hooks[@]} " =~ " mcp-security " ]]; then
+            [ "$first_hook" = false ] && echo "," >> "$config_file"
+            cat >> "$config_file" << EOF
+      {
+        "matcher": "mcp__",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $TARGET_DIR/.claude/hooks/mcp-security-scan.sh"
+          }
+        ]
+      }
+EOF
+            first_hook=false
+        fi
+        
+        # Gemini context injector
+        if [[ " ${pretooluse_hooks[@]} " =~ " gemini-context " ]]; then
+            [ "$first_hook" = false ] && echo "," >> "$config_file"
+            cat >> "$config_file" << EOF
+      {
+        "matcher": "mcp__gemini",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $TARGET_DIR/.claude/hooks/gemini-context-injector.sh"
+          }
+        ]
+      }
+EOF
+            first_hook=false
+        fi
+        
+        # Sub-agent context injector
+        [ "$first_hook" = false ] && echo "," >> "$config_file"
+        cat >> "$config_file" << EOF
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $TARGET_DIR/.claude/hooks/subagent-context-injector.sh"
+          }
+        ]
+      }
+EOF
+        
+        cat >> "$config_file" << EOF
+    ]
+EOF
+    fi
+    
+    # Add notification hooks if enabled
+    if [ "$INSTALL_NOTIFICATIONS" = "y" ]; then
+        [ ${#pretooluse_hooks[@]} -gt 0 ] && echo "," >> "$config_file"
+        cat >> "$config_file" << EOF
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $TARGET_DIR/.claude/hooks/notify.sh input"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $TARGET_DIR/.claude/hooks/notify.sh complete"
+          }
+        ]
+      }
+    ]
+EOF
+    fi
     
     cat >> "$config_file" << EOF
   }
