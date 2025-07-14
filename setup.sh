@@ -566,82 +566,96 @@ generate_config() {
     
     local config_file="$TARGET_DIR/.claude/settings.local.json"
     
-    # Start building the configuration
+    # Start building the configuration with new hooks format
     cat > "$config_file" << EOF
 {
   "hooks": {
 EOF
 
-    # Track if we need commas between hook sections
-    local need_comma=false
+    # PreToolUse hooks
+    local pretooluse_hooks=()
     
-    # Add PreToolUse hooks
-    local pre_tool_hooks=""
+    # Security scan hook for MCP tools
+    if [ "$INSTALL_CONTEXT7" = "y" ] || [ "$INSTALL_GEMINI" = "y" ]; then
+        pretooluse_hooks+=("mcp-security")
+    fi
     
     # Gemini context injector
     if [ "$INSTALL_GEMINI" = "y" ]; then
-        pre_tool_hooks="${pre_tool_hooks}      {
-        \"matcher\": \"mcp__gemini__consult_gemini\",
-        \"hooks\": [
-          {
-            \"type\": \"command\",
-            \"command\": \"bash $TARGET_DIR/.claude/hooks/gemini-context-injector.sh\"
-          }
-        ]
-      }"
+        pretooluse_hooks+=("gemini-context")
     fi
     
-    # Security scan hook (for all MCP tools)
-    if [ "$INSTALL_CONTEXT7" = "y" ] || [ "$INSTALL_GEMINI" = "y" ]; then
-        if [ -n "$pre_tool_hooks" ]; then
-            pre_tool_hooks="${pre_tool_hooks},
-"
-        fi
-        pre_tool_hooks="${pre_tool_hooks}      {
-        \"matcher\": \"mcp__.*\",
-        \"hooks\": [
-          {
-            \"type\": \"command\",
-            \"command\": \"bash $TARGET_DIR/.claude/hooks/mcp-security-scan.sh\"
-          }
-        ]
-      }"
-    fi
+    # Always add sub-agent context injector
+    pretooluse_hooks+=("subagent-context")
     
-    # Sub-agent context injector (always included)
-    if [ -n "$pre_tool_hooks" ]; then
-        pre_tool_hooks="${pre_tool_hooks},
-"
-    fi
-    pre_tool_hooks="${pre_tool_hooks}      {
-        \"matcher\": \"Task\",
-        \"hooks\": [
-          {
-            \"type\": \"command\",
-            \"command\": \"bash $TARGET_DIR/.claude/hooks/subagent-context-injector.sh\"
-          }
-        ]
-      }"
-    
-    # Write PreToolUse section if we have any hooks
-    if [ -n "$pre_tool_hooks" ]; then
+    # Write PreToolUse hooks
+    if [ ${#pretooluse_hooks[@]} -gt 0 ]; then
         cat >> "$config_file" << EOF
     "PreToolUse": [
-${pre_tool_hooks}
+EOF
+        
+        local first_hook=true
+        
+        # MCP security scanner
+        if [[ " ${pretooluse_hooks[@]} " =~ " mcp-security " ]]; then
+            [ "$first_hook" = false ] && echo "," >> "$config_file"
+            cat >> "$config_file" << EOF
+      {
+        "matcher": "mcp__",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $TARGET_DIR/.claude/hooks/mcp-security-scan.sh"
+          }
+        ]
+      }
+EOF
+            first_hook=false
+        fi
+        
+        # Gemini context injector
+        if [[ " ${pretooluse_hooks[@]} " =~ " gemini-context " ]]; then
+            [ "$first_hook" = false ] && echo "," >> "$config_file"
+            cat >> "$config_file" << EOF
+      {
+        "matcher": "mcp__gemini",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $TARGET_DIR/.claude/hooks/gemini-context-injector.sh"
+          }
+        ]
+      }
+EOF
+            first_hook=false
+        fi
+        
+        # Sub-agent context injector
+        [ "$first_hook" = false ] && echo "," >> "$config_file"
+        cat >> "$config_file" << EOF
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $TARGET_DIR/.claude/hooks/subagent-context-injector.sh"
+          }
+        ]
+      }
+EOF
+        
+        cat >> "$config_file" << EOF
     ]
 EOF
-        need_comma=true
     fi
     
-    # Add Notification hooks if enabled
+    # Add notification hooks if enabled
     if [ "$INSTALL_NOTIFICATIONS" = "y" ]; then
-        if [ "$need_comma" = true ]; then
-            echo "," >> "$config_file"
-        fi
+        [ ${#pretooluse_hooks[@]} -gt 0 ] && echo "," >> "$config_file"
         cat >> "$config_file" << EOF
     "Notification": [
       {
-        "matcher": ".*",
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
@@ -652,7 +666,7 @@ EOF
     ],
     "Stop": [
       {
-        "matcher": ".*",
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
@@ -662,7 +676,6 @@ EOF
       }
     ]
 EOF
-        need_comma=true
     fi
     
     cat >> "$config_file" << EOF
