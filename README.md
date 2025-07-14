@@ -134,7 +134,9 @@ your-project/
 ├── docs/                  # Documentation templates and examples
 │   ├── ai-context/        # Core documentation files
 │   ├── open-issues/       # Issue tracking examples
-│   └── specs/             # Specification templates
+│   ├── specs/             # Specification templates
+│   ├── CONTEXT-tier2-component.md  # Component documentation template
+│   └── CONTEXT-tier3-feature.md    # Feature documentation template
 ├── logs/                  # Hook execution logs (created at runtime)
 ├── CLAUDE.md              # Your project's AI context (from template)
 └── MCP-ASSISTANT-RULES.md # MCP coding standards (if Gemini-Assistant-MCP selected)
