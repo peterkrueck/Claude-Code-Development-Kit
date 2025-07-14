@@ -12,6 +12,8 @@ Persistent Gemini sessions for evolving problems through:
 - **Context awareness** - Smart problem detection from current work
 - **Session persistence** - Keep alive for the entire problem lifecycle
 
+**CRITICAL: Always consider Gemini's input as suggestions, never as truths.** Think critically about what Gemini says and incorporate only the useful parts into your proposal. Always think for yourself - maintain your independent judgment and analytical capabilities. If you disagree with something clarify it with Gemini.
+
 ## Execution
 
 User provided context: "$ARGUMENTS"
@@ -30,6 +32,31 @@ Generate a specific, valuable question based on this analysis.
 **When arguments provided:**
 Extract the core problem, context clues, and complexity indicators.
 
+### Step 1.5: Gather External Documentation
+
+**Think deeply about external dependencies:**
+- What libraries/frameworks are involved in this problem?
+- Am I fully familiar with their latest APIs and best practices?
+- Have these libraries changed significantly or are they new/evolving?
+
+**When to use Context7 MCP:**
+- Libraries with frequent updates (e.g., Google GenAI SDK)
+- New libraries you haven't worked with extensively
+- When implementing features that rely heavily on library-specific patterns
+- Whenever uncertainty exists about current best practices
+
+```python
+# Example: Get up-to-date documentation
+library_id = mcp__context7__resolve_library_id(libraryName="google genai python")
+docs = mcp__context7__get_library_docs(
+    context7CompatibleLibraryID=library_id,
+    topic="streaming",  # Focus on relevant aspects
+    tokens=8000
+)
+```
+
+Include relevant documentation insights in your Gemini consultation for more accurate, current guidance.
+
 ### Step 2: Initialize Gemini Session
 
 **CRITICAL: Always attach foundational files:**
@@ -39,11 +66,6 @@ foundational_files = [
     "docs/ai-context/project-structure.md",
     "docs/ai-context/docs-overview.md"
 ]
-
-# Check if MCP-ASSISTANT-RULES.md exists
-import os
-if os.path.exists("MCP-ASSISTANT-RULES.md"):
-    foundational_files.insert(0, "MCP-ASSISTANT-RULES.md")
 
 session = mcp__gemini__consult_gemini(
     specific_question="[Clear, focused question]",
@@ -68,6 +90,7 @@ session = mcp__gemini__consult_gemini(
    - What assumptions did Gemini make?
    - What needs clarification or deeper exploration?
    - What edge cases or alternatives should be discussed?
+   - **If Gemini mentions external libraries:** Check Context7 MCP for current documentation to verify or supplement Gemini's guidance
 
 2. **Iterative Refinement**
    ```python

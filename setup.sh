@@ -679,6 +679,10 @@ EOF
     fi
     
     cat >> "$config_file" << EOF
+
+  },
+  "environment": {
+    "WORKSPACE": "$TARGET_DIR"
   }
 }
 EOF

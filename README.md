@@ -5,6 +5,10 @@
 
 An integrated system that transforms Claude Code into an orchestrated development environment through automated documentation management, multi-agent workflows, and external AI expertise.
 
+## Why Claude Code?
+
+Claude Code's Sub-Agents enable this highly automated, integrated approach. While other AI tools can likely use the documentation structure (see FAQ) and some commands, only Claude Code can currently orchestrate parallel agents and use this Development Kit to its full potential.
+
 ## 🎯 Why This Kit?
 
 > *Ever tried to build a large project with AI assistance, only to watch it struggle as your codebase grows?*
@@ -130,7 +134,9 @@ your-project/
 ├── docs/                  # Documentation templates and examples
 │   ├── ai-context/        # Core documentation files
 │   ├── open-issues/       # Issue tracking examples
-│   └── specs/             # Specification templates
+│   ├── specs/             # Specification templates
+│   ├── CONTEXT-tier2-component.md  # Component documentation template
+│   └── CONTEXT-tier3-feature.md    # Feature documentation template
 ├── logs/                  # Hook execution logs (created at runtime)
 ├── CLAUDE.md              # Your project's AI context (from template)
 └── MCP-ASSISTANT-RULES.md # MCP coding standards (if Gemini-Assistant-MCP selected)
@@ -364,6 +370,24 @@ The kit is designed for adaptation:
 ## Contributing
 
 The kit represents one approach to AI-assisted development. Contributions and adaptations are welcome.
+
+## FAQ
+
+**Q: Will the setup overwrite my existing files?**
+
+**A:** No, the installer detects existing files and prompts you to skip or overwrite each one. For safety, I highly recommend installing on a new Git branch. Safe is safe.
+
+**Q: Can I use this with other AI coding tools like Cursor, Cline, or Gemini CLI?**
+
+**A:** Partially. The documentation structure works with any tool (rename CLAUDE.md to match your tool's convention). However, commands are highly optimized for sub-agent usage and hooks are Claude Code-specific. Other tools would need significant adaptation of the orchestration features.
+
+**Q: How much will this cost in tokens?**
+
+**A:** This framework uses tokens heavily due to comprehensive context loading and sub-agent usage. I strongly recommend a Claude Code Max 20x subscription over pay-per-token API usage. The Claude 4 Opus model currently performs best for complex instruction following.
+
+**Q: Can I use other coding consultant MCPs like Zen instead for Gemini Consultation?**
+
+**A:** While technically possible, the templates and hooks are specifically configured and optimized for my Gemini MCP server (available through the link provided during installation). Using alternative coding consultant MCPs would require adjusting the templates, hooks, and potentially the command structures to match their specific interfaces and capabilities.
 
 ## Connect
 
