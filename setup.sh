@@ -569,52 +569,107 @@ generate_config() {
     # Start building the configuration
     cat > "$config_file" << EOF
 {
-  "environment": {
-    "WORKSPACE": "$TARGET_DIR"
-  },
-  "experimentalTools": {
+  "hooks": {
 EOF
 
-    # Add notification configuration if enabled
-    if [ "$INSTALL_NOTIFICATIONS" = "y" ]; then
-        cat >> "$config_file" << EOF
-    "notify": {
-      "commandAfterRun": "bash $TARGET_DIR/.claude/hooks/notify.sh",
-      "commandAfterUserInput": "bash $TARGET_DIR/.claude/hooks/notify.sh input"
-    }
-EOF
-    fi
+    # Track if we need commas between hook sections
+    local need_comma=false
     
-    cat >> "$config_file" << EOF
-  },
-  "experimentalHooks": {
-EOF
-
-    # Add hooks configuration
-    local hooks_added=false
-    
-    # Security scan hook (always enabled if MCP is used)
-    if [ "$INSTALL_CONTEXT7" = "y" ] || [ "$INSTALL_GEMINI" = "y" ]; then
-        cat >> "$config_file" << EOF
-    "preToolUse": "bash $TARGET_DIR/.claude/hooks/mcp-security-scan.sh",
-EOF
-        hooks_added=true
-    fi
+    # Add PreToolUse hooks
+    local pre_tool_hooks=""
     
     # Gemini context injector
     if [ "$INSTALL_GEMINI" = "y" ]; then
-        cat >> "$config_file" << EOF
-    "preToolUse_gemini": "bash $TARGET_DIR/.claude/hooks/gemini-context-injector.sh",
-EOF
-        hooks_added=true
+        pre_tool_hooks="${pre_tool_hooks}      {
+        \"matcher\": \"mcp__gemini__consult_gemini\",
+        \"hooks\": [
+          {
+            \"type\": \"command\",
+            \"command\": \"bash $TARGET_DIR/.claude/hooks/gemini-context-injector.sh\"
+          }
+        ]
+      }"
     fi
     
-    # Sub-agent context injector
-    cat >> "$config_file" << EOF
-    "preToolUse_task": "bash $TARGET_DIR/.claude/hooks/subagent-context-injector.sh"
+    # Security scan hook (for all MCP tools)
+    if [ "$INSTALL_CONTEXT7" = "y" ] || [ "$INSTALL_GEMINI" = "y" ]; then
+        if [ -n "$pre_tool_hooks" ]; then
+            pre_tool_hooks="${pre_tool_hooks},
+"
+        fi
+        pre_tool_hooks="${pre_tool_hooks}      {
+        \"matcher\": \"mcp__.*\",
+        \"hooks\": [
+          {
+            \"type\": \"command\",
+            \"command\": \"bash $TARGET_DIR/.claude/hooks/mcp-security-scan.sh\"
+          }
+        ]
+      }"
+    fi
+    
+    # Sub-agent context injector (always included)
+    if [ -n "$pre_tool_hooks" ]; then
+        pre_tool_hooks="${pre_tool_hooks},
+"
+    fi
+    pre_tool_hooks="${pre_tool_hooks}      {
+        \"matcher\": \"Task\",
+        \"hooks\": [
+          {
+            \"type\": \"command\",
+            \"command\": \"bash $TARGET_DIR/.claude/hooks/subagent-context-injector.sh\"
+          }
+        ]
+      }"
+    
+    # Write PreToolUse section if we have any hooks
+    if [ -n "$pre_tool_hooks" ]; then
+        cat >> "$config_file" << EOF
+    "PreToolUse": [
+${pre_tool_hooks}
+    ]
 EOF
+        need_comma=true
+    fi
+    
+    # Add Notification hooks if enabled
+    if [ "$INSTALL_NOTIFICATIONS" = "y" ]; then
+        if [ "$need_comma" = true ]; then
+            echo "," >> "$config_file"
+        fi
+        cat >> "$config_file" << EOF
+    "Notification": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $TARGET_DIR/.claude/hooks/notify.sh input"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $TARGET_DIR/.claude/hooks/notify.sh complete"
+          }
+        ]
+      }
+    ]
+EOF
+        need_comma=true
+    fi
     
     cat >> "$config_file" << EOF
+
+  },
+  "environment": {
+    "WORKSPACE": "$TARGET_DIR"
   }
 }
 EOF
