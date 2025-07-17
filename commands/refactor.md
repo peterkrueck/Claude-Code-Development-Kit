@@ -1,4 +1,4 @@
-You are working on the VR Language Learning App project. The user has requested to refactor specific files tagged with @ symbols in their arguments: "$ARGUMENTS"
+You are working on the current project. The user has requested to refactor specific files tagged with @ symbols in their arguments: "$ARGUMENTS"
 
 ## Auto-Loaded Project Context:
 @/CLAUDE.md

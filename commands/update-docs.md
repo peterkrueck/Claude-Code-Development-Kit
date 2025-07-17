@@ -1,4 +1,4 @@
-You have just completed work on the VR Language Learning App project. Analyze changes based on the provided context and automatically update relevant documentation.
+You have just completed work on the current project. Analyze changes based on the provided context and automatically update relevant documentation.
 
 ## Auto-Loaded Project Context:
 @/CLAUDE.md

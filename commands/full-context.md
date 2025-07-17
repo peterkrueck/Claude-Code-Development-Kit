@@ -1,4 +1,4 @@
-You are working on the VR Language Learning App project. Before proceeding with the user's request "$ARGUMENTS", you need to intelligently gather relevant project context using an adaptive sub-agent strategy.
+You are working on the current project. Before proceeding with the user's request "$ARGUMENTS", you need to intelligently gather relevant project context using an adaptive sub-agent strategy.
 
 ## Auto-Loaded Project Context:
 @/CLAUDE.md
