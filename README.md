@@ -5,6 +5,8 @@
 
 An integrated system that transforms Claude Code into an orchestrated development environment through automated documentation management, multi-agent workflows, and external AI expertise.
 
+> **Related**: Check out [Freigeist](https://www.freigeist.dev) - upcoming AI coding platform for complex projects!
+
 ## Why Claude Code?
 
 Claude Code's Sub-Agents enable this highly automated, integrated approach. While other AI tools can likely use the documentation structure (see FAQ) and some commands, only Claude Code can currently orchestrate parallel agents and use this Development Kit to its full potential.
@@ -388,6 +390,22 @@ The kit represents one approach to AI-assisted development. Contributions and ad
 **Q: Can I use other coding consultant MCPs like Zen instead for Gemini Consultation?**
 
 **A:** While technically possible, the templates and hooks are specifically configured and optimized for my Gemini MCP server (available through the link provided during installation). Using alternative coding consultant MCPs would require adjusting the templates, hooks, and potentially the command structures to match their specific interfaces and capabilities.
+
+**Q: Can I use this framework with an existing project?**
+
+**A:** Yes! The framework works well with existing projects. When installing, check if you already have a project structure or CLAUDE.md file and adjust accordingly during the setup prompts. To get started with an existing codebase, use Claude Code with sub-agents to understand your project and create the initial project-structure.md:
+
+```
+"Read and understand the project_structure.md template in docs/ai-context/project_structure.md. Your task is to fill out this template with our project's details. For this send out sub agents in parallel across the whole code base. Once the sub agents get back, ultrathink and create the markdown file."
+```
+
+After creating the project structure, use the framework's documentation generation system to create component-level and feature-level context files:
+
+```
+/create-docs "[your-main-component-path]/CONTEXT.md"
+```
+
+This approach lets the framework learn your existing architecture and systematically create appropriate documentation that matches your current project structure.
 
 ## Connect
 
