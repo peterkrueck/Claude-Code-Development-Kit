@@ -92,6 +92,10 @@ Claude Code's output quality directly depends on what it knows about your projec
 - **Required**: [Claude Code](https://github.com/anthropics/claude-code)
 - **Recommended**: MCP servers like [Context7](https://github.com/upstash/context7) and [Gemini Assistant](https://github.com/peterkrueck/mcp-gemini-assistant)
 
+#### Platform Support
+
+- **Windows**: ❌ (has reported bugs - use at your own risk)
+
 ### Installation
 
 #### Option 1: Quick Install (Recommended)
