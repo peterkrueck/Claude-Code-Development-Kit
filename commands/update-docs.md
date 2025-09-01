@@ -108,7 +108,7 @@ Think deeply about the documentation updates needed based on the auto-loaded pro
 - Changes that span 2-3 components or documentation tiers
 - Technology stack updates requiring validation across docs
 
-**Comprehensive Analysis** (3+ sub-agents):
+**Comprehensive Analysis** (3 or more sub-agents):
 - Complex architectural changes affecting multiple system areas
 - Major refactoring that restructures component relationships
 - New integrations that create cross-system dependencies

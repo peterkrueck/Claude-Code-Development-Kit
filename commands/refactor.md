@@ -34,7 +34,7 @@ Think deeply about the safest and most effective refactoring approach based on t
 - Files with moderate dependency footprint
 - When one aspect needs deep analysis (e.g., complex dependencies OR intricate file structure)
 
-**Comprehensive Analysis** (3+ sub-agents):
+**Comprehensive Analysis** (3 or more sub-agents):
 - High complexity files with multiple concerns
 - Extensive dependency networks
 - Novel refactoring patterns not seen in project

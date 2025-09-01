@@ -18,7 +18,7 @@ Think deeply about the optimal approach based on the project context that has be
 - For complex single-domain questions or tasks requiring thorough exploration
 - When dependencies and impacts need careful assessment
 
-**Multi-Perspective Analysis** (3+ sub-agents):
+**Multi-Perspective Analysis** (3 or more sub-agents):
 - When the request involves multiple areas, components, or technical domains
 - When comprehensive understanding requires different analytical perspectives
 - For tasks requiring careful dependency mapping and impact assessment
