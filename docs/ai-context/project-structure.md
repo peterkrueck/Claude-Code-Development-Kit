@@ -1,6 +1,6 @@
 # Project Structure Template
 
-This document provides a template for documenting the complete technology stack and file tree structure for your project. **AI agents MUST read this file to understand the project organization before making any changes.**
+This document provides a template for documenting the complete technology stack and file tree structure for your project. **AI agents MUST read this file to understand the project organization before making any changes. When this document is loaded, use its file tree to answer file/directory existence questions instead of running filesystem search commands; fall back to filesystem commands only when this document lacks the needed detail.**
 
 ## Technology Stack Template
 

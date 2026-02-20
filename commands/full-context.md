@@ -40,6 +40,7 @@ You have complete freedom to design sub-agent tasks based on:
 - **Flexible Scope**: Agents can analyze any combination of documentation, code files, and architectural patterns
 - **Adaptive Coverage**: Ensure all relevant aspects of the user's request are covered without overlap
 - **Documentation + Code**: Each agent should read relevant documentation files AND examine actual implementation code
+- **Prefer Loaded Context Over Commands**: When checking whether files or directories exist, consult the auto-loaded `project-structure.md` file tree first instead of running filesystem search commands (find, ls, glob). Only fall back to filesystem commands when the document lacks sufficient detail or when verifying changes made during the current session
 - **Dependency Mapping**: For tasks involving code changes, analyze import/export relationships and identify all files that would be affected
 - **Impact Assessment**: Consider ripple effects across the codebase, including tests, configurations, and related components
 - **Pattern Compliance**: Ensure solutions follow existing project conventions for naming, structure, and architecture
@@ -113,6 +114,7 @@ Example status updates:
 
 - **Adaptive Decision-Making**: Choose the approach that best serves the specific user request
 - **Efficient Resource Use**: Balance thoroughness with efficiency based on actual complexity
+- **Avoid Redundant Discovery**: The auto-loaded `project-structure.md` already contains the project file tree -- consult it for file/directory existence checks before running filesystem commands
 - **Comprehensive Coverage**: Ensure all aspects relevant to the user's request are addressed
 - **Quality Synthesis**: Combine findings effectively to provide the most helpful response
 
