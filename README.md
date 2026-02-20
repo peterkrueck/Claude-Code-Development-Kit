@@ -69,7 +69,8 @@ Claude Code's output quality directly depends on what it knows about your projec
 **The Solution:**
 ✅ **Intelligent automation** through hooks and commands:
 - Automatic updates of documentation through custom commands
-- Context injection for all Sub-agents and Gemini MCP calls 
+- Context injection for Gemini MCP calls via hooks
+- CLAUDE.md auto-injected into all sessions and sub-agents by Claude Code
 - Audio notifications for task completion (optional)
 - One-command workflows for complex tasks
 
@@ -103,7 +104,7 @@ Claude Code's output quality directly depends on what it knows about your projec
 Run this single command in your terminal:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/peterkrueck/Claude-Code-Development-Kit/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/drock/Claude-Code-Development-Kit/main/install.sh | bash
 ```
 
 This will:
@@ -119,7 +120,7 @@ https://github.com/user-attachments/assets/0b4a1e69-bddb-4b58-8de9-35f97919bf44
 #### Option 2: Clone and Install
 
 ```bash
-git clone https://github.com/peterkrueck/Claude-Code-Development-Kit.git
+git clone https://github.com/drock/Claude-Code-Development-Kit.git
 cd Claude-Code-Development-Kit
 ./setup.sh
 ```
@@ -136,7 +137,7 @@ your-project/
 │   │   ├── config/        # Security patterns configuration
 │   │   ├── sounds/        # Notification sounds (if notifications enabled)
 │   │   └── *.sh           # Hook scripts (based on your selections)
-│   └── settings.local.json # Generated Claude Code configuration
+│   └── settings.json      # Generated Claude Code configuration
 ├── docs/                  # Documentation templates and examples
 │   ├── ai-context/        # Core documentation files
 │   ├── open-issues/       # Issue tracking examples
@@ -158,7 +159,7 @@ your-project/
 
 2. **Install MCP servers** (if selected during setup):
    - Follow the links provided by the installer
-   - Configure in `.claude/settings.local.json`
+   - Configure in `.claude/settings.json`
 
 3. **Test your installation**:
    ```bash
@@ -225,10 +226,7 @@ Every command execution automatically loads critical documentation:
 @/docs/ai-context/docs-overview.md       # Documentation routing map
 ```
 
-The `subagent-context-injector.sh` hook extends auto-loading to all sub-agents:
-- Sub-agents spawned via the Task tool automatically receive the same core documentation
-- No manual context inclusion needed in Task prompts
-- Ensures consistent knowledge across all agents in multi-agent workflows
+Claude Code automatically injects CLAUDE.md into all sessions (CLI and web), including sub-agents spawned via the Task tool. This means any context, conventions, or instructions in CLAUDE.md are available to every agent without needing a hook.
 
 This ensures:
 - Consistent AI behavior across all sessions and sub-agents
@@ -257,13 +255,11 @@ The kit includes battle-tested hooks that enhance Claude Code's capabilities:
 
 - **Security Scanner** - Prevents accidental exposure of secrets when using MCP servers
 - **Gemini Context Injector** - Automatically includes project structure in Gemini consultations
-- **Subagent Context Injector** - Ensures all sub-agents receive core documentation automatically
 - **Notification System** - Provides non-blocking audio feedback for task completion and input requests (optional)
 
 These hooks integrate seamlessly with the command and MCP server workflows, providing:
 - Pre-execution security checks for all external AI calls
-- Automatic context enhancement for both external AI and sub-agents
-- Consistent knowledge across all agents in multi-agent workflows
+- Automatic context enhancement for external AI consultations
 - Developer awareness through pleasant, non-blocking audio notifications
 
 ## Common Tasks
@@ -318,8 +314,7 @@ your-project/
 │   │   ├── sounds/            # Notification audio files
 │   │   ├── gemini-context-injector.sh
 │   │   ├── mcp-security-scan.sh
-│   │   ├── notify.sh
-│   │   └── subagent-context-injector.sh
+│   │   └── notify.sh
 │   └── settings.json          # Claude Code configuration
 ├── docs/
 │   ├── ai-context/            # Foundation documentation (Tier 1)

@@ -11,11 +11,11 @@ After reading the [main kit documentation](../README.md), you'll understand how 
 - **Integrates MCP servers** when external expertise helps
 - **Maintains documentation** to keep AI context current
 
-### 🚀 Automatic Context Injection
+### Automatic Context Injection
 
-All commands benefit from automatic context injection via the `subagent-context-injector.sh` hook:
+Claude Code automatically injects CLAUDE.md into all sessions (CLI and web), including sub-agents spawned via the Task tool. This means any context, conventions, or instructions in CLAUDE.md are available to every agent without needing a hook.
 
-- **Core documentation auto-loaded**: Every command and sub-agent automatically receives `@/docs/CLAUDE.md`, `@/docs/ai-context/project-structure.md`, and `@/docs/ai-context/docs-overview.md`
+- **Core documentation auto-loaded**: Every session and sub-agent automatically receives CLAUDE.md content
 - **No manual context loading**: Sub-agents spawned by commands automatically have access to essential project documentation
 - **Consistent knowledge**: All agents start with the same foundational understanding
 
