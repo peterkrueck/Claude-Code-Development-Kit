@@ -391,13 +391,6 @@ copy_framework_files() {
     
     # Copy hooks based on user selections
     if [ -d "$SCRIPT_DIR/hooks" ]; then
-        # Always copy subagent context injector (core feature)
-        if [ -f "$SCRIPT_DIR/hooks/subagent-context-injector.sh" ]; then
-            copy_with_check "$SCRIPT_DIR/hooks/subagent-context-injector.sh" \
-                          "$TARGET_DIR/.claude/hooks/subagent-context-injector.sh" \
-                          "Hook script (core feature)"
-        fi
-        
         # Copy MCP security scanner if any MCP server is selected
         if [ "$INSTALL_CONTEXT7" = "y" ] || [ "$INSTALL_GEMINI" = "y" ]; then
             if [ -f "$SCRIPT_DIR/hooks/mcp-security-scan.sh" ]; then
@@ -564,7 +557,7 @@ set_permissions() {
 generate_config() {
     print_color "$YELLOW" "Generating configuration..."
     
-    local config_file="$TARGET_DIR/.claude/settings.local.json"
+    local config_file="$TARGET_DIR/.claude/settings.json"
     
     # Start building the configuration with new hooks format
     cat > "$config_file" << EOF
@@ -585,9 +578,6 @@ EOF
         pretooluse_hooks+=("gemini-context")
     fi
     
-    # Always add sub-agent context injector
-    pretooluse_hooks+=("subagent-context")
-    
     # Write PreToolUse hooks
     if [ ${#pretooluse_hooks[@]} -gt 0 ]; then
         cat >> "$config_file" << EOF
@@ -599,13 +589,13 @@ EOF
         # MCP security scanner
         if [[ " ${pretooluse_hooks[@]} " =~ " mcp-security " ]]; then
             [ "$first_hook" = false ] && echo "," >> "$config_file"
-            cat >> "$config_file" << EOF
+            cat >> "$config_file" << 'EOF'
       {
         "matcher": "mcp__",
         "hooks": [
           {
             "type": "command",
-            "command": "bash $TARGET_DIR/.claude/hooks/mcp-security-scan.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/mcp-security-scan.sh"
           }
         ]
       }
@@ -616,33 +606,19 @@ EOF
         # Gemini context injector
         if [[ " ${pretooluse_hooks[@]} " =~ " gemini-context " ]]; then
             [ "$first_hook" = false ] && echo "," >> "$config_file"
-            cat >> "$config_file" << EOF
+            cat >> "$config_file" << 'EOF'
       {
         "matcher": "mcp__gemini",
         "hooks": [
           {
             "type": "command",
-            "command": "bash $TARGET_DIR/.claude/hooks/gemini-context-injector.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/gemini-context-injector.sh"
           }
         ]
       }
 EOF
             first_hook=false
         fi
-        
-        # Sub-agent context injector
-        [ "$first_hook" = false ] && echo "," >> "$config_file"
-        cat >> "$config_file" << EOF
-      {
-        "matcher": "Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash $TARGET_DIR/.claude/hooks/subagent-context-injector.sh"
-          }
-        ]
-      }
-EOF
         
         cat >> "$config_file" << EOF
     ]
@@ -652,14 +628,14 @@ EOF
     # Add notification hooks if enabled
     if [ "$INSTALL_NOTIFICATIONS" = "y" ]; then
         [ ${#pretooluse_hooks[@]} -gt 0 ] && echo "," >> "$config_file"
-        cat >> "$config_file" << EOF
+        cat >> "$config_file" << 'EOF'
     "Notification": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "bash $TARGET_DIR/.claude/hooks/notify.sh input"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/notify.sh input"
           }
         ]
       }
@@ -670,7 +646,7 @@ EOF
         "hooks": [
           {
             "type": "command",
-            "command": "bash $TARGET_DIR/.claude/hooks/notify.sh complete"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/notify.sh complete"
           }
         ]
       }
@@ -711,7 +687,7 @@ display_mcp_info() {
         fi
         
         echo "After installing the MCP servers, add their configuration to:"
-        print_color "$BLUE" "  $TARGET_DIR/.claude/settings.local.json"
+        print_color "$BLUE" "  $TARGET_DIR/.claude/settings.json"
         echo
         echo "Add a 'mcpServers' section with the appropriate server configurations."
     fi

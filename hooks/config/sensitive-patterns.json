@@ -33,8 +33,9 @@
       ".jks"
     ],
     "regex_patterns": [
-      "sk-[a-zA-Z0-9]{32,}",
-      "sk-proj-[a-zA-Z0-9]{32,}",
+      "sk-[a-zA-Z0-9\\-_]{32,}",
+      "sk-ant-api[0-9]{2}-[a-zA-Z0-9\\-_]{20,}",
+      "sk-proj-[a-zA-Z0-9\\-_]{32,}",
       "AIza[0-9A-Za-z\\-_]{35}",
       "gsk_[a-zA-Z0-9]{32,}",
       "AKIA[0-9A-Z]{16}",

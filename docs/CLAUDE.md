@@ -129,10 +129,21 @@ def calculate_similarity(text1: str, text2: str) -> float:
   - Error: `{ "data": null, "error": {"message": "...", "code": "..."} }`
 
 
-## 4. Multi-Agent Workflows & Context Injection
+## 4. Multi-Agent Workflows & Context Management
 
-### Automatic Context Injection for Sub-Agents
-When using the Task tool to spawn sub-agents, the core project context (CLAUDE.md, project-structure.md, docs-overview.md) is automatically injected into their prompts via the subagent-context-injector hook. This ensures all sub-agents have immediate access to essential project documentation without the need of manual specification in each Task prompt.
+Claude Code automatically injects CLAUDE.md into all sessions (CLI and web),
+including sub-agents spawned via the Task tool. This means any context,
+conventions, or instructions in CLAUDE.md are available to every agent without
+needing a hook.
+
+**To ensure sub-agents have project context**, include key references in this
+file:
+- Project structure overview (or pointer to docs/ai-context/project-structure.md)
+- Coding standards and conventions
+- Key architectural decisions
+
+This replaces the previous subagent-context-injector hook approach, which only
+worked on CLI and did not fire on Claude Code web.
 
 
 ## 5. MCP Server Integrations
@@ -196,8 +207,8 @@ mcp__gemini__consult_gemini(
 mcp__context7__resolve_library_id(libraryName="react")
 
 # Fetch focused documentation
-mcp__context7__get_library_docs(
-    context7CompatibleLibraryID="/facebook/react",
+mcp__context7__query_docs(
+    libraryId="/facebook/react",
     topic="hooks",
     tokens=8000
 )

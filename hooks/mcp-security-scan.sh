@@ -23,7 +23,8 @@ log_security_event() {
     local details="$2"
     local tool_name="${3:-unknown}"
     local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-    echo "{\"timestamp\": \"$timestamp\", \"tool\": \"$tool_name\", \"event\": \"$event_type\", \"details\": \"$details\"}" >> "$LOG_FILE"
+    jq -n --arg ts "$timestamp" --arg tool "$tool_name" --arg evt "$event_type" --arg det "$details" \
+        '{"timestamp": $ts, "tool": $tool, "event": $evt, "details": $det}' >> "$LOG_FILE"
 }
 
 # Function to check if content matches sensitive patterns
@@ -32,26 +33,24 @@ check_sensitive_content() {
     local pattern_type="$2"
     
     # Get patterns from JSON config
-    local patterns=$(jq -r ".patterns.$pattern_type[]" "$PATTERNS_FILE" 2>/dev/null || echo "")
-    
-    for pattern in $patterns; do
+    while IFS= read -r pattern; do
+        [[ -z "$pattern" ]] && continue
         if echo "$content" | grep -qiE "$pattern"; then
             # Check whitelist
             local whitelisted=false
-            local whitelist_patterns=$(jq -r '.whitelist.allowed_mentions[]' "$PATTERNS_FILE" 2>/dev/null || echo "")
-            
-            for whitelist in $whitelist_patterns; do
+            while IFS= read -r whitelist; do
+                [[ -z "$whitelist" ]] && continue
                 if echo "$content" | grep -qF "$whitelist"; then
                     whitelisted=true
                     break
                 fi
-            done
-            
+            done < <(jq -r '.whitelist.allowed_mentions[]' "$PATTERNS_FILE" 2>/dev/null || true)
+
             if [[ "$whitelisted" == "false" ]]; then
                 return 0  # Found sensitive data
             fi
         fi
-    done
+    done < <(jq -r ".patterns.$pattern_type[]" "$PATTERNS_FILE" 2>/dev/null || true)
     
     return 1  # No sensitive data found
 }
@@ -127,12 +126,22 @@ main() {
     done
     
     # Check specific question for Context7
-    if [[ "$tool_name" == "mcp__context7__get-library-docs" ]]; then
-        local library_id=$(echo "$tool_args" | jq -r '.context7CompatibleLibraryID // ""' 2>/dev/null || echo "")
+    if [[ "$tool_name" == "mcp__context7__query-docs" ]]; then
+        local library_id=$(echo "$tool_args" | jq -r '.libraryId // ""' 2>/dev/null || echo "")
         # Basic check to prevent injection attacks
         if echo "$library_id" | grep -qE '(\$|`|;|&&|\|\||>|<)'; then
             log_security_event "blocked" "suspicious_library_id" "$tool_name"
             echo '{"decision": "block", "reason": "Security Alert: Detected suspicious characters in library ID that could indicate command injection. Please use only alphanumeric characters, hyphens, underscores, and forward slashes."}'
+            exit 2
+        fi
+    fi
+
+    if [[ "$tool_name" == "mcp__context7__resolve-library-id" ]]; then
+        local library_name=$(echo "$tool_args" | jq -r '.libraryName // ""' 2>/dev/null || echo "")
+        # Basic check to prevent injection attacks
+        if echo "$library_name" | grep -qE '(\$|`|;|&&|\|\||>|<)'; then
+            log_security_event "blocked" "suspicious_library_name" "$tool_name"
+            echo '{"decision": "block", "reason": "Security Alert: Detected suspicious characters in library name that could indicate command injection. Please use only alphanumeric characters, hyphens, underscores, and forward slashes."}'
             exit 2
         fi
     fi

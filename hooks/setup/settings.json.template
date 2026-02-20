@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${WORKSPACE}/.claude/hooks/gemini-context-injector.sh",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/gemini-context-injector.sh",
             "description": "Automatically adds project structure to new Gemini sessions"
           }
         ]
@@ -16,18 +16,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${WORKSPACE}/.claude/hooks/mcp-security-scan.sh",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/mcp-security-scan.sh",
             "description": "Scans for sensitive data before sending to external services"
-          }
-        ]
-      },
-      {
-        "matcher": "Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${WORKSPACE}/.claude/hooks/subagent-context-injector.sh",
-            "description": "Automatically adds project context to sub-agent prompts"
           }
         ]
       }
@@ -38,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${WORKSPACE}/.claude/hooks/notify.sh input",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/notify.sh input",
             "description": "Plays sound when Claude needs user input"
           }
         ]
@@ -50,14 +40,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${WORKSPACE}/.claude/hooks/notify.sh complete",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/notify.sh complete",
             "description": "Plays sound when Claude completes tasks"
           }
         ]
       }
     ]
-  },
-  "environment": {
-    "WORKSPACE": "/path/to/your/project"
   }
 }
