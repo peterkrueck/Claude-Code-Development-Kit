@@ -8,7 +8,7 @@
 set -euo pipefail
 
 # Configuration
-REPO_OWNER="peterkrueck"
+REPO_OWNER="drock"
 REPO_NAME="Claude-Code-Development-Kit"
 BRANCH="main"
 

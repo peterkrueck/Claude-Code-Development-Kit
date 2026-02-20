@@ -8,8 +8,7 @@ This directory contains battle-tested hooks that enhance your Claude Code develo
 Claude Code Lifecycle
         │
         ├── PreToolUse ──────► Security Scanner
-        │                      ├── Context Injector (Gemini)
-        │                      └── Context Injector (Subagents)
+        │                      └── Context Injector (Gemini)
         │
         ├── Tool Execution
         │
@@ -17,7 +16,7 @@ Claude Code Lifecycle
         │
         ├── Notification ────────► Audio Feedback
         │
-        └── Stop/SubagentStop ───► Completion Sound
+        └── Stop ───────────────► Completion Sound
 ```
 
 These hooks execute at specific points in Claude Code's lifecycle, providing deterministic control over AI behavior.
@@ -67,31 +66,7 @@ These hooks execute at specific points in Claude Code's lifecycle, providing det
 - Update sensitive file patterns
 - Extend the whitelist for your placeholders
 
-### 3. Subagent Context Injector (`subagent-context-injector.sh`)
-
-**Purpose**: Automatically includes core project documentation in all sub-agent Task prompts, ensuring consistent context across multi-agent workflows.
-
-**Trigger**: `PreToolUse` for `Task` tool
-
-**Features**:
-- Intercepts all Task tool calls before execution
-- Prepends references to three core documentation files:
-  - `docs/CLAUDE.md` - Project overview, coding standards, AI instructions
-  - `docs/ai-context/project-structure.md` - Complete file tree and tech stack
-  - `docs/ai-context/docs-overview.md` - Documentation architecture
-- Passes through non-Task tools unchanged
-- Preserves original task prompt by prepending context
-- Enables consistent knowledge across all sub-agents
-- Eliminates need for manual context inclusion in Task prompts
-
-**Benefits**:
-- Every sub-agent starts with the same foundational knowledge
-- No manual context specification needed in each Task prompt
-- Token-efficient through @ references instead of content duplication
-- Update context in one place, affects all sub-agents
-- Clean operation with simple pass-through for non-Task tools
-
-### 4. Notification System (`notify.sh`)
+### 3. Notification System (`notify.sh`)
 
 **Purpose**: Provides pleasant audio feedback when Claude Code needs your attention or completes tasks.
 
@@ -119,7 +94,7 @@ These hooks execute at specific points in Claude Code's lifecycle, providing det
    ```bash
    cp hooks/setup/settings.json.template your-project/.claude/settings.json
    ```
-   Then edit the WORKSPACE path in the settings file.
+   The template uses `$CLAUDE_PROJECT_DIR` which resolves automatically at runtime.
 
 3. **Test the hooks**:
    ```bash
@@ -145,7 +120,7 @@ Add to your Claude Code `settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "${WORKSPACE}/.claude/hooks/gemini-context-injector.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/gemini-context-injector.sh"
           }
         ]
       },
@@ -154,16 +129,7 @@ Add to your Claude Code `settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "${WORKSPACE}/.claude/hooks/mcp-security-scan.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${WORKSPACE}/.claude/hooks/subagent-context-injector.sh"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/mcp-security-scan.sh"
           }
         ]
       }
@@ -174,7 +140,7 @@ Add to your Claude Code `settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "${WORKSPACE}/.claude/hooks/notify.sh input"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/notify.sh input"
           }
         ]
       }
@@ -185,7 +151,7 @@ Add to your Claude Code `settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "${WORKSPACE}/.claude/hooks/notify.sh complete"
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/notify.sh complete"
           }
         ]
       }
@@ -227,7 +193,7 @@ The hooks system complements MCP server integrations:
    - Never log sensitive data in hooks
 
 3. **Configuration**:
-   - Use `${WORKSPACE}` variable for portability
+   - Use `$CLAUDE_PROJECT_DIR` variable for portability
    - Keep hooks executable (`chmod +x`)
    - Version control hook configurations
    - Document custom modifications
