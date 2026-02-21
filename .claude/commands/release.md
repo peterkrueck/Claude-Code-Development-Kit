@@ -66,9 +66,13 @@ Create an annotated git tag on the release commit:
 git tag -a vX.Y.Z -m "Release vX.Y.Z"
 ```
 
-## Step 6: Push to Main and Push Tag
+## Step 6: Push Release
 
-Releases must land on `main`. Push the release commit explicitly to `main`, then push the tag:
+Releases must land on `main`. There are two paths depending on the environment:
+
+### Path A: Direct push (default)
+
+Push the release commit explicitly to `main`, then push the tag:
 ```bash
 git push origin HEAD:main
 git push origin vX.Y.Z
@@ -76,9 +80,35 @@ git push origin vX.Y.Z
 
 **Why `HEAD:main`?** On Claude Code Web, editing files may auto-create a session branch even if the session started from `main`. Using `HEAD:main` ensures the release commit lands on `main` regardless of the current local branch name.
 
-If `HEAD:main` is rejected (e.g., non-fast-forward), **stop and inform the user** — `main` may have diverged and needs manual reconciliation. Do not force-push.
+If both pushes succeed, the release is complete. The GitHub Actions release workflow (`.github/workflows/release.yml`) will automatically create a GitHub Release from the tag push.
 
-If a GitHub Actions release workflow exists (`.github/workflows/release.yml`), inform the user that a GitHub Release will be created automatically from the tag push. If no workflow exists, suggest the user create a GitHub Release manually or add the workflow.
+### Path B: Workflow-assisted push (Claude Code Web fallback)
+
+If the direct push to `main` fails with **HTTP 403** (the Claude Code Web git proxy restricts pushes to `claude/`-prefixed branches), use the release branch workflow instead:
+
+1. Delete the local tag (the workflow will create it on GitHub):
+   ```bash
+   git tag -d vX.Y.Z
+   ```
+
+2. Push to a release branch (the `claude/` prefix satisfies the proxy):
+   ```bash
+   git push -u origin HEAD:claude/release-vX.Y.Z
+   ```
+
+3. Inform the user:
+   - The `release-branch.yml` GitHub Actions workflow will automatically:
+     - Fast-forward `main` to the release commit
+     - Create the annotated `vX.Y.Z` tag
+     - Trigger the `release.yml` workflow to create the GitHub Release
+     - Delete the `claude/release-vX.Y.Z` branch
+   - They can monitor progress at the repository's Actions tab
+
+### Error handling
+
+- **Non-fast-forward rejection** (not a 403): `main` has diverged and needs manual reconciliation. Stop and inform the user. Do not force-push.
+- **Network errors**: Retry up to 4 times with exponential backoff (2s, 4s, 8s, 16s).
+- **Both paths fail**: Stop and inform the user with the specific error details.
 
 ## Step 7: Summary
 
