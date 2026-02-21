@@ -1,5 +1,21 @@
 # Claude Code Development Kit
 
+## Project Structure — Templates vs CDK-Internal Files
+
+**CRITICAL:** This repository is a *kit* that gets installed into other projects. Most top-level directories are **templates** that will be copied into target projects. Only the `.claude/` directory is for managing THIS CDK project itself.
+
+### Template directories (for target projects that install the CDK)
+- `commands/` — Slash command templates (e.g., `/code-review`, `/refactor`, `/handoff`). These get installed into the target project's `.claude/commands/`.
+- `docs/` — Documentation templates (tier architecture, context files). Installed into the target project.
+- `hooks/` — Hook script templates (security scanning, notifications). Installed into the target project's `.claude/hooks/`.
+
+### CDK-internal files (for working on THIS repository)
+- `.claude/commands/` — Slash commands for CDK development only (e.g., `/release` for publishing new CDK versions).
+- `.claude/hooks/` — Hooks that run during CDK development sessions (e.g., `set-gh-default.sh`).
+- `.claude/settings.json` — Claude Code settings for CDK development.
+
+**Do NOT move template files into `.claude/`.** The `commands/`, `docs/`, and `hooks/` directories are intentionally at the repo root because they are templates, not active Claude Code configuration for this repo.
+
 ## Changelog & Release Process
 
 This project uses [Keep a Changelog](https://keepachangelog.com/) and [Semantic Versioning](https://semver.org/).
