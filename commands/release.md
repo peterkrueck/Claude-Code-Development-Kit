@@ -66,13 +66,17 @@ Create an annotated git tag on the release commit:
 git tag -a vX.Y.Z -m "Release vX.Y.Z"
 ```
 
-## Step 6: Push Commit and Tag
+## Step 6: Push to Main and Push Tag
 
-Push the commit to the current branch, then push the tag:
+Releases must land on `main`. Push the release commit explicitly to `main`, then push the tag:
 ```bash
-git push origin HEAD
+git push origin HEAD:main
 git push origin vX.Y.Z
 ```
+
+**Why `HEAD:main`?** On Claude Code Web, editing files may auto-create a session branch even if the session started from `main`. Using `HEAD:main` ensures the release commit lands on `main` regardless of the current local branch name.
+
+If `HEAD:main` is rejected (e.g., non-fast-forward), **stop and inform the user** — `main` may have diverged and needs manual reconciliation. Do not force-push.
 
 If a GitHub Actions release workflow exists (`.github/workflows/release.yml`), inform the user that a GitHub Release will be created automatically from the tag push. If no workflow exists, suggest the user create a GitHub Release manually or add the workflow.
 

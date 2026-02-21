@@ -12,6 +12,8 @@ When completing work that introduces user-facing changes, add an entry to the `[
 - **Improved** — enhancements to existing features (non-breaking)
 - **Removed** — removed features or capabilities
 
+**Consolidate entries:** Before adding a new entry, review existing `[Unreleased]` entries. If your change supersedes, revises, or reverts a previous unreleased entry, **update or replace** that entry instead of adding a new one. The `[Unreleased]` section represents the cumulative delta from the last release — end users never see intermediate states. For example, if an unreleased entry says "Changed button color from blue to red" and you now change it to black, update the entry to "Changed button color from blue to black" (or remove it entirely if it returns to the original state).
+
 Skip changelog entries for: internal refactors with no user-visible effect, test-only changes, CI/tooling changes, and documentation-only updates (unless documenting a new feature).
 
 ### Creating Releases
