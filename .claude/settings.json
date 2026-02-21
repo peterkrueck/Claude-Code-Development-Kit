@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/set-gh-default.sh",
+            "description": "Sets gh CLI default repo so PRs target this repository, not an upstream fork"
+          }
+        ]
+      }
+    ]
+  }
+}
