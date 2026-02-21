@@ -6,6 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased]
+
+### Added
+- `/release` command for user-initiated versioned releases from accumulated changelog entries
+- GitHub Actions workflow (`.github/workflows/release.yml`) to auto-create GitHub Releases on tag push
+- Root `CLAUDE.md` with changelog maintenance and release process instructions
+- SessionStart hook (`set-gh-default.sh`) for automatic `gh` CLI default repository configuration
+  - Writes `.git/.gh-resolved` at session start so PRs target the current repository, not the upstream fork
+  - Parses owner/repo from the git origin remote URL (supports HTTPS, SSH, and proxy formats)
+  - Writes the file directly instead of using `gh repo set-default` since `gh` CLI is unavailable in Claude Code Web
+  - Essential for Claude Code Web where `.git/` state does not persist between sessions
+  - Skips gracefully if already configured, not a git repo, or no origin remote
+  - Logs all events to `.claude/logs/gh-default.log`
+
+### Fixed
+- Removed subagent-context-injector hook (replaced by Claude Code's native CLAUDE.md auto-injection into all sessions and sub-agents)
+- Fixed security bugs in hook scripts: use portable `$CLAUDE_PROJECT_DIR` paths instead of hardcoded paths
+- Removed invalid `environment` field from generated Claude Code `settings.json`
+- Removed hardcoded project-specific references from command templates
+- Un-gitignored `.claude/` directory and `CLAUDE.md` for Claude Code Web compatibility
+
+### Improved
+- Updated CLAUDE.md to prefer `project-structure.md` file tree over filesystem commands for checking file existence
+- Updated CLAUDE.md to document automatic fork PR targeting via SessionStart hook
+- Comprehensive documentation updates across README, hooks README, and CHANGELOG for all new features
+
 ## [2.1.0] - 2025-07-11
 
 ### Added

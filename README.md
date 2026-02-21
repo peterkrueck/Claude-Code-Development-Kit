@@ -136,7 +136,9 @@ your-project/
 │   ├── hooks/             # Automation scripts
 │   │   ├── config/        # Security patterns configuration
 │   │   ├── sounds/        # Notification sounds (if notifications enabled)
-│   │   └── *.sh           # Hook scripts (based on your selections)
+│   │   ├── set-gh-default.sh  # SessionStart: configures PR targeting for forks
+│   │   └── *.sh           # Other hook scripts (based on your selections)
+│   ├── logs/              # Hook execution logs (created at runtime)
 │   └── settings.json      # Generated Claude Code configuration
 ├── docs/                  # Documentation templates and examples
 │   ├── ai-context/        # Core documentation files
@@ -256,11 +258,13 @@ The kit includes battle-tested hooks that enhance Claude Code's capabilities:
 - **Security Scanner** - Prevents accidental exposure of secrets when using MCP servers
 - **Gemini Context Injector** - Automatically includes project structure in Gemini consultations
 - **Notification System** - Provides non-blocking audio feedback for task completion and input requests (optional)
+- **GitHub Default Repo** - SessionStart hook that configures `gh` CLI so PRs target this repository instead of an upstream fork (essential for Claude Code Web where `.git/` state doesn't persist between sessions)
 
 These hooks integrate seamlessly with the command and MCP server workflows, providing:
 - Pre-execution security checks for all external AI calls
 - Automatic context enhancement for external AI consultations
 - Developer awareness through pleasant, non-blocking audio notifications
+- Correct PR targeting in forked repositories without manual intervention
 
 ## Common Tasks
 
@@ -314,7 +318,9 @@ your-project/
 │   │   ├── sounds/            # Notification audio files
 │   │   ├── gemini-context-injector.sh
 │   │   ├── mcp-security-scan.sh
-│   │   └── notify.sh
+│   │   ├── notify.sh
+│   │   └── set-gh-default.sh  # SessionStart: PR targeting for forks
+│   ├── logs/                  # Hook execution logs
 │   └── settings.json          # Claude Code configuration
 ├── docs/
 │   ├── ai-context/            # Foundation documentation (Tier 1)

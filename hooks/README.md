@@ -7,6 +7,8 @@ This directory contains battle-tested hooks that enhance your Claude Code develo
 ```
 Claude Code Lifecycle
         │
+        ├── SessionStart ──────► GitHub Default Repo
+        │
         ├── PreToolUse ──────► Security Scanner
         │                      └── Context Injector (Gemini)
         │
@@ -23,7 +25,23 @@ These hooks execute at specific points in Claude Code's lifecycle, providing det
 
 ## Available Hooks
 
-### 1. Gemini Context Injector (`gemini-context-injector.sh`)
+### 1. GitHub Default Repository (`set-gh-default.sh`)
+
+**Purpose**: Configures the `gh` CLI default repository so that PRs created from a fork target this repository instead of the upstream parent.
+
+**Trigger**: `SessionStart`
+
+**Why it's needed**: In forked repos, `gh pr create` defaults to the upstream parent repository. On Claude Code Web, `.git/` state does not persist between sessions, so any previous `gh repo set-default` configuration is lost. This hook runs automatically at the start of every session to ensure PRs always target the correct repository.
+
+**Features**:
+- Extracts owner/repo from the git origin remote URL
+- Supports multiple URL formats: HTTPS (`github.com/owner/repo.git`), SSH (`git@github.com:owner/repo.git`), and proxy (`http://proxy@host/git/owner/repo`)
+- Writes `.git/.gh-resolved` directly (same format as `gh repo set-default`)
+- Skips gracefully if already configured, not a git repo, or no origin remote
+- Logs all events to `.claude/logs/gh-default.log`
+- Does not require `gh` CLI to be installed (writes the config file directly)
+
+### 2. Gemini Context Injector (`gemini-context-injector.sh`)
 
 **Purpose**: Automatically includes your project documentation and assistant rules when starting new Gemini consultation sessions, ensuring the AI has complete context about your codebase and project standards.
 
@@ -45,7 +63,7 @@ These hooks execute at specific points in Claude Code's lifecycle, providing det
 - Customize it with your project-specific standards, principles, and constraints
 - The hook will automatically include it in Gemini consultations
 
-### 2. MCP Security Scanner (`mcp-security-scan.sh`)
+### 3. MCP Security Scanner (`mcp-security-scan.sh`)
 
 **Purpose**: Prevents accidental exposure of secrets, API keys, and sensitive data when using MCP servers like Gemini or Context7.
 
@@ -66,7 +84,7 @@ These hooks execute at specific points in Claude Code's lifecycle, providing det
 - Update sensitive file patterns
 - Extend the whitelist for your placeholders
 
-### 3. Notification System (`notify.sh`)
+### 4. Notification System (`notify.sh`)
 
 **Purpose**: Provides pleasant audio feedback when Claude Code needs your attention or completes tasks.
 
@@ -114,6 +132,18 @@ Add to your Claude Code `settings.json`:
 ```json
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/set-gh-default.sh",
+            "description": "Sets gh CLI default repo so PRs target this repository, not an upstream fork"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "mcp__gemini__consult_gemini",
