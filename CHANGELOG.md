@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased]
+
+### Added
+- SessionStart hook (`set-gh-default.sh`) that configures `gh` CLI default repository for forked repos
+  - Writes `.git/.gh-resolved` at session start so PRs target the current repository, not the upstream fork
+  - Parses owner/repo from the git origin remote URL (supports HTTPS, SSH, and proxy formats)
+  - Writes the file directly instead of using `gh repo set-default` since `gh` CLI is unavailable in Claude Code Web
+  - Essential for Claude Code Web where `.git/` state does not persist between sessions
+  - Skips gracefully if already configured, not a git repo, or no origin remote
+  - Logs all events to `.claude/logs/gh-default.log`
+
 ## [2.1.0] - 2025-07-11
 
 ### Added

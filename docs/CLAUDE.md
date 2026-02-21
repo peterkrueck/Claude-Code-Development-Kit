@@ -17,7 +17,7 @@
 ### General Instructions
 - Your most important job is to manage your own context. Always read any relevant files BEFORE planning changes.
 - When `project-structure.md` has been loaded or read, consult its file tree FIRST before running filesystem commands (find, ls, glob) to check whether files or directories exist. Use filesystem commands only as a fallback when the document lacks the needed detail or when you need to verify recent changes not yet reflected in the docs.
-- When this repository is a fork, ensure PRs target this repo, not the upstream. Run `gh repo set-default` at session start, or use `gh pr create --repo owner/repo` explicitly.
+- When this repository is a fork, PRs are automatically targeted to this repo by the `set-gh-default.sh` SessionStart hook (writes `.git/.gh-resolved`). If needed manually, use `gh pr create --repo owner/repo` explicitly.
 - When updating documentation, keep updates concise and on point to prevent bloat.
 - Write code following KISS, YAGNI, and DRY principles.
 - When in doubt follow proven best practices for implementation.
