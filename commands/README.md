@@ -94,6 +94,22 @@ Claude Code automatically injects CLAUDE.md into all sessions (CLI and web), inc
 
 **How it works**: Analyzes file structure, maps dependencies, identifies logical split points, and handles all import/export updates across the codebase.
 
+### 🏷️ `/release`
+**Purpose**: Create a new versioned release from accumulated `[Unreleased]` changelog entries.
+
+**When to use**:
+- Ready to cut a release after completing a set of changes
+- All changes are committed, tests pass, and the `[Unreleased]` section has entries
+
+**How it works**: Reads CHANGELOG.md, determines the version bump (from your input or auto-detected from change categories), moves unreleased entries to a new versioned section, updates the README badge, commits, tags, and pushes. A GitHub Action automatically creates a GitHub Release from the pushed tag.
+
+**Usage**:
+```bash
+/release minor           # Explicit bump type
+/release 2.3.0           # Explicit version
+/release                 # Auto-detect from changelog categories
+```
+
 ### 🤝 `/handoff`
 **Purpose**: Preserve context when ending a session or when the conversation becomes too long.
 
@@ -107,13 +123,14 @@ Claude Code automatically injects CLAUDE.md into all sessions (CLI and web), inc
 
 ## Integration Patterns
 
-### Typical Workflow
+### Typical Workflow (Feature → Release)
 ```bash
 /full-context "implement user notifications"    # Understand
 # ... implement the feature ...
-/code-review "review notification system"       # Validate  
+/code-review "review notification system"       # Validate
 /update-docs "document notification feature"    # Synchronize
-/handoff "completed notification system"        # Preserve
+/release minor                                  # Release
+/handoff "released notification system"         # Preserve
 ```
 
 ### Quick Analysis
