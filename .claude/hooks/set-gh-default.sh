@@ -3,8 +3,11 @@
 # Ensures `gh` CLI targets this repository (not an upstream fork) for PR creation.
 #
 # In forked repos, `gh pr create` defaults to the upstream parent repository.
-# This hook extracts owner/repo from the git origin remote and runs
-# `gh repo set-default` so PRs target the correct repository.
+# This hook extracts owner/repo from the git origin remote and writes
+# .git/.gh-resolved directly so PRs target the correct repository.
+#
+# Writes the file directly rather than using `gh repo set-default` since
+# the gh CLI is not available in Claude Code Web environments.
 #
 # Intended to run as a SessionStart hook so every new session is configured
 # automatically -- especially useful for Claude Code Web where .git/ state
@@ -27,14 +30,15 @@ log_event() {
 }
 
 main() {
-    # Skip if gh CLI is not available
-    if ! command -v gh &>/dev/null; then
-        log_event "skipped" "gh_cli_not_found"
+    # Find the git directory
+    local git_dir
+    git_dir=$(git rev-parse --git-dir 2>/dev/null) || {
+        log_event "skipped" "not_a_git_repo"
         exit 0
-    fi
+    }
 
     # Skip if already configured this session
-    if [[ -f ".git/.gh-resolved" ]]; then
+    if [[ -f "$git_dir/.gh-resolved" ]]; then
         log_event "skipped" "already_configured"
         exit 0
     fi
@@ -58,12 +62,9 @@ main() {
         exit 0
     fi
 
-    # Set the default repository for gh CLI
-    if gh repo set-default "$repo" 2>/dev/null; then
-        log_event "configured" "default_repo_set_to: $repo"
-    else
-        log_event "error" "gh_repo_set_default_failed_for: $repo"
-    fi
+    # Write .gh-resolved directly (same format as `gh repo set-default`)
+    echo "base=$repo" > "$git_dir/.gh-resolved"
+    log_event "configured" "default_repo_set_to: $repo"
 
     exit 0
 }
