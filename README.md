@@ -369,7 +369,7 @@ The kit is designed for adaptation:
 ## Documentation
 
 - [Documentation System Guide](docs/) - Understanding the 3-tier architecture
-- [Commands Reference](commands/) - Detailed command usage
+- [Commands Reference](.claude/commands/) - Detailed command usage
 - [MCP Integration](docs/CLAUDE.md) - Configuring external services
 - [Hooks System](hooks/) - Security scanning, context injection, and notifications
 - [Changelog](CHANGELOG.md) - Version history and migration guides

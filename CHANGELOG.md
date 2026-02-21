@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Logs all events to `.claude/logs/gh-default.log`
 
 ### Fixed
+- Moved slash commands from `commands/` to `.claude/commands/` so Claude Code recognizes them (e.g., `/release`)
 - Removed subagent-context-injector hook (replaced by Claude Code's native CLAUDE.md auto-injection into all sessions and sub-agents)
 - Fixed security bugs in hook scripts: use portable `$CLAUDE_PROJECT_DIR` paths instead of hardcoded paths
 - Removed invalid `environment` field from generated Claude Code `settings.json`
