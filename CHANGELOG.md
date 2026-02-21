@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Logs all events to `.claude/logs/gh-default.log`
 
 ### Fixed
-- Moved slash commands from `commands/` to `.claude/commands/` so Claude Code recognizes them (e.g., `/release`)
+- Moved `/release` command to `.claude/commands/` so Claude Code recognizes it (template commands remain in `commands/`)
 - Removed subagent-context-injector hook (replaced by Claude Code's native CLAUDE.md auto-injection into all sessions and sub-agents)
 - Fixed security bugs in hook scripts: use portable `$CLAUDE_PROJECT_DIR` paths instead of hardcoded paths
 - Removed invalid `environment` field from generated Claude Code `settings.json`
@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Un-gitignored `.claude/` directory and `CLAUDE.md` for Claude Code Web compatibility
 
 ### Improved
+- Added project structure guide to CLAUDE.md distinguishing template directories (`commands/`, `docs/`, `hooks/`) from CDK-internal files (`.claude/`)
 - Updated CLAUDE.md to prefer `project-structure.md` file tree over filesystem commands for checking file existence
 - Updated CLAUDE.md to document automatic fork PR targeting via SessionStart hook
 - Comprehensive documentation updates across README, hooks README, and CHANGELOG for all new features
