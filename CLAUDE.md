@@ -10,7 +10,7 @@
 - `hooks/` — Hook script templates (security scanning, notifications). Installed into the target project's `.claude/hooks/`.
 
 ### CDK-internal files (for working on THIS repository)
-- `.claude/commands/` — Slash commands for CDK development only (e.g., `/release` for publishing new CDK versions).
+- `.claude/commands/` — Slash commands for CDK development only.
 - `.claude/hooks/` — Hooks that run during CDK development sessions (e.g., `set-gh-default.sh`).
 - `.claude/settings.json` — Claude Code settings for CDK development.
 
@@ -37,12 +37,12 @@ Releases are handled by a manually-triggered GitHub Actions workflow (`.github/w
 
 The workflow:
 1. Validates that `[Unreleased]` has content
-2. Runs the `/release` command via Claude Code to update CHANGELOG.md and README badge
-3. Extracts the new version number and release notes
+2. Determines the new version (auto-detect from headings, bump keyword, or explicit version)
+3. Updates CHANGELOG.md (moves unreleased entries to a versioned section) and README badge via shell scripts
 4. Commits, tags (`vX.Y.Z`), and pushes to `main`
 5. Creates a GitHub Release with extracted release notes
 
-The `/release` command handles only file updates (CHANGELOG.md + README badge). Git operations are handled by the workflow.
+No API keys or external services are required — the workflow uses only bash/awk for file updates.
 
 Do not create releases, tags, or version bumps manually. Always use the workflow.
 
