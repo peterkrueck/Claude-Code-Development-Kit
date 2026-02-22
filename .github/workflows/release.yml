@@ -1,11 +1,10 @@
 name: Release
 
-# Manually-triggered release workflow. Handles the complete release process:
-#   1. Validates unreleased changelog entries exist
-#   2. Determines version (auto-detect, bump keyword, or explicit)
-#   3. Updates CHANGELOG.md and README.md version badge
-#   4. Commits, tags, and pushes to main
-#   5. Creates a GitHub Release with extracted release notes
+# Manually-triggered release workflow.
+#   1. Runs the /release command via Claude Code to update CHANGELOG.md and README.md
+#   2. Extracts the new version and release notes
+#   3. Commits, tags, and pushes to main
+#   4. Creates a GitHub Release
 
 on:
   workflow_dispatch:
@@ -47,80 +46,42 @@ jobs:
           echo "Unreleased content found:"
           echo "$CONTENT"
 
-      - name: Determine version
+      - name: Build release command arguments
+        id: args
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            echo "release_args=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "release_args=${{ inputs.bump }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run /release command via Claude Code
+        uses: anthropics/claude-code-action@v1
+        with:
+          prompt: "/release ${{ steps.args.outputs.release_args }}"
+          allowed_tools: "Read,Write,Edit,Glob,Grep"
+          direct_prompt: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Determine version from updated changelog
         id: version
         run: |
-          # Get latest released version
-          LATEST=$(grep -oP '(?<=^## \[)\d+\.\d+\.\d+' CHANGELOG.md | head -1)
-          if [ -z "$LATEST" ]; then
-            echo "::error::Could not find any released version in CHANGELOG.md"
+          # Extract the newest versioned heading (first one after [Unreleased])
+          VERSION=$(awk '/^## \[Unreleased\]/{next} /^## \[[0-9]+\.[0-9]+\.[0-9]+\]/{gsub(/.*\[|\].*/,""); print; exit}' CHANGELOG.md)
+          if [ -z "$VERSION" ]; then
+            echo "::error::Could not find new version in CHANGELOG.md after /release command"
             exit 1
-          fi
-          echo "Latest released version: $LATEST"
-
-          if [ -n "${{ inputs.version }}" ]; then
-            NEW_VERSION="${{ inputs.version }}"
-            echo "Using explicit version: $NEW_VERSION"
-          else
-            BUMP="${{ inputs.bump }}"
-
-            if [ "$BUMP" = "auto" ]; then
-              UNRELEASED=$(awk '/^## \[Unreleased\]/{found=1; next} /^## \[/{exit} found{print}' CHANGELOG.md)
-              if echo "$UNRELEASED" | grep -q '^### \(Changed\|Removed\)'; then
-                BUMP="major"
-              elif echo "$UNRELEASED" | grep -q '^### Added'; then
-                BUMP="minor"
-              else
-                BUMP="patch"
-              fi
-              echo "Auto-detected bump type: $BUMP"
-            fi
-
-            IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST"
-            case "$BUMP" in
-              major) NEW_VERSION="$((MAJOR+1)).0.0" ;;
-              minor) NEW_VERSION="${MAJOR}.$((MINOR+1)).0" ;;
-              patch) NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH+1))" ;;
-            esac
           fi
 
           # Validate tag doesn't already exist
-          if git rev-parse "v${NEW_VERSION}" >/dev/null 2>&1; then
-            echo "::error::Tag v${NEW_VERSION} already exists"
+          if git rev-parse "v${VERSION}" >/dev/null 2>&1; then
+            echo "::error::Tag v${VERSION} already exists"
             exit 1
           fi
 
-          echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
-          echo "Releasing version: $NEW_VERSION"
-
-      - name: Update CHANGELOG.md
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          DATE=$(date +%Y-%m-%d)
-
-          awk -v ver="$VERSION" -v date="$DATE" '
-            /^## \[Unreleased\]/ {
-              print "## [Unreleased]"
-              print ""
-              print ""
-              printf "## [%s] - %s\n", ver, date
-              in_unreleased = 1
-              next
-            }
-            /^## \[/ && in_unreleased {
-              in_unreleased = 0
-            }
-            { print }
-          ' CHANGELOG.md > CHANGELOG.tmp && mv CHANGELOG.tmp CHANGELOG.md
-
-          echo "Updated CHANGELOG.md:"
-          head -20 CHANGELOG.md
-
-      - name: Update README.md version badge
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          sed -i "s/changelog-v[0-9]*\.[0-9]*\.[0-9]*/changelog-v${VERSION}/" README.md
-          echo "Updated README badge to v${VERSION}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Releasing version: $VERSION"
 
       - name: Extract release notes
         run: |
@@ -140,19 +101,10 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.version }}"
 
-          # Get first bullet point for commit summary
-          SUMMARY=$(awk -v ver="$VERSION" '
-            /^## \[/ {
-              if (found) exit
-              if (index($0, "[" ver "]")) { found=1; next }
-            }
-            found && /^- / { sub(/^- /, ""); print; exit }
-          ' CHANGELOG.md)
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add CHANGELOG.md README.md
-          git commit -m "release: v${VERSION} — ${SUMMARY}"
+          git commit -m "release: v${VERSION}"
           git tag -a "v${VERSION}" -m "Release v${VERSION}"
           git push origin main --follow-tags
 

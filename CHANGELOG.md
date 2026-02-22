@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Replaced release workflows with a single manually-triggered (`workflow_dispatch`) GitHub Actions workflow that handles the complete release process: changelog updates, version badge, commit, tag, push, and GitHub Release creation
-- `/release` command now triggers the GitHub Actions release workflow instead of performing local git operations
+- Replaced release workflows with a single manually-triggered (`workflow_dispatch`) GitHub Actions workflow that runs `/release` via Claude Code, then commits, tags, pushes, and creates a GitHub Release
+- `/release` command now only updates CHANGELOG.md and README.md badge — git operations are handled by the workflow
 
 ### Removed
 - Removed `release-branch.yml` workflow (superseded by the manual-trigger release workflow)
