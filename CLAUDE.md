@@ -33,11 +33,19 @@ When completing work that introduces user-facing changes, add an entry to the `[
 Skip changelog entries for: internal refactors with no user-visible effect, test-only changes, CI/tooling changes, and documentation-only updates (unless documenting a new feature).
 
 ### Creating Releases
-Releases are user-initiated via the `/release` command. Do not create releases, tags, or version bumps automatically. The `/release` command handles:
-1. Moving `[Unreleased]` entries to a new versioned section with today's date
-2. Updating the README version badge
-3. Committing, tagging (`vX.Y.Z`), and pushing
-4. GitHub Release is auto-created by the `.github/workflows/release.yml` Action on tag push
+Releases are handled by a manually-triggered GitHub Actions workflow (`.github/workflows/release.yml`). The workflow can be triggered in two ways:
+- **From Claude Code**: Run `/release` which triggers the workflow via `gh workflow run`
+- **From GitHub UI**: Actions → Release → Run workflow
+
+The workflow handles the complete release process:
+1. Validates that `[Unreleased]` has content
+2. Determines the version (auto-detect from changelog headings, bump keyword, or explicit version)
+3. Moves `[Unreleased]` entries to a new versioned section with today's date
+4. Updates the README version badge
+5. Commits, tags (`vX.Y.Z`), and pushes to `main`
+6. Creates a GitHub Release with extracted release notes
+
+Do not create releases, tags, or version bumps manually. Always use the workflow.
 
 ### Version Bump Rules (SemVer)
 - **patch** (e.g., 2.1.0 → 2.1.1): bug fixes only

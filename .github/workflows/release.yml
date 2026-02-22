@@ -1,9 +1,29 @@
-name: Create GitHub Release
+name: Release
+
+# Manually-triggered release workflow. Handles the complete release process:
+#   1. Validates unreleased changelog entries exist
+#   2. Determines version (auto-detect, bump keyword, or explicit)
+#   3. Updates CHANGELOG.md and README.md version badge
+#   4. Commits, tags, and pushes to main
+#   5. Creates a GitHub Release with extracted release notes
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump type (auto detects from changelog headings)'
+        required: true
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+      version:
+        description: 'Explicit version (overrides bump type, e.g., 2.3.0 without v prefix)'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -12,32 +32,134 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
+        with:
+          ref: main
 
-      - name: Extract release notes from CHANGELOG.md
-        id: notes
+      - name: Validate unreleased changes
         run: |
-          # Get the tag name (strip leading 'v')
-          VERSION="${GITHUB_REF_NAME#v}"
+          CONTENT=$(awk '/^## \[Unreleased\]/{found=1; next} /^## \[/{exit} found{print}' CHANGELOG.md)
+          if [ -z "$(echo "$CONTENT" | tr -d '[:space:]')" ]; then
+            echo "::error::No unreleased changes found in CHANGELOG.md"
+            exit 1
+          fi
+          echo "Unreleased content found:"
+          echo "$CONTENT"
 
-          # Extract the section for this version from CHANGELOG.md
-          # Matches from "## [X.Y.Z]" up to (but not including) the next "## [" heading
-          NOTES=$(awk -v ver="$VERSION" '
-            /^## \[/ {
-              if (found) exit
-              if ($0 ~ "\\[" ver "\\]") found=1
+      - name: Determine version
+        id: version
+        run: |
+          # Get latest released version
+          LATEST=$(grep -oP '(?<=^## \[)\d+\.\d+\.\d+' CHANGELOG.md | head -1)
+          if [ -z "$LATEST" ]; then
+            echo "::error::Could not find any released version in CHANGELOG.md"
+            exit 1
+          fi
+          echo "Latest released version: $LATEST"
+
+          if [ -n "${{ inputs.version }}" ]; then
+            NEW_VERSION="${{ inputs.version }}"
+            echo "Using explicit version: $NEW_VERSION"
+          else
+            BUMP="${{ inputs.bump }}"
+
+            if [ "$BUMP" = "auto" ]; then
+              UNRELEASED=$(awk '/^## \[Unreleased\]/{found=1; next} /^## \[/{exit} found{print}' CHANGELOG.md)
+              if echo "$UNRELEASED" | grep -q '^### \(Changed\|Removed\)'; then
+                BUMP="major"
+              elif echo "$UNRELEASED" | grep -q '^### Added'; then
+                BUMP="minor"
+              else
+                BUMP="patch"
+              fi
+              echo "Auto-detected bump type: $BUMP"
+            fi
+
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST"
+            case "$BUMP" in
+              major) NEW_VERSION="$((MAJOR+1)).0.0" ;;
+              minor) NEW_VERSION="${MAJOR}.$((MINOR+1)).0" ;;
+              patch) NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH+1))" ;;
+            esac
+          fi
+
+          # Validate tag doesn't already exist
+          if git rev-parse "v${NEW_VERSION}" >/dev/null 2>&1; then
+            echo "::error::Tag v${NEW_VERSION} already exists"
+            exit 1
+          fi
+
+          echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Releasing version: $NEW_VERSION"
+
+      - name: Update CHANGELOG.md
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          DATE=$(date +%Y-%m-%d)
+
+          awk -v ver="$VERSION" -v date="$DATE" '
+            /^## \[Unreleased\]/ {
+              print "## [Unreleased]"
+              print ""
+              print ""
+              printf "## [%s] - %s\n", ver, date
+              in_unreleased = 1
               next
             }
+            /^## \[/ && in_unreleased {
+              in_unreleased = 0
+            }
+            { print }
+          ' CHANGELOG.md > CHANGELOG.tmp && mv CHANGELOG.tmp CHANGELOG.md
+
+          echo "Updated CHANGELOG.md:"
+          head -20 CHANGELOG.md
+
+      - name: Update README.md version badge
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          sed -i "s/changelog-v[0-9]*\.[0-9]*\.[0-9]*/changelog-v${VERSION}/" README.md
+          echo "Updated README badge to v${VERSION}"
+
+      - name: Extract release notes
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          awk -v ver="$VERSION" '
+            /^## \[/ {
+              if (found) exit
+              if (index($0, "[" ver "]")) { found=1; next }
+            }
             found { print }
+          ' CHANGELOG.md > release_notes.md
+
+          echo "Release notes:"
+          cat release_notes.md
+
+      - name: Commit, tag, and push
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Get first bullet point for commit summary
+          SUMMARY=$(awk -v ver="$VERSION" '
+            /^## \[/ {
+              if (found) exit
+              if (index($0, "[" ver "]")) { found=1; next }
+            }
+            found && /^- / { sub(/^- /, ""); print; exit }
           ' CHANGELOG.md)
 
-          # Write to file to preserve multiline content
-          echo "$NOTES" > release_notes.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md README.md
+          git commit -m "release: v${VERSION} — ${SUMMARY}"
+          git tag -a "v${VERSION}" -m "Release v${VERSION}"
+          git push origin main --follow-tags
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ github.ref_name }}
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
           body_path: release_notes.md
           generate_release_notes: false

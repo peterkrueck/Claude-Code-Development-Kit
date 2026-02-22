@@ -1,130 +1,58 @@
-Execute the project's release process to create a new versioned release from the current `[Unreleased]` changelog entries.
+Trigger the GitHub Actions release workflow to create a new versioned release from the current `[Unreleased]` changelog entries.
 
 ## Auto-Loaded Project Context:
 @/CLAUDE.md
 @/CHANGELOG.md
 
-## Step 1: Determine Release Version
+## Step 1: Validate Unreleased Changes
+
+Read CHANGELOG.md and check that the `[Unreleased]` section has content. If empty, stop and tell the user there are no unreleased changes to release.
+
+## Step 2: Determine Workflow Inputs
 
 ### Parse user input from `$ARGUMENTS`:
-- **Explicit version** (e.g., "2.3.0"): Use as-is
-- **Bump keyword** ("major", "minor", "patch"): Calculate from the latest released version in CHANGELOG.md
-- **No input**: Auto-detect the bump type from `[Unreleased]` entries:
-  - Contains `### Added` with new features → **minor**
-  - Contains only `### Fixed` or `### Improved` → **patch**
-  - Contains `### Changed` with breaking changes or `### Removed` → **major**
-  - When in doubt, default to **minor**
+- **Explicit version** (e.g., "2.3.0"): Will pass as `version` input to the workflow
+- **Bump keyword** ("major", "minor", "patch"): Will pass as `bump` input
+- **No input**: Will use `bump=auto` (the workflow auto-detects from changelog headings)
 
-### Validate:
-- `[Unreleased]` section in CHANGELOG.md must have content (not empty). If empty, stop and tell the user there are no unreleased changes to release.
-- The computed version must be greater than the current latest version.
+### Show the user what will happen:
+- Display the unreleased changelog entries
+- State the version/bump that will be used
+- Ask for confirmation before triggering
 
-## Step 2: Update CHANGELOG.md
+## Step 3: Trigger the GitHub Actions Workflow
 
-1. **Read** the current CHANGELOG.md
-2. **Replace** `## [Unreleased]` and its content with:
-   - A fresh, empty `## [Unreleased]` section (two blank lines after it)
-   - A new `## [X.Y.Z] - YYYY-MM-DD` section containing the previous unreleased content
-3. **Preserve** all existing versioned sections below unchanged
+Use the GitHub CLI to trigger the release workflow:
 
-### Expected result structure:
-```
-## [Unreleased]
-
-
-## [X.Y.Z] - YYYY-MM-DD
-
-### Added
-- (moved from unreleased)
-...
-
-## [previous version] - previous date
-...
-```
-
-## Step 3: Update Version Badge in README.md
-
-Find the changelog badge line:
-```
-[![Changelog](https://img.shields.io/badge/changelog-vX.Y.Z-orange.svg)](CHANGELOG.md)
-```
-Update the version to the new release version.
-
-## Step 4: Commit the Release
-
-Stage only the changed files and create a commit:
-```
-release: vX.Y.Z — <brief summary of key changes>
-```
-
-The summary should be derived from the most notable entries in the release section (1 short line).
-
-## Step 5: Create Git Tag
-
-Create an annotated git tag on the release commit:
 ```bash
-git tag -a vX.Y.Z -m "Release vX.Y.Z"
+# With auto-detect (default):
+gh workflow run release.yml -f bump=auto
+
+# With explicit bump:
+gh workflow run release.yml -f bump=minor
+
+# With explicit version:
+gh workflow run release.yml -f bump=auto -f version=2.3.0
 ```
 
-## Step 6: Push Release
+**Important**: Only pass the `version` field if the user provided an explicit version. Otherwise, use only the `bump` field.
 
-Releases must land on `main`. There are two paths depending on the environment:
+## Step 4: Monitor and Report
 
-### Path A: Direct push (default)
+After triggering, inform the user:
+- The workflow has been triggered
+- They can monitor progress at the repository's **Actions** tab
+- The workflow will: update CHANGELOG.md, update the README badge, commit, tag, push, and create a GitHub Release
+- The release commit and tag will appear on `main` when complete
 
-Push the release commit explicitly to `main`, then push the tag:
+Optionally, wait a moment and check the workflow status:
 ```bash
-git push origin HEAD:main
-git push origin vX.Y.Z
-```
-
-**Why `HEAD:main`?** On Claude Code Web, editing files may auto-create a session branch even if the session started from `main`. Using `HEAD:main` ensures the release commit lands on `main` regardless of the current local branch name.
-
-If both pushes succeed, the release is complete. The GitHub Actions release workflow (`.github/workflows/release.yml`) will automatically create a GitHub Release from the tag push.
-
-### Path B: Workflow-assisted push (Claude Code Web fallback)
-
-If the direct push to `main` fails with **HTTP 403** (the Claude Code Web git proxy restricts pushes to `claude/`-prefixed branches), use the release branch workflow instead:
-
-1. Delete the local tag (the workflow will create it on GitHub):
-   ```bash
-   git tag -d vX.Y.Z
-   ```
-
-2. Push to a release branch (the `claude/` prefix satisfies the proxy):
-   ```bash
-   git push -u origin HEAD:claude/release-vX.Y.Z
-   ```
-
-3. Inform the user:
-   - The `release-branch.yml` GitHub Actions workflow will automatically:
-     - Fast-forward `main` to the release commit
-     - Create the annotated `vX.Y.Z` tag
-     - Trigger the `release.yml` workflow to create the GitHub Release
-     - Delete the `claude/release-vX.Y.Z` branch
-   - They can monitor progress at the repository's Actions tab
-
-### Error handling
-
-- **Non-fast-forward rejection** (not a 403): `main` has diverged and needs manual reconciliation. Stop and inform the user. Do not force-push.
-- **Network errors**: Retry up to 4 times with exponential backoff (2s, 4s, 8s, 16s).
-- **Both paths fail**: Stop and inform the user with the specific error details.
-
-## Step 7: Summary
-
-Output a clear summary:
-```
-Released vX.Y.Z
-
-- Changelog: updated with N entries
-- README badge: updated to vX.Y.Z
-- Git tag: vX.Y.Z created and pushed
-- GitHub Release: (auto-created by workflow / manual step needed)
+gh run list --workflow=release.yml --limit=1
 ```
 
 ## Error Handling
 
-- **Empty [Unreleased] section**: Stop early with a clear message — nothing to release.
-- **No CHANGELOG.md**: Stop and inform the user the project needs a CHANGELOG.md following Keep a Changelog format.
-- **Git push failure**: Retry up to 4 times with exponential backoff (2s, 4s, 8s, 16s) for network errors. For permission errors, stop and inform the user.
-- **Tag already exists**: Stop and inform the user the tag already exists — they may need to specify a different version.
+- **Empty [Unreleased] section**: Stop early — nothing to release.
+- **No CHANGELOG.md**: Stop and inform the user.
+- **`gh` CLI unavailable**: Inform the user they can trigger the workflow manually from the GitHub Actions tab (Actions → Release → Run workflow).
+- **Workflow trigger failure**: Show the error and suggest triggering manually from the GitHub UI.
