@@ -2,7 +2,7 @@ name: Release
 
 # Manually-triggered release workflow.
 #   1. Validates unreleased changelog entries exist
-#   2. Determines the new version (auto-detect, bump keyword, or explicit)
+#   2. Determines the new version (bump keyword or explicit version)
 #   3. Updates CHANGELOG.md and README.md badge
 #   4. Commits, tags, and pushes to main
 #   5. Creates a GitHub Release
@@ -11,12 +11,11 @@ on:
   workflow_dispatch:
     inputs:
       bump:
-        description: 'Version bump type (auto detects from changelog headings)'
+        description: 'Version bump type (ignored if explicit version is provided)'
         required: true
-        default: 'auto'
+        default: 'patch'
         type: choice
         options:
-          - auto
           - patch
           - minor
           - major
@@ -60,32 +59,15 @@ jobs:
 
           IFS='.' read -r MAJOR MINOR PATCH <<< "$LATEST"
 
-          # Determine bump type
+          # Determine new version
           if [ -n "${{ inputs.version }}" ]; then
             NEW_VERSION="${{ inputs.version }}"
           else
             BUMP="${{ inputs.bump }}"
-            if [ "$BUMP" = "auto" ]; then
-              # Auto-detect from unreleased changelog headings
-              UNRELEASED=$(awk '/^## \[Unreleased\]/{found=1; next} /^## \[/{exit} found{print}' CHANGELOG.md)
-              if echo "$UNRELEASED" | grep -q '^### \(Changed\|Removed\)'; then
-                BUMP="major"
-              elif echo "$UNRELEASED" | grep -q '^### Added'; then
-                BUMP="minor"
-              else
-                BUMP="patch"
-              fi
-              echo "Auto-detected bump type: $BUMP"
-            fi
-
             case "$BUMP" in
               major) NEW_VERSION="$((MAJOR + 1)).0.0" ;;
               minor) NEW_VERSION="${MAJOR}.$((MINOR + 1)).0" ;;
               patch) NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))" ;;
-              *)
-                echo "::error::Unknown bump type: $BUMP"
-                exit 1
-                ;;
             esac
           fi
 
