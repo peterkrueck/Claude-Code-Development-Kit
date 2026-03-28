@@ -24,11 +24,12 @@ your-project/
 │   ├── commands/
 │   │   └── prime.md                    # /prime — load core project context
 │   ├── hooks/
-│   │   ├── stop-pipeline.sh            # Review -> test -> docs gate on stop
+│   │   ├── review-on-stop.sh           # Advisory review nudge on stop
+│   │   ├── snapshot-baseline.sh        # Session baseline capture
 │   │   ├── security-scan.sh            # MCP/plugin sensitive data scanner
 │   │   ├── notify.sh                   # Audio notifications
 │   │   ├── config/
-│   │   │   ├── pipeline.json           # Stop pipeline configuration
+│   │   │   ├── pipeline.json           # Review-on-stop configuration
 │   │   │   └── sensitive-patterns.json # Security scan patterns
 │   │   └── sounds/
 │   │       ├── complete.wav

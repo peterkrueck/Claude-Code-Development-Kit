@@ -27,7 +27,7 @@ INSTALL_REVIEW_SKILLS="n"
 INSTALL_VISUAL_SKILLS="n"
 INSTALL_DEPLOY_TEMPLATE="n"
 INSTALL_GEMINI="n"
-INSTALL_STOP_PIPELINE="n"
+INSTALL_REVIEW_ON_STOP="n"
 INSTALL_NOTIFICATIONS="n"
 
 print_color() {
@@ -192,13 +192,14 @@ main() {
     safe_read_yn INSTALL_GEMINI "    Install GEMINI.md template? (y/n): "
     echo
 
-    # Stop Pipeline
-    print_color "$CYAN" "  Stop Pipeline Hook"
-    echo "    Prevents Claude from stopping until quality checks pass."
-    echo "    When you have 10+ lines of uncommitted changes, it gates"
-    echo "    stopping on: code review -> run tests -> update docs."
-    echo "    Each phase is configurable and can be disabled individually."
-    safe_read_yn INSTALL_STOP_PIPELINE "    Install stop pipeline? (y/n): "
+    # Review-on-Stop
+    print_color "$CYAN" "  Review-on-Stop Hook"
+    echo "    Nudges you to review before finishing. When you have 10+"
+    echo "    lines of new code, the first stop shows an advisory with"
+    echo "    changed files and suggests review/test/docs. Stop again"
+    echo "    to get a reminder, stop a third time to skip entirely."
+    echo "    Never traps you — three stops always gets you out."
+    safe_read_yn INSTALL_REVIEW_ON_STOP "    Install review-on-stop? (y/n): "
     echo
 
     # Notifications
@@ -217,7 +218,7 @@ main() {
     [ "$INSTALL_VISUAL_SKILLS" = "y" ] && echo "    - Visual skills (/image-gen, /image-edit, /bg-remove)"
     [ "$INSTALL_DEPLOY_TEMPLATE" = "y" ] && echo "    - Deploy skill template"
     [ "$INSTALL_GEMINI" = "y" ] && echo "    - GEMINI.md template"
-    [ "$INSTALL_STOP_PIPELINE" = "y" ] && echo "    - Stop pipeline hook"
+    [ "$INSTALL_REVIEW_ON_STOP" = "y" ] && echo "    - Review-on-stop hook"
     [ "$INSTALL_NOTIFICATIONS" = "y" ] && echo "    - Audio notifications"
     echo
     safe_read_yn confirm "  Continue? (y/n): "
@@ -236,7 +237,7 @@ main() {
         [ ! -f "$TARGET_DIR/docs/$d/.gitkeep" ] && touch "$TARGET_DIR/docs/$d/.gitkeep"
     done
 
-    if [ "$INSTALL_NOTIFICATIONS" = "y" ] || [ "$INSTALL_STOP_PIPELINE" = "y" ]; then
+    if [ "$INSTALL_NOTIFICATIONS" = "y" ] || [ "$INSTALL_REVIEW_ON_STOP" = "y" ]; then
         mkdir -p "$TARGET_DIR/.claude/hooks/sounds"
     fi
 
@@ -311,14 +312,15 @@ main() {
         fi
     fi
 
-    # Stop pipeline hook
-    if [ "$INSTALL_STOP_PIPELINE" = "y" ]; then
-        copy_file "$SCRIPT_DIR/hooks/stop-pipeline.sh" "$TARGET_DIR/.claude/hooks/stop-pipeline.sh" "Hook"
+    # Review-on-stop hook
+    if [ "$INSTALL_REVIEW_ON_STOP" = "y" ]; then
+        copy_file "$SCRIPT_DIR/hooks/review-on-stop.sh" "$TARGET_DIR/.claude/hooks/review-on-stop.sh" "Hook"
+        copy_file "$SCRIPT_DIR/hooks/snapshot-baseline.sh" "$TARGET_DIR/.claude/hooks/snapshot-baseline.sh" "Hook"
         copy_file "$SCRIPT_DIR/hooks/config/pipeline.json" "$TARGET_DIR/.claude/hooks/config/pipeline.json" "Config"
     fi
 
     # Notification sounds
-    if [ "$INSTALL_NOTIFICATIONS" = "y" ] || [ "$INSTALL_STOP_PIPELINE" = "y" ]; then
+    if [ "$INSTALL_NOTIFICATIONS" = "y" ] || [ "$INSTALL_REVIEW_ON_STOP" = "y" ]; then
         copy_file "$SCRIPT_DIR/hooks/notify.sh" "$TARGET_DIR/.claude/hooks/notify.sh" "Hook"
         for sound in "$SCRIPT_DIR/hooks/sounds/"*; do
             [ -f "$sound" ] && copy_file "$sound" "$TARGET_DIR/.claude/hooks/sounds/$(basename "$sound")" "Sound"
@@ -363,23 +365,31 @@ main() {
     }]}')
 
     # Stop hook
-    if [ "$INSTALL_STOP_PIPELINE" = "y" ]; then
+    if [ "$INSTALL_REVIEW_ON_STOP" = "y" ]; then
         hooks_json=$(echo "$hooks_json" | jq --arg dir "$TARGET_DIR" '. + {"Stop": [{
-            "hooks": [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/stop-pipeline.sh"), "timeout": 10000}]
+            "hooks": [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/review-on-stop.sh"), "timeout": 10000}]
         }]}')
     fi
 
     # Notification hook
+    local notification_hooks='[]'
     if [ "$INSTALL_NOTIFICATIONS" = "y" ]; then
-        hooks_json=$(echo "$hooks_json" | jq --arg dir "$TARGET_DIR" '. + {"Notification": [{
-            "hooks": [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/notify.sh input")}]
+        notification_hooks=$(echo "$notification_hooks" | jq --arg dir "$TARGET_DIR" \
+            '. + [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/notify.sh input")}]')
+    fi
+    if [ "$INSTALL_REVIEW_ON_STOP" = "y" ]; then
+        notification_hooks=$(echo "$notification_hooks" | jq --arg dir "$TARGET_DIR" \
+            '. + [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/snapshot-baseline.sh")}]')
+    fi
+    if [ "$(echo "$notification_hooks" | jq 'length')" -gt 0 ]; then
+        hooks_json=$(echo "$hooks_json" | jq --argjson nh "$notification_hooks" '. + {"Notification": [{"hooks": $nh}]}')
+    fi
+
+    # Add stop notification if notifications enabled but review-on-stop is NOT (it handles its own completion sound)
+    if [ "$INSTALL_NOTIFICATIONS" = "y" ] && [ "$INSTALL_REVIEW_ON_STOP" != "y" ]; then
+        hooks_json=$(echo "$hooks_json" | jq --arg dir "$TARGET_DIR" '. + {"Stop": [{
+            "hooks": [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/notify.sh complete")}]
         }]}')
-        # Add stop notification if stop pipeline is NOT installed (pipeline handles its own completion sound)
-        if [ "$INSTALL_STOP_PIPELINE" != "y" ]; then
-            hooks_json=$(echo "$hooks_json" | jq --arg dir "$TARGET_DIR" '. + {"Stop": [{
-                "hooks": [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/notify.sh complete")}]
-            }]}')
-        fi
     fi
 
     # Compose final settings

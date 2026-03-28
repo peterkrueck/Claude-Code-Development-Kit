@@ -2,8 +2,9 @@
   "enabled": true,
   "min_lines_changed": 10,
   "file_patterns": ["*.py", "*.ts", "*.js", "*.swift", "*.go", "*.rs"],
-  "test_file_patterns": ["*.ts", "*.py", "*.js"],
+  "review_command": "/review-work",
   "test_command": null,
+  "docs_command": "/update-docs",
   "phases": {
     "review": true,
     "tests": true,
