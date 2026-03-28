@@ -197,17 +197,20 @@ main() {
     mkdir -p "$TARGET_DIR/.claude/hooks/config"
     mkdir -p "$TARGET_DIR/.claude/skills"
     mkdir -p "$TARGET_DIR/docs/ai-context"
-    mkdir -p "$TARGET_DIR/docs/legal"
-    mkdir -p "$TARGET_DIR/docs/business"
-    mkdir -p "$TARGET_DIR/docs/design-brand"
-    mkdir -p "$TARGET_DIR/docs/open-issues"
+    for d in legal business design-brand open-issues; do
+        mkdir -p "$TARGET_DIR/docs/$d"
+        [ ! -f "$TARGET_DIR/docs/$d/.gitkeep" ] && touch "$TARGET_DIR/docs/$d/.gitkeep"
+    done
 
     if [ "$INSTALL_NOTIFICATIONS" = "y" ] || [ "$INSTALL_STOP_PIPELINE" = "y" ]; then
         mkdir -p "$TARGET_DIR/.claude/hooks/sounds"
     fi
 
     if [ "$INSTALL_ASSETS" = "y" ]; then
-        mkdir -p "$TARGET_DIR/assets"/{app-icon,character,logo,social,web}
+        for d in app-icon character logo social web; do
+            mkdir -p "$TARGET_DIR/assets/$d"
+            [ ! -f "$TARGET_DIR/assets/$d/.gitkeep" ] && touch "$TARGET_DIR/assets/$d/.gitkeep"
+        done
     fi
 
     # ── Copy core files ──────────────────────────────────────────────────
@@ -346,12 +349,12 @@ main() {
     # Notification hook
     if [ "$INSTALL_NOTIFICATIONS" = "y" ]; then
         hooks_json=$(echo "$hooks_json" | jq --arg dir "$TARGET_DIR" '. + {"Notification": [{
-            "hooks": [{"type": "command", "command": ($dir + "/.claude/hooks/notify.sh input")}]
+            "hooks": [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/notify.sh input")}]
         }]}')
         # Add stop notification if stop pipeline is NOT installed (pipeline handles its own completion sound)
         if [ "$INSTALL_STOP_PIPELINE" != "y" ]; then
             hooks_json=$(echo "$hooks_json" | jq --arg dir "$TARGET_DIR" '. + {"Stop": [{
-                "hooks": [{"type": "command", "command": ($dir + "/.claude/hooks/notify.sh complete")}]
+                "hooks": [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/notify.sh complete")}]
             }]}')
         fi
     fi
