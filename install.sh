@@ -46,7 +46,7 @@ spinner() {
 clear
 print_color "$BLUE" "╔═══════════════════════════════════════════════╗"
 print_color "$BLUE" "║                                               ║"
-print_color "$BLUE" "║    🚀 Claude Code Development Kit Installer  ║"
+print_color "$BLUE" "║  Claude Code Development Kit v3 Installer     ║"
 print_color "$BLUE" "║                                               ║"
 print_color "$BLUE" "╚═══════════════════════════════════════════════╝"
 echo

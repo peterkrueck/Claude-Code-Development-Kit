@@ -1,10 +1,7 @@
-# Claude Code specific files
+# Project-specific (local to each installation, not part of the kit)
 /CLAUDE.md
+/GEMINI.md
 .claude/
-.gitignore
-
-# Logs
-logs/
 
 # OS generated files
 .DS_Store

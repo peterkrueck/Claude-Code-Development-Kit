@@ -1,416 +1,198 @@
 # Claude Code Development Kit
 
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Changelog](https://img.shields.io/badge/changelog-v2.1.0-orange.svg)](CHANGELOG.md)
+The best-practice Claude Code setup for serious development. Skills, hooks, templates, and settings — configured so you don't have to.
 
-An integrated system that transforms Claude Code into an orchestrated development environment through automated documentation management, multi-agent workflows, and external AI expertise.
+## What's Included
 
-> **Related**: Check out [Freigeist](https://www.freigeist.dev) - upcoming AI coding platform for complex projects!
-
-## Why Claude Code?
-
-Claude Code's Sub-Agents enable this highly automated, integrated approach. While other AI tools can likely use the documentation structure (see FAQ) and some commands, only Claude Code can currently orchestrate parallel agents and use this Development Kit to its full potential.
-
-## 🎯 Why This Kit?
-
-> *Ever tried to build a large project with AI assistance, only to watch it struggle as your codebase grows?*
-
-Claude Code's output quality directly depends on what it knows about your project. As AI-assisted development scales, three critical challenges emerge:
-
----
-
-### Challenge 1: Context Management
-
-**The Problem:**
-```
-❌ Loses track of your architecture patterns and design decisions
-❌ Forgets your coding standards and team conventions
-❌ No guidance on where to find the right context in large codebases
-```
-
-**The Solution:**
-✅ **Automated context delivery** through two integrated systems:
-- **3-tier documentation system** - Auto-loads the right docs at the right time
-- **Custom commands with sub-agents** - Orchestrates specialized agents that already know your project
-- Result: No manual context loading, consistent knowledge across all agents
-
----
-
-### Challenge 2: AI Reliability 
-
-**The Problem:**
-```
-❌ Outdated library documentation
-❌ Hallucinated API methods
-❌ Inconsistent architectural decisions
-```
-
-**The Solution:**
-✅ **"Four eyes principle"** through MCP integration:
-
-| Service | Purpose | Benefit |
-|---------|---------|---------|
-| **Context7** | Real-time library docs | Current APIs, not training data |
-| **Gemini** | Architecture consultation | Cross-validation & best practices |
-
-*Result: Fewer errors, better code, current standards*
-
----
-
-### Challenge 3: Automation Without Complexity
-
-**The Problem:**
-```
-❌ Manual context loading for every session
-❌ Repetitive command sequences
-❌ No feedback when tasks complete
-```
-
-**The Solution:**
-✅ **Intelligent automation** through hooks and commands:
-- Automatic updates of documentation through custom commands
-- Context injection for all Sub-agents and Gemini MCP calls 
-- Audio notifications for task completion (optional)
-- One-command workflows for complex tasks
-
----
-
-### 🎉 The Result
-
-> **Claude Code transforms from a helpful tool into a reliable development partner that remembers your project context, validates its own work, and handles the tedious stuff automatically.**
-
-
-[![Demo-Video auf YouTube](https://img.youtube.com/vi/kChalBbMs4g/0.jpg)](https://youtu.be/kChalBbMs4g)
-
-
-
+| Component | Count | Purpose |
+|-----------|-------|---------|
+| **Skills** | 7 | Automated code review, image generation, background removal, and more |
+| **Commands** | 1 | `/prime` — load core project context |
+| **Hooks** | 3 | Stop pipeline, security scanner, audio notifications |
+| **Templates** | 6 | CLAUDE.md, GEMINI.md, and 4 documentation files |
+| **Settings** | 6 | Modular permission sets composed at install time |
 
 ## Quick Start
 
-### Prerequisites
-
-- **Required**: [Claude Code](https://github.com/anthropics/claude-code)
-- **Recommended**: MCP servers like [Context7](https://github.com/upstash/context7) and [Gemini Assistant](https://github.com/peterkrueck/mcp-gemini-assistant)
-
-#### Platform Support
-
-- **Windows**: ❌ (has reported bugs - use at your own risk)
-
-### Installation
-
-#### Option 1: Quick Install (Recommended)
-
-Run this single command in your terminal:
-
+**One command:**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/peterkrueck/Claude-Code-Development-Kit/main/install.sh | bash
 ```
 
-This will:
-1. Download the framework
-2. Guide you through an interactive setup
-3. Install everything in your chosen project directory
-4. Provide links to optional MCP server installations
-
-
-https://github.com/user-attachments/assets/0b4a1e69-bddb-4b58-8de9-35f97919bf44
-
-
-#### Option 2: Clone and Install
-
+**Or clone and run:**
 ```bash
 git clone https://github.com/peterkrueck/Claude-Code-Development-Kit.git
 cd Claude-Code-Development-Kit
 ./setup.sh
 ```
 
-### What Gets Installed
-
-The setup script will create the following structure in your project:
+## What Gets Installed
 
 ```
 your-project/
 ├── .claude/
-│   ├── commands/          # AI orchestration templates (.md files)
-│   ├── hooks/             # Automation scripts
-│   │   ├── config/        # Security patterns configuration
-│   │   ├── sounds/        # Notification sounds (if notifications enabled)
-│   │   └── *.sh           # Hook scripts (based on your selections)
-│   └── settings.local.json # Generated Claude Code configuration
-├── docs/                  # Documentation templates and examples
-│   ├── ai-context/        # Core documentation files
-│   ├── open-issues/       # Issue tracking examples
-│   ├── specs/             # Specification templates
-│   ├── CONTEXT-tier2-component.md  # Component documentation template
-│   └── CONTEXT-tier3-feature.md    # Feature documentation template
-├── logs/                  # Hook execution logs (created at runtime)
-├── CLAUDE.md              # Your project's AI context (from template)
-└── MCP-ASSISTANT-RULES.md # MCP coding standards (if Gemini-Assistant-MCP selected)
-```
-
-**Note**: The exact files installed depend on your choices during setup (MCP servers, notifications, etc.)
-
-### Post-Installation Setup
-
-1. **Customize your AI context**:
-   - Edit `CLAUDE.md` with your project standards
-   - Update `docs/ai-context/project-structure.md` with your tech stack
-
-2. **Install MCP servers** (if selected during setup):
-   - Follow the links provided by the installer
-   - Configure in `.claude/settings.local.json`
-
-3. **Test your installation**:
-   ```bash
-   claude
-   /full-context "analyze my project structure"
-   ```
-
-
-## Terminology
-
-- **CLAUDE.md** - Master context files containing project-specific AI instructions, coding standards, and integration patterns
-- **CONTEXT.md** - Component and feature-level documentation files (Tier 2 and Tier 3) that provide specific implementation details and patterns
-- **MCP (Model Context Protocol)** - Standard for integrating external AI services with Claude Code
-- **Sub-agents** - Specialized AI agents spawned by Claude Code to work on specific aspects of a task in parallel
-- **3-Tier Documentation** - Hierarchical organization (Foundation/Component/Feature) that minimizes maintenance while maximizing AI effectiveness
-- **Auto-loading** - Automatic inclusion of relevant documentation when commands execute
-- **Hooks** - Shell scripts that execute at specific points in Claude Code's lifecycle for security, automation, and UX enhancements
-
-## Architecture
-
-### Integrated Intelligence Loop
-
-```
-                        CLAUDE CODE
-                   ┌─────────────────┐
-                   │                 │
-                   │    COMMANDS      │
-                   │                 │
-                   └────────┬────────┘
-                  Multi-agent│orchestration
-                   Parallel │execution
-                   Dynamic  │scaling
-                           ╱│╲
-                          ╱ │ ╲
-          Routes agents  ╱  │  ╲  Leverages
-          to right docs ╱   │   ╲ expertise
-                       ╱    │    ╲
-                      ▼     │     ▼
-         ┌─────────────────┐│┌─────────────────┐
-         │                 │││                 │
-         │  DOCUMENTATION  │││  MCP SERVERS   │
-         │                 │││                 │
-         └─────────────────┘│└─────────────────┘
-          3-tier structure  │  Context7 + Gemini
-          Auto-loading      │  Real-time updates
-          Context routing   │  AI consultation
-                      ╲     │     ╱
-                       ╲    │    ╱
-        Provides project╲   │   ╱ Enhances with
-        context for      ╲  │  ╱  current best
-        consultation      ╲ │ ╱   practices
-                           ╲│╱
-                            ▼
-                    Integrated Workflow
-```
-
-### Auto-Loading Mechanism
-
-Every command execution automatically loads critical documentation:
-
-```
-@/CLAUDE.md                              # Master AI context and coding standards
-@/docs/ai-context/project-structure.md   # Complete technology stack and file tree
-@/docs/ai-context/docs-overview.md       # Documentation routing map
-```
-
-The `subagent-context-injector.sh` hook extends auto-loading to all sub-agents:
-- Sub-agents spawned via the Task tool automatically receive the same core documentation
-- No manual context inclusion needed in Task prompts
-- Ensures consistent knowledge across all agents in multi-agent workflows
-
-This ensures:
-- Consistent AI behavior across all sessions and sub-agents
-- Zero manual context management at any level
-
-### Component Integration
-
-**Commands ↔️ Documentation**
-- Commands determine which documentation tiers to load based on task complexity
-- Documentation structure guides agent spawning patterns
-- Commands update documentation to maintain current context
-
-**Commands ↔️ MCP Servers**
-- Context7 provides up-to-date library documentation
-- Gemini offers architectural consultation for complex problems
-- Integration happens seamlessly within command workflows
-
-**Documentation ↔️ MCP Servers**
-- Project structure and MCP assistant rules auto-attach to Gemini consultations
-- Ensures external AI understands specific architecture and coding standards
-- Makes all recommendations project-relevant and standards-compliant
-
-### Hooks Integration
-
-The kit includes battle-tested hooks that enhance Claude Code's capabilities:
-
-- **Security Scanner** - Prevents accidental exposure of secrets when using MCP servers
-- **Gemini Context Injector** - Automatically includes project structure in Gemini consultations
-- **Subagent Context Injector** - Ensures all sub-agents receive core documentation automatically
-- **Notification System** - Provides non-blocking audio feedback for task completion and input requests (optional)
-
-These hooks integrate seamlessly with the command and MCP server workflows, providing:
-- Pre-execution security checks for all external AI calls
-- Automatic context enhancement for both external AI and sub-agents
-- Consistent knowledge across all agents in multi-agent workflows
-- Developer awareness through pleasant, non-blocking audio notifications
-
-## Common Tasks
-
-### Starting New Feature Development
-
-```bash
-/full-context "implement user authentication across backend and frontend"
-```
-
-The system:
-1. Auto-loads project documentation
-2. Spawns specialized agents (security, backend, frontend)
-3. Consults Context7 for authentication framework documentation
-4. Asks Gemini 2.5 pro for feedback and improvement suggestions
-4. Provides comprehensive analysis and implementation plan
-
-### Code Review with Multiple Perspectives
-
-```bash
-/code-review "review authentication implementation"
-```
-
-Multiple agents analyze:
-- Security vulnerabilities
-- Performance implications
-- Architectural alignment
-- Integration impacts
-
-### Maintaining Documentation Currency
-
-```bash
-/update-docs "document authentication changes"
-```
-
-Automatically:
-- Updates affected CLAUDE.md files across all tiers
-- Keeps project-structure.md and docs-overview.md up-to-date
-- Maintains context for future AI sessions
-- Ensures documentation matches implementation
-
-## Creating Your Project Structure
-
-After installation, you'll add your own project-specific documentation:
-
-```
-your-project/
-├── .claude/
-│   ├── commands/              # AI orchestration templates
-│   ├── hooks/                 # Security and automation hooks
-│   │   ├── config/            # Hook configuration files
-│   │   ├── sounds/            # Notification audio files
-│   │   ├── gemini-context-injector.sh
-│   │   ├── mcp-security-scan.sh
-│   │   ├── notify.sh
-│   │   └── subagent-context-injector.sh
-│   └── settings.json          # Claude Code configuration
+│   ├── commands/prime.md               # /prime — load project context
+│   ├── hooks/
+│   │   ├── stop-pipeline.sh            # Review → test → docs gate
+│   │   ├── security-scan.sh            # Block sensitive data in MCP calls
+│   │   ├── notify.sh                   # Audio feedback
+│   │   ├── config/
+│   │   │   ├── pipeline.json           # Pipeline phase configuration
+│   │   │   └── sensitive-patterns.json # Security scan patterns
+│   │   └── sounds/
+│   │       ├── complete.wav
+│   │       └── input-needed.wav
+│   ├── skills/                         # Selected skills installed here
+│   └── settings.local.json             # Composed from selected modules
+│
+├── assets/                             # Visual assets scaffolding
+│   ├── app-icon/
+│   ├── character/
+│   ├── logo/
+│   ├── social/
+│   └── web/
+│
 ├── docs/
-│   ├── ai-context/            # Foundation documentation (Tier 1)
-│   │   ├── docs-overview.md   # Documentation routing map
-│   │   ├── project-structure.md # Technology stack and file tree
-│   │   ├── system-integration.md # Cross-component patterns
-│   │   ├── deployment-infrastructure.md # Infrastructure context
-│   │   └── handoff.md        # Session continuity
-│   ├── open-issues/           # Issue tracking templates
-│   ├── specs/                 # Feature specifications
-│   └── README.md              # Documentation system guide
-├── CLAUDE.md                  # Master AI context (Tier 1)
-├── MCP-ASSISTANT-RULES.md     # MCP coding standards (if Gemini selected)
-├── backend/
-│   ├── **`CONTEXT.md`**       # Backend context (Tier 2) - 🔴 create this
-│   └── src/api/
-│       └── **`CONTEXT.md`**   # API context (Tier 3) - 🔴 create this
-└── frontend/
-    ├── **`CONTEXT.md`**       # Frontend context (Tier 2) - 🔴 create this
-    └── src/components/
-        └── **`CONTEXT.md`**   # Components context (Tier 3) - 🔴 create this
+│   ├── ai-context/
+│   │   ├── spec.md                     # What the product does
+│   │   ├── project-structure.md        # File tree and tech stack
+│   │   ├── progress.md                 # Roadmap and task tracking
+│   │   └── deployment-infrastructure.md
+│   ├── legal/
+│   ├── business/
+│   ├── design-brand/
+│   └── open-issues/
+│
+├── CLAUDE.md                           # Your project's AI instruction set
+└── GEMINI.md                           # Gemini second-opinion instructions
 ```
 
-The framework provides templates for CONTEXT.md files in `docs/`:
-- `docs/CONTEXT-tier2-component.md` - Use as template for component-level docs
-- `docs/CONTEXT-tier3-feature.md` - Use as template for feature-level docs
+## Skills
 
-## Configuration
+### Review Skills (require [Gemini CLI](https://github.com/google-gemini/gemini-cli))
 
-The kit is designed for adaptation:
+| Skill | Trigger | What it does |
+|-------|---------|-------------|
+| `/review-work` | Manual or stop hook | Sends diff to Gemini for independent code review. Falls back to Claude sub-agent. |
+| `/second-opinion` | Auto (when stuck or facing trade-offs) | Consults Gemini on architecture decisions, debugging, edge cases. |
 
-- **Commands** - Modify orchestration patterns in `.claude/commands/`
-- **Documentation** - Adjust tier structure for your architecture
-- **MCP Integration** - Add additional servers for specialized expertise
-- **Hooks** - Customize security patterns, add new hooks, or modify notifications in `.claude/hooks/`
-- **MCP Assistant Rules** - Copy `docs/MCP-ASSISTANT-RULES.md` template to project root and customize for project-specific standards
+### Documentation Skills
 
-## Best Practices
+| Skill | Trigger | What it does |
+|-------|---------|-------------|
+| `/update-docs` | Manual or stop hook | Updates `docs/ai-context/` files to match current code state. |
 
-1. **Let documentation guide development** - The 3-tier structure reflects natural boundaries
-2. **Update documentation immediately** - Use `/update-docs` after significant changes
-3. **Trust the auto-loading** - Avoid manual context management
-4. **Scale complexity naturally** - Simple tasks stay simple, complex tasks get sophisticated analysis
+### Visual Skills (require Python 3)
 
+| Skill | Trigger | What it does |
+|-------|---------|-------------|
+| `/image-gen` | Manual | Generates character art via Gemini image API with reference images for consistency. |
+| `/image-edit` | Manual | Crop, resize, rotate, mirror images via Python/Pillow. Measures before cutting. |
+| `/bg-remove` | Manual | Removes backgrounds locally via rembg (no data sent externally). |
 
-## Documentation
+### Template Skills
 
-- [Documentation System Guide](docs/) - Understanding the 3-tier architecture
-- [Commands Reference](commands/) - Detailed command usage
-- [MCP Integration](docs/CLAUDE.md) - Configuring external services
-- [Hooks System](hooks/) - Security scanning, context injection, and notifications
-- [Changelog](CHANGELOG.md) - Version history and migration guides
+| Skill | Trigger | What it does |
+|-------|---------|-------------|
+| `/deploy` | Manual | Test-gated deployment pipeline. Customize for your stack. |
 
-## Contributing
+## Hooks
 
-The kit represents one approach to AI-assisted development. Contributions and adaptations are welcome.
+### Stop Pipeline (`stop-pipeline.sh`)
+
+A state machine that gates Claude from stopping until quality checks pass:
+
+1. **Check** — Are there 10+ lines of uncommitted changes?
+2. **Review** — Run `/review-work` for independent code review
+3. **Tests** — Run your test command (configured in `pipeline.json`)
+4. **Docs** — Run `/update-docs` to keep documentation current
+
+Configure in `.claude/hooks/config/pipeline.json`:
+```json
+{
+  "enabled": true,
+  "min_lines_changed": 10,
+  "file_patterns": ["*.py", "*.ts", "*.js", "*.swift"],
+  "test_command": "npm test",
+  "phases": { "review": true, "tests": true, "docs": true }
+}
+```
+
+### Security Scanner (`security-scan.sh`)
+
+Scans MCP and plugin requests for secrets before they leave your machine. Uses pattern matching from `sensitive-patterns.json`.
+
+### Notifications (`notify.sh`)
+
+Cross-platform audio alerts (macOS/Linux/Windows) when Claude completes tasks or needs input.
+
+## Settings
+
+The installer composes `settings.local.json` from modular permission sets based on your selections:
+
+- **Core** — Always included. Git commands, basic bash, deny list for destructive ops.
+- **Review skills** — Gemini CLI permissions.
+- **Visual skills** — Python, rembg, image tool permissions.
+- **Context7 plugin** — Plugin tool permissions.
+- **Supabase plugin** — Plugin tool permissions.
+
+The **deny list** blocks dangerous operations by default:
+```
+git push --force, git reset --hard, git clean -f,
+git checkout -- ., git restore ., git branch -D, rm -rf
+```
+
+## Gemini Integration
+
+The kit treats Gemini as a **peer reviewer**, not a subordinate. Gemini gets its own instruction file (`GEMINI.md`) and reads your project docs independently.
+
+**Setup:**
+1. Install [Gemini CLI](https://github.com/google-gemini/gemini-cli)
+2. Customize `GEMINI.md` with your project details
+3. The `/review-work` and `/second-opinion` skills handle invocation automatically
+
+## Plugins
+
+Plugins are installed separately via Claude Code:
+
+```bash
+claude plugins add context7     # Library documentation
+claude plugins add supabase     # Database management
+```
+
+The installer adds the correct permissions to `settings.local.json` when you select these.
+
+## Upgrading from v2
+
+v3 is a major rewrite. Key changes:
+
+- **Commands → Skills**: 7 commands replaced by 7 skills + 1 command
+- **3-tier CONTEXT.md → 4 focused files**: `spec.md`, `project-structure.md`, `progress.md`, `deployment-infrastructure.md`
+- **Gemini MCP → Gemini CLI**: Native `GEMINI.md` file instead of MCP server + hook injection
+- **Context7 MCP → Plugin**: `claude plugins add context7` instead of MCP server setup
+- **New**: Stop pipeline hook, modular settings, visual skills, asset directories
+
+**v2 is still available:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/peterkrueck/Claude-Code-Development-Kit/v2/install.sh | bash
+```
+
+See [CHANGELOG.md](CHANGELOG.md) for the full migration guide.
 
 ## FAQ
 
-**Q: Will the setup overwrite my existing files?**
+**Do I need a Claude Code subscription?**
+The kit works on any plan, but skills that spawn sub-agents benefit from higher rate limits.
 
-**A:** No, the installer detects existing files and prompts you to skip or overwrite each one. For safety, I highly recommend installing on a new Git branch. Safe is safe.
+**Do I need Gemini CLI?**
+Only for the review skills (`/review-work`, `/second-opinion`). Everything else works without it.
 
-**Q: Can I use this with other AI coding tools like Cursor, Cline, or Gemini CLI?**
+**Can I use this with Cursor/Windsurf/other editors?**
+The skills and hooks are Claude Code-specific. The documentation templates (`CLAUDE.md`, `docs/ai-context/`) work with any AI tool.
 
-**A:** Partially. The documentation structure works with any tool (rename CLAUDE.md to match your tool's convention). However, commands are highly optimized for sub-agent usage and hooks are Claude Code-specific. Other tools would need significant adaptation of the orchestration features.
+**What about Windows?**
+Hooks use bash scripts. On Windows, use WSL or Git Bash.
 
-**Q: How much will this cost in tokens?**
+## License
 
-**A:** This framework uses tokens heavily due to comprehensive context loading and sub-agent usage. I strongly recommend a Claude Code Max 20x subscription over pay-per-token API usage. The Claude 4 Opus model currently performs best for complex instruction following.
-
-**Q: Can I use other coding consultant MCPs like Zen instead for Gemini Consultation?**
-
-**A:** While technically possible, the templates and hooks are specifically configured and optimized for my Gemini MCP server (available through the link provided during installation). Using alternative coding consultant MCPs would require adjusting the templates, hooks, and potentially the command structures to match their specific interfaces and capabilities.
-
-**Q: Can I use this framework with an existing project?**
-
-**A:** Yes! The framework works well with existing projects. When installing, check if you already have a project structure or CLAUDE.md file and adjust accordingly during the setup prompts. To get started with an existing codebase, use Claude Code with sub-agents to understand your project and create the initial project-structure.md:
-
-```
-"Read and understand the project_structure.md template in docs/ai-context/project_structure.md. Your task is to fill out this template with our project's details. For this send out sub agents in parallel across the whole code base. Once the sub agents get back, ultrathink and create the markdown file."
-```
-
-After creating the project structure, use the framework's documentation generation system to create component-level and feature-level context files:
-
-```
-/create-docs "[your-main-component-path]/CONTEXT.md"
-```
-
-This approach lets the framework learn your existing architecture and systematically create appropriate documentation that matches your current project structure.
-
-## Connect
-
-Feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/peterkrueck/) if you have questions, need clarification, or wish to provide feedback.
+MIT — see [LICENSE](LICENSE).

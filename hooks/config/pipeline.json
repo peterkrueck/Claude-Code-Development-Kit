@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "min_lines_changed": 10,
+  "file_patterns": ["*.py", "*.ts", "*.js", "*.swift", "*.go", "*.rs"],
+  "test_file_patterns": ["*.ts", "*.py", "*.js"],
+  "test_command": null,
+  "phases": {
+    "review": true,
+    "tests": true,
+    "docs": true
+  }
+}
