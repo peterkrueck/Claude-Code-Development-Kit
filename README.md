@@ -93,23 +93,6 @@ your-project/
 └── GEMINI.md                           # Gemini instructions (if selected)
 ```
 
-## Extending It
-
-This kit is a starting point. Some things you might add as your project grows:
-
-- **More skills** — Create your own in `.claude/skills/your-skill/SKILL.md`
-- **Custom hooks** — Add lifecycle hooks in `.claude/settings.local.json`
-- **Project-specific rules** — Edit `CLAUDE.md` with your coding standards, architecture decisions, and constraints
-- **Context7 plugin** — `claude plugins add context7` for up-to-date library docs (highly recommended)
-
-## Settings
-
-The installer composes `settings.local.json` from modular permissions based on your selections. The deny list blocks dangerous operations by default:
-
-```
-git push --force, git reset --hard, git clean -f,
-git checkout -- ., git restore ., git branch -D, rm -rf
-```
 
 ## Upgrading from v2
 
@@ -122,16 +105,14 @@ curl -fsSL https://raw.githubusercontent.com/peterkrueck/Claude-Code-Development
 
 See [CHANGELOG.md](CHANGELOG.md) for the full migration guide.
 
-## FAQ
 
-**Do I need a Claude Code subscription?**
-Yes. This kit is designed for Claude Code (the CLI/desktop app), not the API.
+## FAQ
 
 **Do I need Gemini CLI?**
 Only for the review skills. Everything else works without it.
 
-**Can I use this with Cursor/Windsurf?**
-The skills and hooks are Claude Code-specific. The documentation templates work with any AI tool.
+**Can I use this with Cursor/Windsurf/Codex?**
+The skills and hooks are Claude Code-specific. The documentation templates work with any AI tool. SKILLS should work with most AI coding tools by now.
 
 **Is this for large teams?**
 It works for teams, but it's designed for individual developers and small teams. If you're running complex multi-agent workflows at scale via the API, this probably isn't what you need.
