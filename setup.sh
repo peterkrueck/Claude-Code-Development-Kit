@@ -160,10 +160,11 @@ main() {
 
     # Visual Skills
     print_color "$CYAN" "  Visual Skills"
-    echo "    AI-powered image generation with style consistency (reference"
-    echo "    photos keep your character/brand consistent across poses),"
-    echo "    precise image editing (crop, resize, rotate — measures before"
-    echo "    cutting), and local background removal (no data sent externally)."
+    echo "    AI-powered image generation using Nanobanana 2 (Gemini) with"
+    echo "    optional reference photos for style/character consistency."
+    echo "    Precise image editing (crop, resize, rotate — analyzes content"
+    echo "    bounds before cutting). Local background removal via rembg"
+    echo "    (no data sent externally)."
     echo
     echo "    Includes: /image-gen, /image-edit, /bg-remove"
     print_color "$DIM" "    Requires: Python 3 with Pillow/numpy"
@@ -203,8 +204,7 @@ main() {
     # Notifications
     print_color "$CYAN" "  Audio Notifications"
     echo "    Plays a sound when Claude finishes a task or needs your input."
-    echo "    Useful when working in another window. Cross-platform"
-    echo "    (macOS/Linux/Windows)."
+    echo "    Useful when working in another window. Supports macOS and Linux."
     safe_read_yn INSTALL_NOTIFICATIONS "    Install notifications? (y/n): "
 
     # Confirm
@@ -411,27 +411,41 @@ main() {
     if [ "$INSTALL_GEMINI" = "y" ]; then
         echo "  3. Customize GEMINI.md with your project details"
     fi
-    if [ "$INSTALL_STOP_PIPELINE" = "y" ]; then
-        echo
-        echo "  Configure stop pipeline:"
-        echo "    Edit .claude/hooks/config/pipeline.json to set your test command"
-    fi
     echo
     print_color "$CYAN" "  Recommended plugin:"
     echo "    claude plugins add context7"
     echo "    Gives Claude access to up-to-date library documentation."
     echo "    Highly recommended for any project using external libraries."
     echo
-    if [ "$INSTALL_REVIEW_SKILLS" = "y" ] && ! command -v gemini &>/dev/null; then
-        print_color "$YELLOW" "  Review skills require Gemini CLI:"
+
+    # Dynamic setup instructions based on selections
+    local needs_gemini_cli=false
+    local needs_gemini_key=false
+    local needs_rembg=false
+
+    [ "$INSTALL_REVIEW_SKILLS" = "y" ] && needs_gemini_cli=true
+    [ "$INSTALL_VISUAL_SKILLS" = "y" ] && needs_gemini_key=true && needs_rembg=true
+    # Gemini integration (GEMINI.md) also needs Gemini CLI to be useful
+    [ "$INSTALL_GEMINI" = "y" ] && needs_gemini_cli=true
+
+    if [ "$needs_gemini_cli" = true ] && ! command -v gemini &>/dev/null; then
+        print_color "$YELLOW" "  Gemini CLI required (review skills + GEMINI.md):"
         echo "    See: https://github.com/google-gemini/gemini-cli"
         echo
     fi
-    if [ "$INSTALL_VISUAL_SKILLS" = "y" ]; then
-        print_color "$YELLOW" "  Visual skills setup:"
-        echo "    /image-gen requires: export GEMINI_API_KEY=your-key"
-        echo "      Get one at: https://aistudio.google.com/apikey"
-        echo "    /bg-remove requires: pip install \"rembg[cpu,cli]\""
+    if [ "$needs_gemini_key" = true ]; then
+        print_color "$YELLOW" "  Gemini API key required (/image-gen):"
+        echo "    export GEMINI_API_KEY=your-key"
+        echo "    Get one at: https://aistudio.google.com/apikey"
+        echo
+    fi
+    if [ "$needs_rembg" = true ]; then
+        print_color "$YELLOW" "  rembg required (/bg-remove):"
+        echo "    pip install \"rembg[cpu,cli]\""
+        echo
+    fi
+    if [ "$INSTALL_STOP_PIPELINE" = "y" ]; then
+        print_color "$DIM" "  Tip: Set your test command in .claude/hooks/config/pipeline.json"
         echo
     fi
     echo "  Test your setup:"
