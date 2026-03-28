@@ -1,16 +1,14 @@
 # Claude Code Development Kit
 
-The best-practice Claude Code setup for serious development. Skills, hooks, templates, and settings — configured so you don't have to.
+A lightweight starter kit for Claude Code subscribers. Gives your project a solid foundation — documentation structure, code review automation, image tools, and sensible defaults — that you extend as you go.
 
-## What's Included
+This isn't a heavy framework. It's the setup you'd build yourself after a few weeks of using Claude Code, packaged so you start with it on day one.
 
-| Component | Count | Purpose |
-|-----------|-------|---------|
-| **Skills** | 7 | Automated code review, image generation, background removal, and more |
-| **Commands** | 1 | `/prime` — load core project context |
-| **Hooks** | 3 | Stop pipeline, security scanner, audio notifications |
-| **Templates** | 6 | CLAUDE.md, GEMINI.md, and 4 documentation files |
-| **Settings** | 6 | Modular permission sets composed at install time |
+## Who This Is For
+
+You have a Claude Code subscription and want to hit the ground running. Maybe you're building an app, a side project, or starting something new. You want Claude to understand your project structure, review its own work, and not accidentally `git push --force` your main branch.
+
+This kit gives you that. Install what you need, skip what you don't, extend it however you want.
 
 ## Quick Start
 
@@ -26,149 +24,96 @@ cd Claude-Code-Development-Kit
 ./setup.sh
 ```
 
+The installer walks you through what to include. Everything is optional except the core.
+
+## What You Get
+
+### Always installed (core)
+
+- **`CLAUDE.md`** — A template for your project's AI instruction set. This is how you tell Claude your project's rules, architecture decisions, and constraints.
+- **`/prime` command** — Loads your documentation into context. Run it at the start of a session.
+- **`/update-docs` skill** — Keeps your documentation in sync after code changes.
+- **Documentation scaffolding** — Four structured files (`spec.md`, `project-structure.md`, `progress.md`, `deployment-infrastructure.md`) plus directories for legal, business, design, and open issues.
+- **Security scanner** — Blocks API keys and secrets from leaking through MCP plugins.
+- **Deny list** — Prevents `git push --force`, `rm -rf`, `git reset --hard`, and other destructive commands.
+- **Asset directories** — `assets/` for your app icons, logos, and graphics.
+
+### Optional: Review skills
+
+Independent code review using Google's Gemini CLI — a completely different AI architecture that catches things Claude might miss. When Gemini is unavailable, falls back to a Claude sub-agent.
+
+- `/review-work` — Sends your uncommitted diff to Gemini with a review checklist
+- `/second-opinion` — Auto-triggers when Claude faces tricky architecture decisions
+
+Requires: [Gemini CLI](https://github.com/google-gemini/gemini-cli)
+
+### Optional: Visual skills
+
+Generate app icons, character art, social media graphics, and marketing assets. Edit images with precision. Remove backgrounds locally.
+
+- `/image-gen` — AI image generation via Nanobanana 2 (Gemini). Optional reference photos for style consistency.
+- `/image-edit` — Crop, resize, rotate, mirror. Analyzes content bounds before cutting.
+- `/bg-remove` — Background removal via rembg. Runs locally, nothing sent externally.
+
+Requires: Python 3, Pillow, numpy. `/image-gen` also needs a `GEMINI_API_KEY`. `/bg-remove` needs rembg.
+
+### Optional: Deploy skill template
+
+A customizable deployment pipeline you fill in with your own commands. Follows: detect changes → run tests → deploy → verify → report.
+
+### Optional: Gemini integration
+
+`GEMINI.md` — an instruction file that Gemini CLI reads automatically. Gives Gemini full context about your project when invoked as a reviewer or consultant.
+
+### Optional: Stop pipeline hook
+
+Prevents Claude from stopping until quality checks pass. When you have 10+ lines of uncommitted changes, it gates stopping on: code review → run tests → update docs. Each phase is configurable.
+
+### Optional: Audio notifications
+
+Plays a sound when Claude finishes a task or needs your input. Supports macOS and Linux.
+
 ## What Gets Installed
 
 ```
 your-project/
 ├── .claude/
 │   ├── commands/prime.md               # /prime — load project context
-│   ├── hooks/
-│   │   ├── stop-pipeline.sh            # Review → test → docs gate
-│   │   ├── security-scan.sh            # Block sensitive data in MCP calls
-│   │   ├── notify.sh                   # Audio feedback
-│   │   ├── config/
-│   │   │   ├── pipeline.json           # Pipeline phase configuration
-│   │   │   └── sensitive-patterns.json # Security scan patterns
-│   │   └── sounds/
-│   │       ├── complete.wav
-│   │       └── input-needed.wav
-│   ├── skills/                         # Selected skills installed here
-│   └── settings.local.json             # Composed from selected modules
-│
-├── assets/                             # Visual assets scaffolding
-│   ├── app-icon/
-│   ├── character/
-│   ├── logo/
-│   ├── social/
-│   └── web/
-│
+│   ├── hooks/                          # Automation (security, pipeline, sounds)
+│   ├── skills/                         # Selected skills
+│   └── settings.local.json             # Permissions and hook config
+├── assets/                             # Your visual assets
 ├── docs/
-│   ├── ai-context/
-│   │   ├── spec.md                     # What the product does
-│   │   ├── project-structure.md        # File tree and tech stack
-│   │   ├── progress.md                 # Roadmap and task tracking
-│   │   └── deployment-infrastructure.md
+│   ├── ai-context/                     # Core AI context (4 files)
 │   ├── legal/
 │   ├── business/
 │   ├── design-brand/
 │   └── open-issues/
-│
-├── CLAUDE.md                           # Your project's AI instruction set
-└── GEMINI.md                           # Gemini second-opinion instructions
+├── CLAUDE.md                           # Your project's AI rules
+└── GEMINI.md                           # Gemini instructions (if selected)
 ```
 
-## Skills
+## Extending It
 
-### Core Skills (always installed)
+This kit is a starting point. Some things you might add as your project grows:
 
-| Skill | Trigger | What it does |
-|-------|---------|-------------|
-| `/update-docs` | Manual or stop hook | Updates `docs/ai-context/` files to match current code state. |
-
-### Review Skills (require [Gemini CLI](https://github.com/google-gemini/gemini-cli))
-
-| Skill | Trigger | What it does |
-|-------|---------|-------------|
-| `/review-work` | Manual or stop hook | Sends diff to Gemini for independent code review. Falls back to Claude sub-agent. |
-| `/second-opinion` | Auto (when stuck or facing trade-offs) | Consults Gemini on architecture decisions, debugging, edge cases. |
-
-### Visual Skills (require Python 3, `/image-gen` also requires `GEMINI_API_KEY`)
-
-| Skill | Trigger | What it does |
-|-------|---------|-------------|
-| `/image-gen` | Manual | Generates character art via Gemini image API with reference images for consistency. |
-| `/image-edit` | Manual | Crop, resize, rotate, mirror images via Python/Pillow. Measures before cutting. |
-| `/bg-remove` | Manual | Removes backgrounds locally via rembg (no data sent externally). |
-
-### Template Skills
-
-| Skill | Trigger | What it does |
-|-------|---------|-------------|
-| `/deploy` | Manual | Test-gated deployment pipeline. Customize for your stack. |
-
-## Hooks
-
-### Stop Pipeline (`stop-pipeline.sh`)
-
-A state machine that gates Claude from stopping until quality checks pass:
-
-1. **Check** — Are there 10+ lines of uncommitted changes?
-2. **Review** — Run `/review-work` for independent code review
-3. **Tests** — Run your test command (configured in `pipeline.json`)
-4. **Docs** — Run `/update-docs` to keep documentation current
-
-Configure in `.claude/hooks/config/pipeline.json`:
-```json
-{
-  "enabled": true,
-  "min_lines_changed": 10,
-  "file_patterns": ["*.py", "*.ts", "*.js", "*.swift"],
-  "test_command": "npm test",
-  "phases": { "review": true, "tests": true, "docs": true }
-}
-```
-
-### Security Scanner (`security-scan.sh`)
-
-Scans MCP and plugin requests for secrets before they leave your machine. Uses pattern matching from `sensitive-patterns.json`.
-
-### Notifications (`notify.sh`)
-
-Cross-platform audio alerts (macOS/Linux/Windows) when Claude completes tasks or needs input.
+- **More skills** — Create your own in `.claude/skills/your-skill/SKILL.md`
+- **Custom hooks** — Add lifecycle hooks in `.claude/settings.local.json`
+- **Project-specific rules** — Edit `CLAUDE.md` with your coding standards, architecture decisions, and constraints
+- **Context7 plugin** — `claude plugins add context7` for up-to-date library docs (highly recommended)
 
 ## Settings
 
-The installer composes `settings.local.json` from modular permission sets based on your selections:
+The installer composes `settings.local.json` from modular permissions based on your selections. The deny list blocks dangerous operations by default:
 
-- **Core** — Always included. Git commands, basic bash, deny list for destructive ops.
-- **Review skills** — Gemini CLI permissions.
-- **Visual skills** — Python, rembg, image tool permissions.
-- **Context7 plugin** — Plugin tool permissions.
-- **Supabase plugin** — Plugin tool permissions.
-
-The **deny list** blocks dangerous operations by default:
 ```
 git push --force, git reset --hard, git clean -f,
 git checkout -- ., git restore ., git branch -D, rm -rf
 ```
 
-## Gemini Integration
-
-The kit treats Gemini as a **peer reviewer**, not a subordinate. Gemini gets its own instruction file (`GEMINI.md`) and reads your project docs independently.
-
-**Setup:**
-1. Install [Gemini CLI](https://github.com/google-gemini/gemini-cli)
-2. Customize `GEMINI.md` with your project details
-3. The `/review-work` and `/second-opinion` skills handle invocation automatically
-
-## Plugins
-
-Install plugins separately via Claude Code as needed:
-
-```bash
-claude plugins add context7     # Library documentation (highly recommended)
-claude plugins add supabase     # Database management
-```
-
 ## Upgrading from v2
 
-v3 is a major rewrite. Key changes:
-
-- **Commands → Skills**: 7 commands replaced by 7 skills + 1 command
-- **3-tier CONTEXT.md → 4 focused files**: `spec.md`, `project-structure.md`, `progress.md`, `deployment-infrastructure.md`
-- **Gemini MCP → Gemini CLI**: Native `GEMINI.md` file instead of MCP server + hook injection
-- **Context7 MCP → Plugin**: `claude plugins add context7` instead of MCP server setup
-- **New**: Stop pipeline hook, modular settings, visual skills, asset directories
+v3 is a major rewrite. Commands became skills, the 3-tier doc system became 4 focused files, Gemini moved from MCP to native CLI, Context7 is now a plugin.
 
 **v2 is still available:**
 ```bash
@@ -180,16 +125,16 @@ See [CHANGELOG.md](CHANGELOG.md) for the full migration guide.
 ## FAQ
 
 **Do I need a Claude Code subscription?**
-The kit works on any plan, but skills that spawn sub-agents benefit from higher rate limits.
+Yes. This kit is designed for Claude Code (the CLI/desktop app), not the API.
 
 **Do I need Gemini CLI?**
-Only for the review skills (`/review-work`, `/second-opinion`). Everything else works without it.
+Only for the review skills. Everything else works without it.
 
-**Can I use this with Cursor/Windsurf/other editors?**
-The skills and hooks are Claude Code-specific. The documentation templates (`CLAUDE.md`, `docs/ai-context/`) work with any AI tool.
+**Can I use this with Cursor/Windsurf?**
+The skills and hooks are Claude Code-specific. The documentation templates work with any AI tool.
 
-**What about Windows?**
-Hooks use bash scripts. On Windows, use WSL or Git Bash.
+**Is this for large teams?**
+It works for teams, but it's designed for individual developers and small teams. If you're running complex multi-agent workflows at scale via the API, this probably isn't what you need.
 
 ## License
 
