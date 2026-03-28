@@ -1,0 +1,34 @@
+{
+  "allow": [
+    "WebSearch",
+    "Bash(git status:*)",
+    "Bash(git diff:*)",
+    "Bash(git log:*)",
+    "Bash(git add:*)",
+    "Bash(git commit:*)",
+    "Bash(ls:*)",
+    "Bash(find:*)",
+    "Bash(tree:*)",
+    "Bash(mkdir:*)",
+    "Bash(cp:*)",
+    "Bash(cat:*)",
+    "Bash(grep:*)",
+    "Bash(wc:*)",
+    "Bash(npm:*)",
+    "Bash(npx:*)",
+    "Bash(node:*)",
+    "Bash(deno:*)",
+    "Bash(curl:*)",
+    "mcp__ide__getDiagnostics"
+  ],
+  "deny": [
+    "Bash(rm -rf:*)",
+    "Bash(git push --force:*)",
+    "Bash(git push -f:*)",
+    "Bash(git reset --hard:*)",
+    "Bash(git clean -f:*)",
+    "Bash(git checkout -- .:*)",
+    "Bash(git restore .:*)",
+    "Bash(git branch -D:*)"
+  ]
+}

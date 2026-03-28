@@ -6,135 +6,121 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [3.0.0] - 2026-03-28
+
+### Philosophy
+
+From "build orchestration on top of Claude Code" to "configure Claude Code optimally."
+
+Claude Code has evolved significantly since v2 — native features now handle what v2 built manually. v3 leans on the platform instead of reimplementing it.
+
+### Breaking Changes
+
+- **Commands replaced by Skills** — 7 command templates removed, replaced by 7 skills + 1 command (`/prime`)
+- **3-tier CONTEXT.md system removed** — replaced by 4 focused `docs/ai-context/` files (spec, structure, progress, deployment)
+- **Gemini MCP integration removed** — replaced by native Gemini CLI + `GEMINI.md` file
+- **Context7 MCP setup removed** — now a Claude Code plugin (`claude plugins add context7`)
+- **Subagent context injector hook removed** — Claude Code handles this natively
+- **Gemini context injector hook removed** — `GEMINI.md` replaces the injection pattern
+- **MCP-ASSISTANT-RULES.md removed** — replaced by `GEMINI.md`
+- **setup.sh completely rewritten** — new feature selection flow, modular settings
+
+### Added
+
+- 7 skills: `/review-work`, `/second-opinion`, `/update-docs`, `/deploy`, `/image-gen`, `/image-edit`, `/bg-remove`
+- `/prime` command (replaces `/full-context`)
+- Stop pipeline hook — configurable review -> test -> docs gate with `pipeline.json`
+- `GEMINI.md` template for Gemini CLI second-opinion integration
+- Modular settings system with composable permission modules (core, review, visual, context7, supabase)
+- Deny list for destructive operations (git push --force, rm -rf, etc.)
+- Asset directory scaffolding (`assets/{app-icon,character,logo,social,web}`)
+- Documentation scaffolding for `docs/{legal,business,design-brand,open-issues}`
+- Framework documentation (`docs/README.md`, `docs/skills.md`)
+
+### Changed
+
+- `mcp-security-scan.sh` renamed to `security-scan.sh`
+- `setup.sh` completely rewritten with skill/plugin selection and settings composition
+- `install.sh` updated for v3 branding
+- `README.md` rewritten for new positioning
+- Documentation templates moved from `docs/` to `templates/docs/`
+
+### Removed
+
+- Commands: `/full-context`, `/code-review`, `/update-docs` (command), `/create-docs`, `/refactor`, `/handoff`, `/gemini-consult`
+- Hooks: `gemini-context-injector.sh`, `subagent-context-injector.sh`
+- Documentation: `docs-overview.md`, `system-integration.md`, `handoff.md`
+- Templates: `CONTEXT-tier2-component.md`, `CONTEXT-tier3-feature.md`
+- Directories: `docs/specs/`, `logs/`, `hooks/setup/`
+
+
+## Upgrading from v2.x to v3.0.0
+
+### Before you start
+
+v2 is preserved on the `v2` branch. You can always go back:
+```bash
+curl -fsSL https://raw.githubusercontent.com/peterkrueck/Claude-Code-Development-Kit/v2/install.sh | bash
+```
+
+### Migration steps
+
+1. **Back up your customized files**: `CLAUDE.md`, any `CONTEXT.md` files, `MCP-ASSISTANT-RULES.md`
+
+2. **Run the v3 installer**: It detects existing files and prompts for overwrite/skip
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/peterkrueck/Claude-Code-Development-Kit/main/install.sh | bash
+   ```
+
+3. **Migrate content manually**:
+   - `MCP-ASSISTANT-RULES.md` -> `GEMINI.md` (restructure to match new template)
+   - `docs/ai-context/handoff.md` -> `docs/ai-context/progress.md`
+   - Custom `CONTEXT.md` files -> merge into `CLAUDE.md` or keep as-is (Claude still reads them)
+
+4. **Install Gemini CLI** if using review or second-opinion skills
+
+5. **Enable Context7 plugin**: `claude plugins add context7`
+
+### What you can keep
+
+- Your customized `CLAUDE.md` (just remove MCP-specific sections)
+- `hooks/config/sensitive-patterns.json` (unchanged format)
+- `hooks/sounds/` (unchanged)
+- Any custom hooks you've written
+
+### What to remove
+
+- `.claude/hooks/gemini-context-injector.sh`
+- `.claude/hooks/subagent-context-injector.sh`
+- Old command files from `.claude/commands/` (v3 keeps only `prime.md` there; all others are now in `.claude/skills/`)
+
+
+---
+
+
 ## [2.1.0] - 2025-07-11
 
 ### Added
 - New `/gemini-consult` command for deep, iterative conversations with Gemini MCP
-  - Persistent session support for complex problem-solving
-  - Context-aware problem detection when no arguments provided
-  - Automatic attachment of project documentation and MCP-ASSISTANT-RULES.md
-  - Support for follow-up questions with session continuity
 - Core Documentation Principle section in `/update-docs` command
-  - Emphasizes documenting current "is" state only
-  - Provides anti-patterns to avoid and best practices to follow
-  - Ensures documentation reads as if current implementation always existed
 
 ### Improved
 - Enhanced setup script with conditional command installation
-  - `/gemini-consult` command only installed when Gemini MCP is selected
-  - Better user experience with relevant commands based on chosen components
-- Updated commands README with comprehensive `/gemini-consult` documentation
-  - Added use cases and workflow examples
-  - Integrated into typical development patterns
-
-### What's New in v2.0.0:
-- **Security**: Automatic scanning prevents accidental exposure of API keys and secrets
-- **Context Enhancement**: Project structure and MCP assistant rules automatically included in Gemini consultations
-- **Sub-Agent Context**: All sub-agents now automatically receive core project documentation
-- **Developer Experience**: Audio notifications for task completion and input requests
-- **MCP Assistant Rules**: Define project-specific coding standards for MCP assistants
-- **No Breaking Changes**: All v1.0.0 features remain unchanged and fully compatible
 
 
 ## [2.0.0] - 2025-07-10
 
 ### Added
-- Comprehensive hooks system as 4th core framework component
-  - Security scanner hook to prevent accidental exposure of secrets when using MCP servers
-  - Gemini context injector for automatic project structure and MCP assistant rules inclusion in consultations
-  - Subagent context injector for automatic documentation inclusion in all sub-agent tasks
-  - Cross-platform notification system with audio feedback
-- MCP-ASSISTANT-RULES.md support for project-specific coding standards
-  - Template in `docs/MCP-ASSISTANT-RULES.md` for customization
-  - Automatic injection into Gemini consultations via updated hook
-  - Example implementation in framework root (gitignored)
-- Hook setup command (`/hook-setup`) for easy configuration verification
-- Settings template for Claude Code configuration with all hooks pre-configured
-- Hook configuration examples and comprehensive documentation
-- Multi-Agent Workflows documentation section in `docs/CLAUDE.md`
-- Automatic context injection documentation in `commands/README.md`
-- Remote installation capability via curl command
-  - New `install.sh` script for one-command installation
-  - Downloads framework from GitHub without cloning
-  - Professional installer with progress indicators
-  - Automatic cleanup of temporary files
-- Interactive `setup.sh` script for framework installation
-  - Prerequisite checking with clear explanations for required tools
-  - Interactive prompts for optional components with descriptions
-  - Conditional file copying based on user selections
-  - Conflict resolution for existing files (skip/overwrite/all)
-  - Dynamic OS detection only when notifications are selected
-  - Configuration file generation with selected components only
-  - Cross-platform support (macOS, Linux, Windows via WSL)
-
-
-### Improved
-- Developer experience with automatic sub-agent context injection
-- More consistent multi-agent workflow patterns across all commands
-- Simplified sub-agent prompts by removing manual context loading
-- Installation experience with two methods: quick install (curl) or manual (git clone)
-- Documentation with clearer installation instructions and correct MCP server links
-- User onboarding with step-by-step setup guidance and component descriptions
-- Setup safety with file conflict resolution instead of automatic overwrites
+- Comprehensive hooks system (security scanner, context injectors, notifications)
+- MCP-ASSISTANT-RULES.md support
+- Remote installation via curl
+- Interactive setup.sh with prerequisite checking
 
 ### Changed
-- Tier 2 and Tier 3 documentation files renamed from CLAUDE.md to CONTEXT.md
-- Updated all documentation and templates to reflect new naming convention
-- Clarified that only Tier 1 (master context) remains as CLAUDE.md
+- Tier 2/3 documentation files renamed from CLAUDE.md to CONTEXT.md
 
 
 ## [1.0.0] - 2025-07-01
 
 ### Added
-- Initial framework release with 3 core components
-- 3-tier documentation system (Foundation/Component/Feature)
-- Command templates for multi-agent workflows
-  - `/full-context` - Comprehensive context gathering and analysis
-  - `/code-review` - Multi-perspective code analysis
-  - `/update-docs` - Documentation synchronization
-  - `/create-docs` - Initial documentation generation
-  - `/refactor` - Intelligent code restructuring
-  - `/handoff` - Session context preservation
-- MCP server integration patterns (Context7, Gemini)
-- Auto-loading mechanism for critical documentation
-- Comprehensive documentation structure with routing system
-- Example templates for issues and specifications
-- Integration guide for external AI services
-
-### Core Features
-- Automatic context management through documentation hierarchy
-- Sub-agent orchestration for complex tasks
-- Seamless integration with external AI expertise
-- Self-maintaining documentation system
-
-
-## Upgrading from v1.0.0 to v2.0.0
-
-The hooks system is optional but recommended for enhanced security and developer experience.
-
-### To add hooks to your existing v1.0.0 project:
-
-1. **Copy the hooks directory to your project**:
-   ```bash
-   cp -r hooks your-project/.claude/hooks/
-   ```
-
-2. **Configure hooks in your project**:
-   ```bash
-   # Copy the settings template to your project
-   cp hooks/setup/settings.json.template your-project/.claude/settings.json
-   
-   # Edit to update the WORKSPACE path
-   # All hooks including subagent-context-injector are pre-configured
-   ```
-
-3. **Test the installation**:
-   ```bash
-   # Run the hook setup verification
-   /hook-setup
-   ```
-
-4. **Update existing command files** (optional):
-   - Commands will work without changes, but you can simplify sub-agent prompts
-   - Remove manual `Read /CLAUDE.md` instructions from Task prompts
-   - Sub-agents now automatically receive core documentation
+- Initial release: 3-tier documentation, 6 command templates, MCP integration

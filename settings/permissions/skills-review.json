@@ -1,0 +1,6 @@
+{
+  "allow": [
+    "Bash(gemini:*)"
+  ],
+  "deny": []
+}

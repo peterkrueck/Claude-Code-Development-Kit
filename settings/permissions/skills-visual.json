@@ -1,0 +1,9 @@
+{
+  "allow": [
+    "Bash(python3:*)",
+    "Bash(sips:*)",
+    "Bash(source ~/.claude/tools/rembg-env/bin/activate:*)",
+    "Bash(rembg:*)"
+  ],
+  "deny": []
+}
