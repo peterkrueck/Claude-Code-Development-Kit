@@ -65,9 +65,9 @@ A customizable deployment pipeline you fill in with your own commands. Follows: 
 
 `GEMINI.md` — an instruction file that Gemini CLI reads automatically. Gives Gemini full context about your project when invoked as a reviewer or consultant.
 
-### Optional: Stop pipeline hook
+### Optional: Review-on-stop hook
 
-Prevents Claude from stopping until quality checks pass. When you have 10+ lines of uncommitted changes, it gates stopping on: code review → run tests → update docs. Each phase is configurable.
+Nudges you to review before finishing. When you have 10+ lines of new code (net changes this session, not pre-existing dirty state), the first stop shows an advisory with changed files and suggests review/test/docs. Stop again for a reminder, a third time to skip entirely. Never traps you — three stops always gets you out.
 
 ### Optional: Audio notifications
 
@@ -82,10 +82,11 @@ your-project/
 │   │   └── prime.md                    # /prime — load project context
 │   ├── hooks/
 │   │   ├── security-scan.sh            # Blocks secrets from leaking to plugins
-│   │   ├── stop-pipeline.sh            # Review → test → docs gate (if selected)
+│   │   ├── review-on-stop.sh           # Advisory review nudge (if selected)
+│   │   ├── snapshot-baseline.sh        # Session baseline capture (if selected)
 │   │   ├── notify.sh                   # Audio notifications (if selected)
 │   │   ├── config/
-│   │   │   ├── pipeline.json           # Stop pipeline configuration
+│   │   │   ├── pipeline.json           # Review-on-stop configuration
 │   │   │   └── sensitive-patterns.json # Security scan patterns
 │   │   └── sounds/
 │   │       ├── complete.wav

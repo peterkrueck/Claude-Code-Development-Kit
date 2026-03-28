@@ -3,7 +3,7 @@
 ## review-work
 
 **Purpose:** Independent code review using Gemini CLI with Claude fallback.
-**Trigger:** Manual (`/review-work`) or via stop pipeline hook.
+**Trigger:** Manual (`/review-work`) or via review-on-stop hook advisory.
 **Requires:** Gemini CLI installed and configured.
 
 Captures `git diff`, sends to Gemini with a review checklist (bugs, security, compliance, tests), then critically evaluates findings before presenting to the user. Falls back to a Claude sub-agent if Gemini is at capacity.
@@ -27,7 +27,7 @@ Sends focused questions to Gemini with optional code context. Supports multi-tur
 ## update-docs
 
 **Purpose:** Keep `docs/ai-context/` synchronized with code changes.
-**Trigger:** Manual (`/update-docs`) or via stop pipeline hook.
+**Trigger:** Manual (`/update-docs`) or via review-on-stop hook advisory.
 
 Analyzes recent git changes and updates the relevant documentation files (spec, structure, progress, deployment). Follows the "document the is-state only" principle. Skips trivial changes (bug fixes, styling, small refactors).
 

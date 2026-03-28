@@ -29,7 +29,7 @@ Claude Code has evolved significantly since v2 — native features now handle wh
 
 - 7 skills: `/review-work`, `/second-opinion`, `/update-docs`, `/deploy`, `/image-gen`, `/image-edit`, `/bg-remove`
 - `/prime` command (replaces `/full-context`)
-- Stop pipeline hook — configurable review -> test -> docs gate with `pipeline.json`
+- Review-on-stop hook — advisory 3-stop model with session baseline tracking, configurable via `pipeline.json`
 - `GEMINI.md` template for Gemini CLI second-opinion integration
 - Modular settings system with composable permission modules (core, review, visual, context7, supabase)
 - Deny list for destructive operations (git push --force, rm -rf, etc.)
