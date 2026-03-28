@@ -78,17 +78,34 @@ Plays a sound when Claude finishes a task or needs your input. Supports macOS an
 ```
 your-project/
 ├── .claude/
-│   ├── commands/prime.md               # /prime — load project context
-│   ├── hooks/                          # Automation (security, pipeline, sounds)
-│   ├── skills/                         # Selected skills
-│   └── settings.local.json             # Permissions and hook config
+│   ├── commands/
+│   │   └── prime.md                    # /prime — load project context
+│   ├── hooks/
+│   │   ├── security-scan.sh            # Blocks secrets from leaking to plugins
+│   │   ├── stop-pipeline.sh            # Review → test → docs gate (if selected)
+│   │   ├── notify.sh                   # Audio notifications (if selected)
+│   │   ├── config/
+│   │   │   ├── pipeline.json           # Stop pipeline configuration
+│   │   │   └── sensitive-patterns.json # Security scan patterns
+│   │   └── sounds/
+│   │       ├── complete.wav
+│   │       └── input-needed.wav
+│   ├── skills/                         # Selected skills (review, visual, deploy)
+│   └── settings.local.json             # Permissions, hooks, deny list
+│
 ├── assets/                             # Your visual assets
+│
 ├── docs/
-│   ├── ai-context/                     # Core AI context (4 files)
+│   ├── ai-context/
+│   │   ├── spec.md                     # What the product does
+│   │   ├── project-structure.md        # File tree and tech stack
+│   │   ├── progress.md                 # Roadmap and task tracking
+│   │   └── deployment-infrastructure.md # Hosting, secrets, CI/CD
 │   ├── legal/
 │   ├── business/
 │   ├── design-brand/
 │   └── open-issues/
+│
 ├── CLAUDE.md                           # Your project's AI rules
 └── GEMINI.md                           # Gemini instructions (if selected)
 ```
