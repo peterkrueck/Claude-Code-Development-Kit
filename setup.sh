@@ -160,11 +160,11 @@ main() {
 
     # Visual Skills
     print_color "$CYAN" "  Visual Skills"
-    echo "    AI-powered image generation using Nanobanana 2 (Gemini) with"
-    echo "    optional reference photos for style/character consistency."
-    echo "    Precise image editing (crop, resize, rotate — analyzes content"
-    echo "    bounds before cutting). Local background removal via rembg"
-    echo "    (no data sent externally)."
+    echo "    Generate app icons, character art, social media graphics, and"
+    echo "    marketing assets using Nanobanana 2 (Gemini). Optional reference"
+    echo "    photos keep your character/brand consistent across variations."
+    echo "    Precise image editing (crop, resize, rotate) and local background"
+    echo "    removal for transparent PNGs — no data sent externally."
     echo
     echo "    Includes: /image-gen, /image-edit, /bg-remove"
     print_color "$DIM" "    Requires: Python 3 with Pillow/numpy"
@@ -442,10 +442,6 @@ main() {
     if [ "$needs_rembg" = true ]; then
         print_color "$YELLOW" "  rembg required (/bg-remove):"
         echo "    pip install \"rembg[cpu,cli]\""
-        echo
-    fi
-    if [ "$INSTALL_STOP_PIPELINE" = "y" ]; then
-        print_color "$DIM" "  Tip: Set your test command in .claude/hooks/config/pipeline.json"
         echo
     fi
     echo "  Test your setup:"
