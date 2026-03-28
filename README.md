@@ -5,7 +5,7 @@
 
 An integrated system that transforms Claude Code into an orchestrated development environment through automated documentation management, multi-agent workflows, and external AI expertise.
 
-> **Related**: Check out [Freigeist](https://www.freigeist.dev) - upcoming AI coding platform for complex projects!
+> **Related**: Check out [Freigeist](https://www.freigeist.dev) - upcoming AI coding platform for complex projects! | [claude-dash](https://github.com/krabat-l/claude-dash) - real-time statusline for Claude Code showing context, cost, quota, cache, tools, and git status.
 
 ## Why Claude Code?
 
