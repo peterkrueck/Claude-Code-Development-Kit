@@ -14,6 +14,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
+DIM='\033[2m'
 NC='\033[0m'
 
 # State
@@ -28,9 +29,6 @@ INSTALL_DEPLOY_TEMPLATE="n"
 INSTALL_GEMINI="n"
 INSTALL_STOP_PIPELINE="n"
 INSTALL_NOTIFICATIONS="n"
-INSTALL_CONTEXT7="n"
-INSTALL_SUPABASE="n"
-INSTALL_ASSETS="n"
 
 print_color() {
     local color=$1; shift
@@ -139,54 +137,89 @@ main() {
     print_color "$BLUE" "─── Feature Selection ───"
     echo
     print_color "$GREEN" "  Core (always installed):"
-    echo "    CLAUDE.md template, /prime command, security scanner, deny list"
-    echo "    Documentation scaffolding (spec, structure, progress, deployment)"
+    echo "    - CLAUDE.md — your project's AI instruction set"
+    echo "    - /prime command — loads core documentation into context"
+    echo "    - /update-docs skill — keeps documentation in sync with code"
+    echo "    - Security scanner — blocks secrets from leaking to MCP/plugins"
+    echo "    - Deny list — prevents destructive git/rm commands"
+    echo "    - Documentation scaffolding (spec, structure, progress, deployment)"
+    echo "    - Asset directories (assets/)"
     echo
 
-    print_color "$CYAN" "  Review Skills (Gemini CLI + Claude fallback)"
-    echo "    /review-work, /second-opinion, /update-docs"
-    safe_read_yn INSTALL_REVIEW_SKILLS "    Install? (y/n): "
+    # Review Skills
+    print_color "$CYAN" "  Review Skills"
+    echo "    Independent code review and architecture consultation using"
+    echo "    Google's Gemini CLI — a different AI architecture that catches"
+    echo "    blind spots Claude might miss. Falls back to Claude if Gemini"
+    echo "    is unavailable."
+    echo
+    echo "    Includes: /review-work, /second-opinion"
+    print_color "$DIM" "    Requires: Gemini CLI (https://github.com/google-gemini/gemini-cli)"
+    safe_read_yn INSTALL_REVIEW_SKILLS "    Install review skills? (y/n): "
     echo
 
-    print_color "$CYAN" "  Visual Skills (Python/Pillow/rembg)"
-    echo "    /image-gen, /image-edit, /bg-remove"
-    safe_read_yn INSTALL_VISUAL_SKILLS "    Install? (y/n): "
+    # Visual Skills
+    print_color "$CYAN" "  Visual Skills"
+    echo "    AI-powered image generation with style consistency (reference"
+    echo "    photos keep your character/brand consistent across poses),"
+    echo "    precise image editing (crop, resize, rotate — measures before"
+    echo "    cutting), and local background removal (no data sent externally)."
+    echo
+    echo "    Includes: /image-gen, /image-edit, /bg-remove"
+    print_color "$DIM" "    Requires: Python 3 with Pillow/numpy"
+    print_color "$DIM" "    /image-gen also requires: GEMINI_API_KEY env variable (~\$0.10/image)"
+    print_color "$DIM" "    /bg-remove also requires: rembg (pip install \"rembg[cpu,cli]\")"
+    safe_read_yn INSTALL_VISUAL_SKILLS "    Install visual skills? (y/n): "
     echo
 
+    # Deploy Template
     print_color "$CYAN" "  Deploy Skill Template"
-    echo "    Customizable test-gated deployment pipeline"
-    safe_read_yn INSTALL_DEPLOY_TEMPLATE "    Install? (y/n): "
+    echo "    A customizable deployment pipeline you fill in with your own"
+    echo "    test, deploy, and health check commands. Follows the pattern:"
+    echo "    detect changes -> run tests -> deploy -> verify -> report."
+    safe_read_yn INSTALL_DEPLOY_TEMPLATE "    Install deploy template? (y/n): "
     echo
 
+    # Gemini Integration
     print_color "$CYAN" "  Gemini Integration"
-    echo "    GEMINI.md template for second-opinion consulting"
-    safe_read_yn INSTALL_GEMINI "    Install? (y/n): "
+    echo "    Creates GEMINI.md — an instruction file that Gemini CLI reads"
+    echo "    automatically, giving it full context about your project when"
+    echo "    invoked as a second-opinion consultant."
+    if [ "$INSTALL_REVIEW_SKILLS" = "y" ]; then
+        print_color "$GREEN" "    Recommended: you selected review skills which use Gemini."
+    fi
+    safe_read_yn INSTALL_GEMINI "    Install GEMINI.md template? (y/n): "
     echo
 
+    # Stop Pipeline
     print_color "$CYAN" "  Stop Pipeline Hook"
-    echo "    Gates stopping on: code review -> tests -> doc updates"
-    safe_read_yn INSTALL_STOP_PIPELINE "    Install? (y/n): "
+    echo "    Prevents Claude from stopping until quality checks pass."
+    echo "    When you have 10+ lines of uncommitted changes, it gates"
+    echo "    stopping on: code review -> run tests -> update docs."
+    echo "    Each phase is configurable and can be disabled individually."
+    safe_read_yn INSTALL_STOP_PIPELINE "    Install stop pipeline? (y/n): "
     echo
 
+    # Notifications
     print_color "$CYAN" "  Audio Notifications"
-    echo "    Sounds when tasks complete or input is needed"
-    safe_read_yn INSTALL_NOTIFICATIONS "    Install? (y/n): "
-    echo
-
-    print_color "$CYAN" "  Asset Directories"
-    echo "    Scaffolding: assets/{app-icon,character,logo,social,web}"
-    safe_read_yn INSTALL_ASSETS "    Install? (y/n): "
-    echo
-
-    print_color "$CYAN" "  Plugins (permissions only — install separately)"
-    echo "    Context7: claude plugins add context7"
-    safe_read_yn INSTALL_CONTEXT7 "    Add Context7 permissions? (y/n): "
-    echo "    Supabase: claude plugins add supabase"
-    safe_read_yn INSTALL_SUPABASE "    Add Supabase permissions? (y/n): "
+    echo "    Plays a sound when Claude finishes a task or needs your input."
+    echo "    Useful when working in another window. Cross-platform"
+    echo "    (macOS/Linux/Windows)."
+    safe_read_yn INSTALL_NOTIFICATIONS "    Install notifications? (y/n): "
 
     # Confirm
     echo
     print_color "$YELLOW" "Ready to install to: $TARGET_DIR"
+    echo
+    print_color "$GREEN" "  Will install:"
+    echo "    - Core (CLAUDE.md, /prime, /update-docs, security, docs, assets)"
+    [ "$INSTALL_REVIEW_SKILLS" = "y" ] && echo "    - Review skills (/review-work, /second-opinion)"
+    [ "$INSTALL_VISUAL_SKILLS" = "y" ] && echo "    - Visual skills (/image-gen, /image-edit, /bg-remove)"
+    [ "$INSTALL_DEPLOY_TEMPLATE" = "y" ] && echo "    - Deploy skill template"
+    [ "$INSTALL_GEMINI" = "y" ] && echo "    - GEMINI.md template"
+    [ "$INSTALL_STOP_PIPELINE" = "y" ] && echo "    - Stop pipeline hook"
+    [ "$INSTALL_NOTIFICATIONS" = "y" ] && echo "    - Audio notifications"
+    echo
     safe_read_yn confirm "  Continue? (y/n): "
     [ "$confirm" != "y" ] && { print_color "$RED" "Cancelled."; exit 0; }
 
@@ -197,6 +230,7 @@ main() {
     mkdir -p "$TARGET_DIR/.claude/hooks/config"
     mkdir -p "$TARGET_DIR/.claude/skills"
     mkdir -p "$TARGET_DIR/docs/ai-context"
+    mkdir -p "$TARGET_DIR/assets"
     for d in legal business design-brand open-issues; do
         mkdir -p "$TARGET_DIR/docs/$d"
         [ ! -f "$TARGET_DIR/docs/$d/.gitkeep" ] && touch "$TARGET_DIR/docs/$d/.gitkeep"
@@ -204,13 +238,6 @@ main() {
 
     if [ "$INSTALL_NOTIFICATIONS" = "y" ] || [ "$INSTALL_STOP_PIPELINE" = "y" ]; then
         mkdir -p "$TARGET_DIR/.claude/hooks/sounds"
-    fi
-
-    if [ "$INSTALL_ASSETS" = "y" ]; then
-        for d in app-icon character logo social web; do
-            mkdir -p "$TARGET_DIR/assets/$d"
-            [ ! -f "$TARGET_DIR/assets/$d/.gitkeep" ] && touch "$TARGET_DIR/assets/$d/.gitkeep"
-        done
     fi
 
     # ── Copy core files ──────────────────────────────────────────────────
@@ -227,6 +254,10 @@ main() {
     # /prime command
     copy_file "$SCRIPT_DIR/commands/prime.md" "$TARGET_DIR/.claude/commands/prime.md" "Command"
 
+    # /update-docs skill (core — always installed)
+    mkdir -p "$TARGET_DIR/.claude/skills/update-docs"
+    copy_file "$SCRIPT_DIR/skills/update-docs/SKILL.md" "$TARGET_DIR/.claude/skills/update-docs/SKILL.md" "Skill"
+
     # Security scanner
     copy_file "$SCRIPT_DIR/hooks/security-scan.sh" "$TARGET_DIR/.claude/hooks/security-scan.sh" "Hook"
     copy_file "$SCRIPT_DIR/hooks/config/sensitive-patterns.json" "$TARGET_DIR/.claude/hooks/config/sensitive-patterns.json" "Config"
@@ -240,7 +271,7 @@ main() {
 
     # Review skills
     if [ "$INSTALL_REVIEW_SKILLS" = "y" ]; then
-        for skill in review-work second-opinion update-docs; do
+        for skill in review-work second-opinion; do
             mkdir -p "$TARGET_DIR/.claude/skills/$skill"
             copy_file "$SCRIPT_DIR/skills/$skill/SKILL.md" "$TARGET_DIR/.claude/skills/$skill/SKILL.md" "Skill"
         done
@@ -317,14 +348,6 @@ main() {
         allow_entries="$allow_entries"$'\n'$(jq -r '.allow[]' "$SCRIPT_DIR/settings/permissions/skills-visual.json")
     fi
 
-    if [ "$INSTALL_CONTEXT7" = "y" ]; then
-        allow_entries="$allow_entries"$'\n'$(jq -r '.allow[]' "$SCRIPT_DIR/settings/permissions/plugin-context7.json")
-    fi
-
-    if [ "$INSTALL_SUPABASE" = "y" ]; then
-        allow_entries="$allow_entries"$'\n'$(jq -r '.allow[]' "$SCRIPT_DIR/settings/permissions/plugin-supabase.json")
-    fi
-
     # Build allow and deny JSON arrays (filter empty lines)
     local allow_json deny_json
     allow_json=$(echo "$allow_entries" | grep -v '^$' | sort -u | jq -R . | jq -s .)
@@ -389,18 +412,26 @@ main() {
         echo "  3. Customize GEMINI.md with your project details"
     fi
     if [ "$INSTALL_STOP_PIPELINE" = "y" ]; then
-        echo "  Edit .claude/hooks/config/pipeline.json for test commands"
+        echo
+        echo "  Configure stop pipeline:"
+        echo "    Edit .claude/hooks/config/pipeline.json to set your test command"
     fi
     echo
-    if [ "$INSTALL_CONTEXT7" = "y" ] || [ "$INSTALL_SUPABASE" = "y" ]; then
-        print_color "$CYAN" "  Install plugins:"
-        [ "$INSTALL_CONTEXT7" = "y" ] && echo "    claude plugins add context7"
-        [ "$INSTALL_SUPABASE" = "y" ] && echo "    claude plugins add supabase"
-        echo
-    fi
+    print_color "$CYAN" "  Recommended plugin:"
+    echo "    claude plugins add context7"
+    echo "    Gives Claude access to up-to-date library documentation."
+    echo "    Highly recommended for any project using external libraries."
+    echo
     if [ "$INSTALL_REVIEW_SKILLS" = "y" ] && ! command -v gemini &>/dev/null; then
         print_color "$YELLOW" "  Review skills require Gemini CLI:"
         echo "    See: https://github.com/google-gemini/gemini-cli"
+        echo
+    fi
+    if [ "$INSTALL_VISUAL_SKILLS" = "y" ]; then
+        print_color "$YELLOW" "  Visual skills setup:"
+        echo "    /image-gen requires: export GEMINI_API_KEY=your-key"
+        echo "      Get one at: https://aistudio.google.com/apikey"
+        echo "    /bg-remove requires: pip install \"rembg[cpu,cli]\""
         echo
     fi
     echo "  Test your setup:"

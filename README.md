@@ -69,6 +69,12 @@ your-project/
 
 ## Skills
 
+### Core Skills (always installed)
+
+| Skill | Trigger | What it does |
+|-------|---------|-------------|
+| `/update-docs` | Manual or stop hook | Updates `docs/ai-context/` files to match current code state. |
+
 ### Review Skills (require [Gemini CLI](https://github.com/google-gemini/gemini-cli))
 
 | Skill | Trigger | What it does |
@@ -76,13 +82,7 @@ your-project/
 | `/review-work` | Manual or stop hook | Sends diff to Gemini for independent code review. Falls back to Claude sub-agent. |
 | `/second-opinion` | Auto (when stuck or facing trade-offs) | Consults Gemini on architecture decisions, debugging, edge cases. |
 
-### Documentation Skills
-
-| Skill | Trigger | What it does |
-|-------|---------|-------------|
-| `/update-docs` | Manual or stop hook | Updates `docs/ai-context/` files to match current code state. |
-
-### Visual Skills (require Python 3)
+### Visual Skills (require Python 3, `/image-gen` also requires `GEMINI_API_KEY`)
 
 | Skill | Trigger | What it does |
 |-------|---------|-------------|
@@ -153,14 +153,12 @@ The kit treats Gemini as a **peer reviewer**, not a subordinate. Gemini gets its
 
 ## Plugins
 
-Plugins are installed separately via Claude Code:
+Install plugins separately via Claude Code as needed:
 
 ```bash
-claude plugins add context7     # Library documentation
+claude plugins add context7     # Library documentation (highly recommended)
 claude plugins add supabase     # Database management
 ```
-
-The installer adds the correct permissions to `settings.local.json` when you select these.
 
 ## Upgrading from v2
 
