@@ -8,7 +8,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOOK_INPUT=$(cat)
-SESSION_ID=$(echo "$HOOK_INPUT" | jq -r '.session_id // "unknown"' 2>/dev/null || echo "unknown")
+SESSION_ID=$(echo "$HOOK_INPUT" | jq -r '.session_id // empty' 2>/dev/null || true)
+[[ -z "$SESSION_ID" ]] && exit 0  # Can't snapshot without session ID
 BASELINE="/tmp/claude-baseline-${SESSION_ID}.numstat"
 
 # Only snapshot once per session
@@ -17,10 +18,13 @@ BASELINE="/tmp/claude-baseline-${SESSION_ID}.numstat"
 PROJECT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$PROJECT_DIR" 2>/dev/null || exit 0
 
-# Read file patterns from config
+# Read file patterns from config (bash 3.2 compatible — no mapfile)
 CONFIG_FILE="$SCRIPT_DIR/config/pipeline.json"
+FILE_PATTERNS=()
 if [[ -f "$CONFIG_FILE" ]]; then
-    mapfile -t FILE_PATTERNS < <(jq -r '(.file_patterns // ["*.py","*.ts","*.js","*.swift","*.go","*.rs"]) | .[]' "$CONFIG_FILE" 2>/dev/null)
+    while IFS= read -r _pat; do
+        [[ -n "$_pat" ]] && FILE_PATTERNS+=("$_pat")
+    done < <(jq -r '(.file_patterns // ["*.py","*.ts","*.js","*.swift","*.go","*.rs"]) | .[]' "$CONFIG_FILE" 2>/dev/null)
 else
     FILE_PATTERNS=("*.py" "*.ts" "*.js" "*.swift" "*.go" "*.rs")
 fi

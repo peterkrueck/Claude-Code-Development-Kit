@@ -17,42 +17,59 @@ mkdir -p "$(dirname "$LOG_FILE")"
 # Read input from stdin
 INPUT_JSON=$(cat)
 
-# Function to log security events
+# Load whitelist once at startup (avoids re-reading per pattern check)
+WHITELIST_ENTRIES=""
+if [[ -f "$PATTERNS_FILE" ]]; then
+    WHITELIST_ENTRIES=$(jq -r '.whitelist.allowed_mentions[]' "$PATTERNS_FILE" 2>/dev/null || echo "")
+fi
+
+# Function to log security events (uses jq to prevent JSON injection)
 log_security_event() {
     local event_type="$1"
     local details="$2"
     local tool_name="${3:-unknown}"
-    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-    echo "{\"timestamp\": \"$timestamp\", \"tool\": \"$tool_name\", \"event\": \"$event_type\", \"details\": \"$details\"}" >> "$LOG_FILE"
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    jq -n --arg ts "$timestamp" --arg tool "$tool_name" --arg event "$event_type" --arg details "$details" \
+        '{"timestamp": $ts, "tool": $tool, "event": $event, "details": $details}' >> "$LOG_FILE"
 }
 
 # Function to check if content matches sensitive patterns
+# Whitelist is checked per-line (not against whole content) to prevent
+# a whitelisted placeholder elsewhere from bypassing a real secret.
 check_sensitive_content() {
     local content="$1"
     local pattern_type="$2"
-    
-    # Get patterns from JSON config
-    local patterns=$(jq -r ".patterns.$pattern_type[]" "$PATTERNS_FILE" 2>/dev/null || echo "")
-    
-    for pattern in $patterns; do
-        if echo "$content" | grep -qiE "$pattern"; then
-            # Check whitelist
-            local whitelisted=false
-            local whitelist_patterns=$(jq -r '.whitelist.allowed_mentions[]' "$PATTERNS_FILE" 2>/dev/null || echo "")
-            
-            for whitelist in $whitelist_patterns; do
-                if echo "$content" | grep -qF "$whitelist"; then
-                    whitelisted=true
+
+    local patterns
+    patterns=$(jq -r ".patterns.$pattern_type[]" "$PATTERNS_FILE" 2>/dev/null || echo "")
+    [[ -z "$patterns" ]] && return 1
+
+    while IFS= read -r pattern; do
+        [[ -z "$pattern" ]] && continue
+        # Get only the lines that matched this pattern
+        local matched_lines
+        matched_lines=$(echo "$content" | grep -iE "$pattern" 2>/dev/null || true)
+        [[ -z "$matched_lines" ]] && continue
+
+        # Check each matched line individually against whitelist
+        while IFS= read -r match_line; do
+            [[ -z "$match_line" ]] && continue
+            local line_whitelisted=false
+            while IFS= read -r wl_entry; do
+                [[ -z "$wl_entry" ]] && continue
+                if echo "$match_line" | grep -qF "$wl_entry"; then
+                    line_whitelisted=true
                     break
                 fi
-            done
-            
-            if [[ "$whitelisted" == "false" ]]; then
-                return 0  # Found sensitive data
+            done <<< "$WHITELIST_ENTRIES"
+
+            if [[ "$line_whitelisted" == "false" ]]; then
+                return 0  # Found sensitive data on a non-whitelisted line
             fi
-        fi
-    done
-    
+        done <<< "$matched_lines"
+    done <<< "$patterns"
+
     return 1  # No sensitive data found
 }
 
