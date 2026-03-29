@@ -80,7 +80,7 @@ fi
 | `-o text` | Clean text output, no JSON wrapper noise |
 | `2>/tmp/gemini-stderr.txt` | Capture stderr separately for error detection |
 
-Set a **300-second timeout** on the Bash tool call (Gemini may need time to read files and reason).
+Set a **600-second timeout** on the Bash tool call (Gemini may need time to read files and reason).
 
 ### Step 2b: Follow Up (Multi-Turn)
 
