@@ -1,6 +1,16 @@
 {
   "patterns": {
-    "api_keys": [],
+    "api_keys": [
+      "sk_live_[a-zA-Z0-9]{24,}",
+      "pk_live_[a-zA-Z0-9]{24,}",
+      "rk_live_[a-zA-Z0-9]{24,}",
+      "whsec_[a-zA-Z0-9]{32,}",
+      "sk-ant-[a-zA-Z0-9\\-_]{90,}",
+      "sbp_[a-zA-Z0-9]{40,}",
+      "npm_[a-zA-Z0-9]{36}",
+      "SG\\.[a-zA-Z0-9\\-_]{22}\\.[a-zA-Z0-9\\-_]{43}",
+      "vercel_[a-zA-Z0-9]{24}"
+    ],
     "credentials": [
       "password\\s*[:=]\\s*[\"']?[^\\s\"']+[\"']?",
       "passwd\\s*[:=]\\s*[\"']?[^\\s\"']+[\"']?",

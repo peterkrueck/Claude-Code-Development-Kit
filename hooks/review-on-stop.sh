@@ -8,7 +8,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOOK_INPUT=$(cat)
-SESSION_ID=$(echo "$HOOK_INPUT" | jq -r '.session_id // "unknown"' 2>/dev/null || echo "unknown")
+SESSION_ID=$(echo "$HOOK_INPUT" | jq -r '.session_id // empty' 2>/dev/null || true)
+[[ -z "$SESSION_ID" ]] && exit 0  # Can't track phases without session ID
 STATE_FILE="/tmp/claude-stop-${SESSION_ID}.state"
 BASELINE="/tmp/claude-baseline-${SESSION_ID}.numstat"
 PROJECT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
@@ -26,8 +27,11 @@ ENABLED=$(jq -r '.enabled // true' "$CONFIG_FILE")
 
 MIN_LINES=$(jq -r '.min_lines_changed // 10' "$CONFIG_FILE")
 
-# Read file patterns from config
-mapfile -t FILE_PATTERNS < <(jq -r '(.file_patterns // ["*.py","*.ts","*.js","*.swift","*.go","*.rs"]) | .[]' "$CONFIG_FILE" 2>/dev/null)
+# Read file patterns from config (bash 3.2 compatible — no mapfile)
+FILE_PATTERNS=()
+while IFS= read -r _pat; do
+    [[ -n "$_pat" ]] && FILE_PATTERNS+=("$_pat")
+done < <(jq -r '(.file_patterns // ["*.py","*.ts","*.js","*.swift","*.go","*.rs"]) | .[]' "$CONFIG_FILE" 2>/dev/null)
 
 # Build git diff pattern args
 PATTERN_ARGS=()
@@ -124,5 +128,5 @@ SUGGEST_STR=$(IFS=', '; echo "${SUGGESTIONS[*]}")
 
 MSG="This session changed ${TOTAL_NEW} lines:\n${FILE_LIST}\nConsider: ${SUGGEST_STR}. Use your judgment — or stop again to skip."
 
-jq -n --arg reason "$(echo -e "$MSG")" '{"decision": "block", "reason": $reason}'
+jq -n --arg reason "$(printf '%b' "$MSG")" '{"decision": "block", "reason": $reason}'
 exit 0

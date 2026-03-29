@@ -26,6 +26,12 @@ cd Claude-Code-Development-Kit
 
 The installer walks you through what to include. Everything is optional except the core.
 
+## How It Works
+
+**Skills** are things Claude does — automatically based on context, or when you type a `/slash-command`. **Hooks** run in the background on specific events (security checks, review nudges, notification sounds). **Commands** are manual triggers you type, like `/prime` to load your project context.
+
+The installer lets you pick: **recommended** (review + notifications + review-on-stop), **customize** (choose each feature), or **minimal** (core only). Re-run anytime to add more.
+
 ## What You Get
 
 ### Always installed (core)
@@ -49,11 +55,11 @@ Requires: [Gemini CLI](https://github.com/google-gemini/gemini-cli)
 
 ### Optional: Visual skills
 
-Generate app icons, character art, social media graphics, and marketing assets. Edit images with precision. Remove backgrounds locally.
+For any project that needs visual assets — app icons, UI artwork, social media graphics, marketing materials, or website imagery. Generate images with AI, edit with precision, remove backgrounds locally.
 
-- `/image-gen` — AI image generation via Nanobanana 2 (Gemini). Optional reference photos for style consistency.
-- `/image-edit` — Crop, resize, rotate, mirror. Analyzes content bounds before cutting.
-- `/bg-remove` — Background removal via rembg. Runs locally, nothing sent externally.
+- `/image-gen` — AI image generation via Gemini. Optional reference photos for style consistency across variations.
+- `/image-edit` — Crop, resize, rotate, mirror. Analyzes content bounds before cutting (never guesses coordinates).
+- `/bg-remove` — Background removal via rembg. Runs 100% locally, nothing sent externally.
 
 Requires: Python 3, Pillow, numpy. `/image-gen` also needs a `GEMINI_API_KEY`. `/bg-remove` needs rembg.
 
@@ -123,6 +129,16 @@ curl -fsSL https://raw.githubusercontent.com/peterkrueck/Claude-Code-Development
 
 See [CHANGELOG.md](CHANGELOG.md) for the full migration guide.
 
+
+## Uninstalling
+
+Remove the installed files from your project:
+
+```bash
+rm -rf .claude/ docs/ai-context/ assets/ CLAUDE.md GEMINI.md
+```
+
+The scaffolding directories (`docs/legal/`, `docs/business/`, etc.) are empty by default — remove them too if unused. Your code is never modified.
 
 ## FAQ
 

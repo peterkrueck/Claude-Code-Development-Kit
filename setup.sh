@@ -96,6 +96,71 @@ copy_file() {
     fi
 }
 
+# ── Tutorial ─────────────────────────────────────────────────────────────
+
+# Terminology + workflow overview shown before feature selection
+# so users understand what they're choosing.
+show_workflow_overview() {
+    echo
+    print_color "$BLUE" "─── How It Works ───"
+    echo
+    print_color "$DIM" "  Terminology:"
+    echo "    Skills   — things Claude does (auto or via /slash-command)"
+    echo "    Hooks    — background automation (security, review nudges, sounds)"
+    echo "    Commands — you type /prime to load project context"
+    echo
+    print_color "$DIM" "  A typical session with all features enabled:"
+    echo
+    print_color "$YELLOW" "  1. Start"
+    echo "     \$ cd your-project && claude"
+    echo
+    print_color "$YELLOW" "  2. Load context"
+    print_color "$GREEN" "     > /prime"
+    print_color "$CYAN" "     \"I see a Node.js API with Postgres. Auth is done,"
+    print_color "$CYAN" "      payments module is next. What are we working on?\""
+    echo
+    print_color "$YELLOW" "  3. Describe your task — Claude writes the code"
+    print_color "$GREEN" "     > Add a /users/me endpoint with auth"
+    echo "     ✓ Creates files, runs tests, verifies."
+    echo
+    print_color "$YELLOW" "  4. Independent code review"
+    print_color "$GREEN" "     > /review-work"
+    echo "     Gemini reviews your diff — different AI, different blind spots."
+    print_color "$DIM" "                                                  (review skills)"
+    echo
+    print_color "$YELLOW" "  5. Create visual assets"
+    print_color "$GREEN" "     > Generate an app icon, crop to 1024x1024, remove bg"
+    echo "     AI generation → precision editing → local background removal."
+    print_color "$DIM" "                                                  (visual skills)"
+    echo
+    print_color "$YELLOW" "  6. Keep docs in sync"
+    print_color "$GREEN" "     > /update-docs"
+    echo "     Only updates what actually changed."
+    echo
+    print_color "$YELLOW" "  7. Finish — review-on-stop nudges you"
+    echo "     stop → advisory → stop → reminder → stop → exit"
+    echo "     Gentle nudge to review. Never traps you."
+    print_color "$DIM" "                                                  (review-on-stop)"
+    echo
+    print_color "$DIM" "  Always on: security scanner blocks secrets from leaking."
+    print_color "$DIM" "  Notifications: sound alerts when Claude finishes or needs input."
+    echo
+}
+
+safe_read_setup_mode() {
+    local var_name="$1"
+    local prompt="$2"
+    local user_input sanitized_input valid_input=false
+    while [ "$valid_input" = false ]; do
+        if ! safe_read user_input "$prompt"; then return 1; fi
+        sanitized_input="$(echo "${user_input//$'\r'/}" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')"
+        case "$sanitized_input" in
+            r|c|m) valid_input=true; printf -v "$var_name" '%s' "$sanitized_input" ;;
+            *) print_color "$YELLOW" "Please enter 'r', 'c', or 'm'." ;;
+        esac
+    done
+}
+
 # ── Main ─────────────────────────────────────────────────────────────────
 
 main() {
@@ -132,8 +197,10 @@ main() {
     [ "$TARGET_DIR" = "$SCRIPT_DIR" ] && { print_color "$RED" "Cannot install into source directory"; exit 1; }
     print_color "$GREEN" "  Target: $TARGET_DIR"
 
+    # ── Workflow overview (before feature selection) ────────────────────
+    show_workflow_overview
+
     # ── Feature selection ────────────────────────────────────────────────
-    echo
     print_color "$BLUE" "─── Feature Selection ───"
     echo
     print_color "$GREEN" "  Core (always installed):"
@@ -145,68 +212,98 @@ main() {
     echo "    - Documentation scaffolding (spec, structure, progress, deployment)"
     echo "    - Asset directories (assets/)"
     echo
-
-    # Review Skills
-    print_color "$CYAN" "  Review Skills"
-    echo "    Independent code review and architecture consultation using"
-    echo "    Google's Gemini CLI — a different AI architecture that catches"
-    echo "    blind spots Claude might miss. Falls back to Claude if Gemini"
-    echo "    is unavailable."
+    print_color "$CYAN" "  How do you want to set up optional features?"
     echo
-    echo "    Includes: /review-work, /second-opinion"
-    print_color "$DIM" "    Requires: Gemini CLI (https://github.com/google-gemini/gemini-cli)"
-    safe_read_yn INSTALL_REVIEW_SKILLS "    Install review skills? (y/n): "
+    echo "    [r] Recommended — review skills, Gemini, review-on-stop, notifications"
+    echo "    [c] Customize   — choose each feature individually"
+    echo "    [m] Minimal     — core only, nothing optional"
+    echo
+    safe_read_setup_mode setup_mode "    Your choice (r/c/m): "
     echo
 
-    # Visual Skills
-    print_color "$CYAN" "  Visual Skills"
-    echo "    Generate app icons, character art, social media graphics, and"
-    echo "    marketing assets using Nanobanana 2 (Gemini). Optional reference"
-    echo "    photos keep your character/brand consistent across variations."
-    echo "    Precise image editing (crop, resize, rotate) and local background"
-    echo "    removal for transparent PNGs — no data sent externally."
-    echo
-    echo "    Includes: /image-gen, /image-edit, /bg-remove"
-    print_color "$DIM" "    Requires: Python 3 with Pillow/numpy"
-    print_color "$DIM" "    /image-gen also requires: GEMINI_API_KEY env variable (~\$0.10/image)"
-    print_color "$DIM" "    /bg-remove also requires: rembg (pip install \"rembg[cpu,cli]\")"
-    safe_read_yn INSTALL_VISUAL_SKILLS "    Install visual skills? (y/n): "
-    echo
+    case "$setup_mode" in
+        r)
+            INSTALL_REVIEW_SKILLS="y"
+            INSTALL_GEMINI="y"
+            INSTALL_REVIEW_ON_STOP="y"
+            INSTALL_NOTIFICATIONS="y"
+            print_color "$GREEN" "  Recommended set:"
+            echo "    ✓ Review skills (/review-work, /second-opinion)"
+            echo "    ✓ GEMINI.md template"
+            echo "    ✓ Review-on-stop hook"
+            echo "    ✓ Audio notifications"
+            echo
+            print_color "$DIM" "  Not included (re-run setup.sh to add later):"
+            echo "    - Visual skills (/image-gen, /image-edit, /bg-remove)"
+            echo "    - Deploy skill template"
+            ;;
+        m)
+            print_color "$GREEN" "  Minimal: core only."
+            print_color "$DIM" "  Re-run setup.sh anytime to add features."
+            ;;
+        c)
+            # Review Skills
+            print_color "$CYAN" "  Review Skills"
+            echo "    Independent code review and architecture consultation using"
+            echo "    Google's Gemini CLI — a different AI architecture that catches"
+            echo "    blind spots Claude might miss. Falls back to Claude if Gemini"
+            echo "    is unavailable."
+            echo
+            echo "    Includes: /review-work, /second-opinion"
+            print_color "$DIM" "    Requires: Gemini CLI (https://github.com/google-gemini/gemini-cli)"
+            safe_read_yn INSTALL_REVIEW_SKILLS "    Install review skills? (y/n): "
+            echo
 
-    # Deploy Template
-    print_color "$CYAN" "  Deploy Skill Template"
-    echo "    A customizable deployment pipeline you fill in with your own"
-    echo "    test, deploy, and health check commands. Follows the pattern:"
-    echo "    detect changes -> run tests -> deploy -> verify -> report."
-    safe_read_yn INSTALL_DEPLOY_TEMPLATE "    Install deploy template? (y/n): "
-    echo
+            # Visual Skills
+            print_color "$CYAN" "  Visual Skills"
+            echo "    For any project that needs visual assets — app icons, UI artwork,"
+            echo "    social media graphics, marketing materials, or website imagery."
+            echo "    Generate images with AI (reference photos for consistency),"
+            echo "    crop and resize precisely, and remove backgrounds locally."
+            echo
+            echo "    Includes: /image-gen, /image-edit, /bg-remove"
+            print_color "$DIM" "    Requires: Python 3 with Pillow/numpy"
+            print_color "$DIM" "    /image-gen also requires: GEMINI_API_KEY env variable (~\$0.10/image)"
+            print_color "$DIM" "    /bg-remove also requires: rembg (pip install \"rembg[cpu,cli]\")"
+            safe_read_yn INSTALL_VISUAL_SKILLS "    Install visual skills? (y/n): "
+            echo
 
-    # Gemini Integration
-    print_color "$CYAN" "  Gemini Integration"
-    echo "    Creates GEMINI.md — an instruction file that Gemini CLI reads"
-    echo "    automatically, giving it full context about your project when"
-    echo "    invoked as a second-opinion consultant."
-    if [ "$INSTALL_REVIEW_SKILLS" = "y" ]; then
-        print_color "$GREEN" "    Recommended: you selected review skills which use Gemini."
-    fi
-    safe_read_yn INSTALL_GEMINI "    Install GEMINI.md template? (y/n): "
-    echo
+            # Deploy Template
+            print_color "$CYAN" "  Deploy Skill Template"
+            echo "    A customizable deployment pipeline you fill in with your own"
+            echo "    test, deploy, and health check commands. Follows the pattern:"
+            echo "    detect changes -> run tests -> deploy -> verify -> report."
+            safe_read_yn INSTALL_DEPLOY_TEMPLATE "    Install deploy template? (y/n): "
+            echo
 
-    # Review-on-Stop
-    print_color "$CYAN" "  Review-on-Stop Hook"
-    echo "    Nudges you to review before finishing. When you have 10+"
-    echo "    lines of new code, the first stop shows an advisory with"
-    echo "    changed files and suggests review/test/docs. Stop again"
-    echo "    to get a reminder, stop a third time to skip entirely."
-    echo "    Never traps you — three stops always gets you out."
-    safe_read_yn INSTALL_REVIEW_ON_STOP "    Install review-on-stop? (y/n): "
-    echo
+            # Gemini Integration
+            print_color "$CYAN" "  Gemini Integration"
+            echo "    Creates GEMINI.md — an instruction file that Gemini CLI reads"
+            echo "    automatically, giving it full context about your project when"
+            echo "    invoked as a second-opinion consultant."
+            if [ "$INSTALL_REVIEW_SKILLS" = "y" ]; then
+                print_color "$GREEN" "    Recommended: you selected review skills which use Gemini."
+            fi
+            safe_read_yn INSTALL_GEMINI "    Install GEMINI.md template? (y/n): "
+            echo
 
-    # Notifications
-    print_color "$CYAN" "  Audio Notifications"
-    echo "    Plays a sound when Claude finishes a task or needs your input."
-    echo "    Useful when working in another window. Supports macOS and Linux."
-    safe_read_yn INSTALL_NOTIFICATIONS "    Install notifications? (y/n): "
+            # Review-on-Stop
+            print_color "$CYAN" "  Review-on-Stop Hook"
+            echo "    Nudges you to review before finishing. When you have 10+"
+            echo "    lines of new code, the first stop shows an advisory with"
+            echo "    changed files and suggests review/test/docs. Stop again"
+            echo "    to get a reminder, stop a third time to skip entirely."
+            echo "    Never traps you — three stops always gets you out."
+            safe_read_yn INSTALL_REVIEW_ON_STOP "    Install review-on-stop? (y/n): "
+            echo
+
+            # Notifications
+            print_color "$CYAN" "  Audio Notifications"
+            echo "    Plays a sound when Claude finishes a task or needs your input."
+            echo "    Useful when working in another window. Supports macOS and Linux."
+            safe_read_yn INSTALL_NOTIFICATIONS "    Install notifications? (y/n): "
+            ;;
+    esac
 
     # Confirm
     echo
@@ -457,6 +554,12 @@ main() {
     echo "  Test your setup:"
     echo "    cd \"$TARGET_DIR\" && claude"
     echo "    Then: /prime"
+    echo
+    print_color "$DIM" "  To uninstall: remove .claude/, docs/ai-context/, assets/,"
+    print_color "$DIM" "  CLAUDE.md, and GEMINI.md from your project."
+    echo
+    print_color "$DIM" "  To add features later: re-run setup.sh (existing files"
+    print_color "$DIM" "  are preserved unless you choose to overwrite)."
 }
 
 main "$@"
