@@ -94,7 +94,7 @@ else
 fi
 ```
 
-Set a **300-second timeout** on the Bash tool call.
+Set a **600-second timeout** on the Bash tool call.
 
 **If Gemini succeeds:** proceed to Step 4 (Evaluate Findings). Note who reviewed: "Reviewed by: Gemini".
 
