@@ -155,8 +155,8 @@ safe_read_setup_mode() {
         if ! safe_read user_input "$prompt"; then return 1; fi
         sanitized_input="$(echo "${user_input//$'\r'/}" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')"
         case "$sanitized_input" in
-            r|c|m) valid_input=true; printf -v "$var_name" '%s' "$sanitized_input" ;;
-            *) print_color "$YELLOW" "Please enter 'r', 'c', or 'm'." ;;
+            f|c|m) valid_input=true; printf -v "$var_name" '%s' "$sanitized_input" ;;
+            *) print_color "$YELLOW" "Please enter 'f', 'c', or 'm'." ;;
         esac
     done
 }
@@ -214,28 +214,30 @@ main() {
     echo
     print_color "$CYAN" "  How do you want to set up optional features?"
     echo
-    echo "    [r] Recommended — review skills, Gemini, review-on-stop, notifications"
-    echo "    [c] Customize   — choose each feature individually"
-    echo "    [m] Minimal     — core only, nothing optional"
+    echo "    [f] Full       — all skills, hooks, and templates (recommended)"
+    echo "    [c] Customize  — choose each feature individually"
+    echo "    [m] Minimal    — core only, add features later"
     echo
-    safe_read_setup_mode setup_mode "    Your choice (r/c/m): "
+    safe_read_setup_mode setup_mode "    Your choice (f/c/m): "
     echo
 
     case "$setup_mode" in
-        r)
+        f)
             INSTALL_REVIEW_SKILLS="y"
+            INSTALL_VISUAL_SKILLS="y"
+            INSTALL_DEPLOY_TEMPLATE="y"
             INSTALL_GEMINI="y"
             INSTALL_REVIEW_ON_STOP="y"
             INSTALL_NOTIFICATIONS="y"
-            print_color "$GREEN" "  Recommended set:"
+            print_color "$GREEN" "  Full install:"
             echo "    ✓ Review skills (/review-work, /second-opinion)"
+            echo "    ✓ Visual skills (/image-gen, /image-edit, /bg-remove)"
+            echo "    ✓ Deploy skill template"
             echo "    ✓ GEMINI.md template"
             echo "    ✓ Review-on-stop hook"
             echo "    ✓ Audio notifications"
             echo
-            print_color "$DIM" "  Not included (re-run setup.sh to add later):"
-            echo "    - Visual skills (/image-gen, /image-edit, /bg-remove)"
-            echo "    - Deploy skill template"
+            print_color "$DIM" "  Some skills need additional setup — see post-install notes."
             ;;
         m)
             print_color "$GREEN" "  Minimal: core only."

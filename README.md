@@ -30,7 +30,7 @@ The installer walks you through what to include. Everything is optional except t
 
 **Skills** are things Claude does — automatically based on context, or when you type a `/slash-command`. **Hooks** run in the background on specific events (security checks, review nudges, notification sounds). **Commands** are manual triggers you type, like `/prime` to load your project context.
 
-The installer lets you pick: **recommended** (review + notifications + review-on-stop), **customize** (choose each feature), or **minimal** (core only). Re-run anytime to add more.
+The installer gives you three paths: **full** (recommended — installs everything), **customize** (choose each feature individually), or **minimal** (core only). Re-run anytime to add more.
 
 ## What You Get
 
