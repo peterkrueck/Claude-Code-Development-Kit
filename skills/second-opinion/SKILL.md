@@ -32,92 +32,79 @@ Gemini has NO access to your conversation history, but it CAN read project files
 
 For questions about existing project code, you can simply reference file paths — Gemini will read them itself.
 
-### Step 2: Invoke Gemini and Check for Errors
+### Step 2: Invoke Gemini
 
-**IMPORTANT:** The invocation and error checking MUST be in a **single Bash tool call**. Shell variables (`GEMINI_RESPONSE`, exit codes) do not persist across separate Bash tool calls.
+**CRITICAL: Permission-free invocation pattern.** The command MUST start with `gemini` (matches the `Bash(gemini:*)` allow rule) and MUST NOT use `$()` command substitution or `/tmp/` file redirects — both trigger permission prompts.
 
-**With context piped via stdin** (for code snippets, diffs, or focused excerpts):
+**Standard call** (Gemini reads project files itself — preferred):
 
 ```bash
-GEMINI_RESPONSE=$(cat <<'CONTEXT_EOF' | gemini -p "$(cat <<'PROMPT_EOF'
-<your question here>
-PROMPT_EOF
-)" -o text 2>/tmp/gemini-stderr.txt
+gemini -p '<your question here>' -o text
+```
+
+**With context piped via stdin** (for code snippets, diffs, or focused excerpts — use when context is scattered or you want to focus attention on specific sections):
+
+```bash
+gemini -p '<your question here>' -o text <<'CONTEXT_EOF'
 <relevant code, diff, or context here>
 CONTEXT_EOF
-) ; GEMINI_EXIT=$?
-
-if grep -q "MODEL_CAPACITY_EXHAUSTED\|No capacity available\|code.*429" /tmp/gemini-stderr.txt 2>/dev/null; then
-  echo "GEMINI_UNAVAILABLE"
-elif [ "$GEMINI_EXIT" -ne 0 ]; then
-  echo "GEMINI_ERROR"
-  grep -v "^Loading\|^Registering\|^Server '\|^Scheduling\|^Executing\|^Coalescing\|^MCP\|^Loaded\|^Keychain\|^Using FileKeychain\|^Attempt\|^YOLO\|^$" /tmp/gemini-stderr.txt
-else
-  echo "$GEMINI_RESPONSE"
-fi
 ```
 
-**Without stdin context** (Gemini reads files itself — preferred when you can reference file paths):
-
-```bash
-GEMINI_RESPONSE=$(gemini -p '<your question here>' -o text 2>/tmp/gemini-stderr.txt) ; GEMINI_EXIT=$?
-
-if grep -q "MODEL_CAPACITY_EXHAUSTED\|No capacity available\|code.*429" /tmp/gemini-stderr.txt 2>/dev/null; then
-  echo "GEMINI_UNAVAILABLE"
-elif [ "$GEMINI_EXIT" -ne 0 ]; then
-  echo "GEMINI_ERROR"
-  grep -v "^Loading\|^Registering\|^Server '\|^Scheduling\|^Executing\|^Coalescing\|^MCP\|^Loaded\|^Keychain\|^Using FileKeychain\|^Attempt\|^YOLO\|^$" /tmp/gemini-stderr.txt
-else
-  echo "$GEMINI_RESPONSE"
-fi
-```
+The Bash tool captures all output (stdout + stderr) directly — no file redirects needed. Gemini's stderr noise (Loading, Registering, Scheduling, etc.) appears in the output but is easily identified and ignored. If the output contains `MODEL_CAPACITY_EXHAUSTED`, `No capacity available`, or `code.*429`, treat as unavailable.
 
 **Required flags — no exceptions:**
 
 | Flag | Why |
 |------|-----|
-| `-p` | Non-interactive headless mode. Tool calls are auto-approved in this mode |
+| `-p` | Non-interactive headless mode. Tool calls are auto-approved in this mode (`-y` is not needed) |
 | `-o text` | Clean text output, no JSON wrapper noise |
-| `2>/tmp/gemini-stderr.txt` | Capture stderr separately for error detection |
 
-Set a **600-second timeout** on the Bash tool call (Gemini may need time to read files and reason).
+**DO NOT use:**
+- `$()` command substitution (e.g., `GEMINI_RESPONSE=$(gemini ...)`) — triggers "Command contains $() command substitution" permission prompt
+- `/tmp/` file redirects (e.g., `2>/tmp/gemini-stderr.txt`) — triggers "allow access to tmp/" permission prompt
+- Nested heredocs inside `$()` — same issue
 
-### Step 2b: Follow Up (Multi-Turn)
+Set a **600-second timeout** on the Bash tool call (Gemini may need time to read files and reason through complex questions).
 
-If Gemini's initial response is unclear, incomplete, or you want to drill deeper, **resume the session** instead of starting fresh. This preserves the full conversation history so you don't need to re-explain context.
+### Step 2b: Multi-Turn Discussion (Autonomous)
+
+When the topic warrants debate (architecture, design reviews, trade-off analysis), **run the full multi-turn conversation autonomously** — do NOT ask the user for permission between rounds. Push back on Gemini's points, let Gemini push back on yours, iterate until you reach consensus or clearly identify the disagreements. Typically 2-4 rounds.
+
+Resume the session instead of starting fresh to preserve conversation history:
 
 ```bash
-GEMINI_RESPONSE=$(gemini -r latest -p '<your follow-up question>' -o text 2>/tmp/gemini-stderr.txt) ; GEMINI_EXIT=$?
-
-if grep -q "MODEL_CAPACITY_EXHAUSTED\|No capacity available\|code.*429" /tmp/gemini-stderr.txt 2>/dev/null; then
-  echo "GEMINI_UNAVAILABLE"
-elif [ "$GEMINI_EXIT" -ne 0 ]; then
-  echo "GEMINI_ERROR"
-  grep -v "^Loading\|^Registering\|^Server '\|^Scheduling\|^Executing\|^Coalescing\|^MCP\|^Loaded\|^Keychain\|^Using FileKeychain\|^Attempt\|^YOLO\|^$" /tmp/gemini-stderr.txt
-else
-  echo "$GEMINI_RESPONSE"
-fi
+gemini -r latest -p '<your follow-up question>' -o text
 ```
+
+You can also resume by session index (`-r 6`) or session ID (`-r <uuid>`). Use `gemini --list-sessions` to see available sessions.
+
+**When to use multi-turn:**
+- Design reviews or architecture discussions — run the full debate autonomously
+- Gemini's answer is vague — ask it to be specific about the part that matters
+- You want to challenge Gemini's reasoning — push back and see if it holds
+- The question naturally has layers — e.g., "which approach?" then "what are the migration risks of that one?"
+
+**When NOT to use multi-turn:**
+- The first answer was clear and complete — just present it
+- You're asking an unrelated question — start a fresh session
 
 ### Step 3: Present the Result
 
-**If Gemini responded successfully**, present it clearly:
+**If multi-turn:** Present a consolidated synthesis — the key agreements, remaining disagreements, and your joint recommendation. Don't dump each round's raw output; the user wants the conclusion, not the transcript.
 
-> **Second opinion from Gemini:**
->
-> [Gemini's response]
-
-Then add your own brief synthesis: where you agree, where you disagree, and what the user should take away from both perspectives.
+**If single-turn:** Present Gemini's response, then add your own brief synthesis: where you agree, where you disagree, and what the user should take away from both perspectives. The value is in the synthesis, not just the raw second opinion.
 
 **If Gemini is unavailable** (capacity exhausted / 429):
 
-> Gemini is currently at capacity. Proceeding with my own analysis only.
+> Gemini is currently at capacity. No fallback to a weaker model — proceeding with my own analysis only.
 
-Do NOT retry with a different model. Report unavailability and continue with your own reasoning.
+Do NOT retry with a different model. Do NOT silently fall back. Report unavailability and continue with your own reasoning.
+
+**If there's another error**, show the filtered stderr and continue with your own reasoning.
 
 ## Important Rules
 
-1. **Don't over-use.** This is for genuinely tricky decisions, not routine coding questions you can answer confidently yourself.
-2. **Shell quoting matters.** Use heredocs (as shown above) for prompts containing quotes, backticks, or special characters. Single-quote the heredoc delimiter (`'PROMPT_EOF'`) to prevent variable expansion.
-3. **Clean up.** Delete `/tmp/gemini-stderr.txt` after use if it contains any project-specific information.
-4. **Don't over-use multi-turn.** Most second opinions need one call. Only resume a session when the follow-up genuinely depends on the prior exchange.
+1. **Never fall back to a lesser model.** A weaker model's opinion isn't worth the false confidence it creates.
+2. **Don't over-use.** This is for genuinely tricky decisions, not routine coding questions you can answer confidently yourself.
+3. **Shell quoting matters.** For prompts containing single quotes, escape with `'\''`. For very complex prompts, use stdin heredoc (see Step 2).
+4. **Command must start with `gemini`** to match the `Bash(gemini:*)` allow rule. Never wrap in `$()` or redirect to `/tmp/`.

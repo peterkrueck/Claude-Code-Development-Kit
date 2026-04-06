@@ -125,7 +125,7 @@ show_workflow_overview() {
     echo
     print_color "$YELLOW" "  4. Independent code review"
     print_color "$GREEN" "     > /review-work"
-    echo "     Gemini reviews your diff — different AI, different blind spots."
+    echo "     Parallel sub-agents catch bugs, security issues, rule violations."
     print_color "$DIM" "                                                  (review skills)"
     echo
     print_color "$YELLOW" "  5. Create visual assets"
@@ -246,13 +246,12 @@ main() {
         c)
             # Review Skills
             print_color "$CYAN" "  Review Skills"
-            echo "    Independent code review and architecture consultation using"
-            echo "    Google's Gemini CLI — a different AI architecture that catches"
-            echo "    blind spots Claude might miss. Falls back to Claude if Gemini"
-            echo "    is unavailable."
+            echo "    Independent code review using parallel Claude sub-agents, plus"
+            echo "    architecture consultation via Gemini CLI for genuinely independent"
+            echo "    second opinions."
             echo
-            echo "    Includes: /review-work, /second-opinion"
-            print_color "$DIM" "    Requires: Gemini CLI (https://github.com/google-gemini/gemini-cli)"
+            echo "    Includes: /review-work (Claude sub-agents), /second-opinion (Gemini)"
+            print_color "$DIM" "    /second-opinion requires: Gemini CLI (https://github.com/google-gemini/gemini-cli)"
             safe_read_yn INSTALL_REVIEW_SKILLS "    Install review skills? (y/n): "
             echo
 
@@ -532,13 +531,13 @@ main() {
     local needs_gemini_key=false
     local needs_rembg=false
 
-    [ "$INSTALL_REVIEW_SKILLS" = "y" ] && needs_gemini_cli=true
     [ "$INSTALL_VISUAL_SKILLS" = "y" ] && needs_gemini_key=true && needs_rembg=true
-    # Gemini integration (GEMINI.md) also needs Gemini CLI to be useful
+    # /second-opinion and GEMINI.md need Gemini CLI
+    [ "$INSTALL_REVIEW_SKILLS" = "y" ] && needs_gemini_cli=true
     [ "$INSTALL_GEMINI" = "y" ] && needs_gemini_cli=true
 
     if [ "$needs_gemini_cli" = true ] && ! command -v gemini &>/dev/null; then
-        print_color "$YELLOW" "  Gemini CLI required (review skills + GEMINI.md):"
+        print_color "$YELLOW" "  Gemini CLI required (/second-opinion + GEMINI.md):"
         echo "    See: https://github.com/google-gemini/gemini-cli"
         echo
     fi

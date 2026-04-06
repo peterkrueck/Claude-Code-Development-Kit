@@ -2,11 +2,11 @@
 
 ## review-work
 
-**Purpose:** Independent code review using Gemini CLI with Claude fallback.
+**Purpose:** Independent code review using parallel Claude sub-agents.
 **Trigger:** Manual (`/review-work`) or via review-on-stop hook advisory.
-**Requires:** Gemini CLI installed and configured.
+**Requires:** Nothing.
 
-Captures `git diff`, sends to Gemini with a review checklist (bugs, security, compliance, tests), then critically evaluates findings before presenting to the user. Falls back to a Claude sub-agent if Gemini is at capacity.
+Captures `git diff`, spawns specialist sub-agents to review against a checklist (bugs, security, compliance, tests), then critically evaluates findings before presenting to the user. For 50+ line changes, spawns two parallel specialists (Bug Hunter + Rules Auditor); for smaller changes, uses a single combined reviewer.
 
 **Customize:** Edit the review checklist in the SKILL.md to add project-specific categories.
 
@@ -18,7 +18,7 @@ Captures `git diff`, sends to Gemini with a review checklist (bugs, security, co
 **Trigger:** Automatic — when Claude detects tricky decisions, debugging dead ends, or the user asks for a second opinion.
 **Requires:** Gemini CLI installed and configured.
 
-Sends focused questions to Gemini with optional code context. Supports multi-turn follow-ups. Presents Gemini's response with Claude's own synthesis.
+Sends focused questions to Gemini with optional code context. Supports autonomous multi-turn debate (2-4 rounds of back-and-forth). Uses permission-free invocation pattern to avoid prompt interruptions. Presents a consolidated synthesis of agreements and disagreements.
 
 **Note:** `user_invocable: false` — Claude invokes this automatically when appropriate.
 

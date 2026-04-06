@@ -8,15 +8,19 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOOK_INPUT=$(cat)
-SESSION_ID=$(echo "$HOOK_INPUT" | jq -r '.session_id // empty' 2>/dev/null || true)
-[[ -z "$SESSION_ID" ]] && exit 0  # Can't snapshot without session ID
+SESSION_ID=$(echo "$HOOK_INPUT" | jq -r '.session_id // "unknown"' 2>/dev/null || echo "unknown")
+HOOK_CWD=$(echo "$HOOK_INPUT" | jq -r '.cwd // ""' 2>/dev/null || echo "")
 BASELINE="/tmp/claude-baseline-${SESSION_ID}.numstat"
 
 # Only snapshot once per session
 [[ -f "$BASELINE" ]] && exit 0
 
-PROJECT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-cd "$PROJECT_DIR" 2>/dev/null || exit 0
+# Use cwd from hook input (handles worktrees correctly), fall back to git toplevel
+if [[ -n "$HOOK_CWD" && -d "$HOOK_CWD" ]]; then
+    cd "$HOOK_CWD" 2>/dev/null || exit 0
+else
+    cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" 2>/dev/null || exit 0
+fi
 
 # Read file patterns from config (bash 3.2 compatible — no mapfile)
 CONFIG_FILE="$SCRIPT_DIR/config/pipeline.json"

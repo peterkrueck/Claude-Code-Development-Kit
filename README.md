@@ -46,12 +46,12 @@ The installer gives you three paths: **full** (recommended — installs everythi
 
 ### Optional: Review skills
 
-Independent code review using Google's Gemini CLI — a completely different AI architecture that catches things Claude might miss. When Gemini is unavailable, falls back to a Claude sub-agent.
+Independent code review and architecture consultation.
 
-- `/review-work` — Sends your uncommitted diff to Gemini with a review checklist
-- `/second-opinion` — Auto-triggers when Claude faces tricky architecture decisions
+- `/review-work` — Spawns parallel Claude sub-agents (Bug Hunter + Rules Auditor) to review your uncommitted diff. Scales automatically: single reviewer for small changes, parallel specialists for 50+ lines.
+- `/second-opinion` — Auto-triggers when Claude faces tricky architecture decisions. Consults Google's Gemini CLI for a genuinely independent perspective (different AI architecture).
 
-Requires: [Gemini CLI](https://github.com/google-gemini/gemini-cli)
+`/second-opinion` requires: [Gemini CLI](https://github.com/google-gemini/gemini-cli)
 
 ### Optional: Visual skills
 
@@ -143,7 +143,7 @@ The scaffolding directories (`docs/legal/`, `docs/business/`, etc.) are empty by
 ## FAQ
 
 **Do I need Gemini CLI?**
-Only for the review skills. Everything else works without it.
+Only for `/second-opinion`. The `/review-work` skill uses Claude sub-agents and works without it. Everything else works without it too.
 
 **Can I use this with Cursor/Windsurf/Codex?**
 The skills and hooks are Claude Code-specific. The documentation templates work with any AI tool. SKILLS should work with most AI coding tools by now.

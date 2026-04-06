@@ -8,11 +8,17 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOOK_INPUT=$(cat)
-SESSION_ID=$(echo "$HOOK_INPUT" | jq -r '.session_id // empty' 2>/dev/null || true)
-[[ -z "$SESSION_ID" ]] && exit 0  # Can't track phases without session ID
+SESSION_ID=$(echo "$HOOK_INPUT" | jq -r '.session_id // "unknown"' 2>/dev/null || echo "unknown")
+HOOK_CWD=$(echo "$HOOK_INPUT" | jq -r '.cwd // ""' 2>/dev/null || echo "")
 STATE_FILE="/tmp/claude-stop-${SESSION_ID}.state"
 BASELINE="/tmp/claude-baseline-${SESSION_ID}.numstat"
-PROJECT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+
+# Use cwd from hook input (handles worktrees correctly), fall back to git toplevel
+if [[ -n "$HOOK_CWD" && -d "$HOOK_CWD" ]]; then
+    PROJECT_DIR="$HOOK_CWD"
+else
+    PROJECT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+fi
 
 cd "$PROJECT_DIR" 2>/dev/null || exit 0
 
@@ -41,28 +47,18 @@ done
 
 # Multi-phase stop: 1st stop = advisory, 2nd stop = reminder, 3rd stop = allow
 if [[ -f "$STATE_FILE" ]]; then
-    PHASE=$(cat "$STATE_FILE" 2>/dev/null)
+    STATE_CONTENT=$(cat "$STATE_FILE" 2>/dev/null)
+    PHASE="${STATE_CONTENT%%:*}"
+    STORED_ADVICE="${STATE_CONTENT#*:}"
     if [[ "$PHASE" == "2" ]]; then
         # Third stop (state was "2" from second stop) — always allow
         rm -f "$STATE_FILE"
         "$SCRIPT_DIR/notify.sh" complete 2>/dev/null || true
         exit 0
     else
-        # Phase 2: second stop — quick reminder
-        echo "2" > "$STATE_FILE"
-        # Build short reminder from enabled phases
-        REMINDERS=()
-        PHASE_REVIEW=$(jq -r '.phases.review // true' "$CONFIG_FILE")
-        PHASE_TESTS=$(jq -r '.phases.tests // true' "$CONFIG_FILE")
-        PHASE_DOCS=$(jq -r '.phases.docs // true' "$CONFIG_FILE")
-        REVIEW_CMD=$(jq -r '.review_command // "/review-work"' "$CONFIG_FILE")
-        TEST_CMD=$(jq -r '.test_command // null' "$CONFIG_FILE")
-        DOCS_CMD=$(jq -r '.docs_command // "/update-docs"' "$CONFIG_FILE")
-        [[ "$PHASE_REVIEW" == "true" ]] && REMINDERS+=("$REVIEW_CMD")
-        [[ "$PHASE_TESTS" == "true" && "$TEST_CMD" != "null" ]] && REMINDERS+=("$TEST_CMD")
-        [[ "$PHASE_DOCS" == "true" ]] && REMINDERS+=("$DOCS_CMD")
-        REMINDER_STR=$(IFS=', '; echo "${REMINDERS[*]}")
-        MSG="Reminder: ${REMINDER_STR} — stop again to skip."
+        # Phase 2: second stop — quick reminder using stored advice from phase 1
+        echo "2:$STORED_ADVICE" > "$STATE_FILE"
+        MSG="Reminder: $STORED_ADVICE — stop again to skip."
         jq -n --arg reason "$MSG" '{"decision": "block", "reason": $reason}'
         exit 0
     fi
@@ -109,9 +105,7 @@ if [[ $TOTAL_NEW -lt $MIN_LINES ]]; then
     exit 0
 fi
 
-# Phase 1: first stop — full advisory, mark state
-echo "1" > "$STATE_FILE"
-
+# Phase 1: first stop — full advisory
 # Build advisory from enabled phases
 PHASE_REVIEW=$(jq -r '.phases.review // true' "$CONFIG_FILE")
 PHASE_TESTS=$(jq -r '.phases.tests // true' "$CONFIG_FILE")
@@ -125,6 +119,9 @@ SUGGESTIONS=()
 [[ "$PHASE_TESTS" == "true" && "$TEST_CMD" != "null" ]] && SUGGESTIONS+=("$TEST_CMD")
 [[ "$PHASE_DOCS" == "true" ]] && SUGGESTIONS+=("$DOCS_CMD")
 SUGGEST_STR=$(IFS=', '; echo "${SUGGESTIONS[*]}")
+
+# Store phase + advice so phase 2 can recall without re-reading config
+echo "1:$SUGGEST_STR" > "$STATE_FILE"
 
 MSG="This session changed ${TOTAL_NEW} lines:\n${FILE_LIST}\nConsider: ${SUGGEST_STR}. Use your judgment — or stop again to skip."
 

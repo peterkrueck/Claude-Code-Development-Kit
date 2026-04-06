@@ -1,12 +1,12 @@
 ---
 name: review-work
-description: Review uncommitted code changes using Gemini CLI (different architecture = independent perspective). Falls back to Claude sub-agent if Gemini is unavailable. Checks for bugs, security issues, CLAUDE.md compliance, and test coverage gaps. Use after completing substantial implementation work, or when the Stop hook requests it.
+description: Review uncommitted code changes using parallel Claude sub-agents with specialized roles (Bug Hunter, Rules Auditor). Spawns multiple focused reviewers for large diffs (50+ lines), single reviewer for smaller changes. Checks for bugs, security issues, CLAUDE.md compliance, and test coverage gaps. Use after completing substantial implementation work, or when the Stop hook requests it. Also invocable manually with /review-work.
 user_invocable: true
 ---
 
 # Review Work — Automated Code Review
 
-Review uncommitted code changes using **Gemini** as the primary reviewer (genuinely independent — different model architecture). Falls back to a Claude sub-agent if Gemini is at capacity.
+Review uncommitted code changes using **Claude sub-agents** as independent reviewers. For large diffs, spawns **parallel specialist agents** with different roles for deeper, faster coverage.
 
 ## Process
 
@@ -31,96 +31,105 @@ If the project has a test command configured and relevant source files changed, 
 
 If tests fail, include the failure output in the review prompt — test failures are high-priority findings.
 
-### Step 2: Try Gemini Review (Primary)
+### Step 2: Determine Scale
 
-Send the diff and review checklist to Gemini. Gemini already has project context via `GEMINI.md` (architecture, tech stack, key decisions). The prompt adds the specific review checklist and diff.
+Count the total lines changed from `git diff --stat HEAD` (the summary line).
 
-**IMPORTANT:** Invocation and error checking MUST be in a **single Bash tool call** — shell variables don't persist across calls.
+- **Under 50 lines changed → Single reviewer** (Step 3A)
+- **50+ lines changed → Parallel specialist reviewers** (Step 3B)
 
-Write the diff to a temp file first (avoids heredoc quoting issues with code containing backticks, quotes, etc.):
+### Step 3A: Single Reviewer (< 50 lines)
 
-```bash
-git diff HEAD > /tmp/gemini-review-diff.txt
-```
-
-Then invoke Gemini with the diff piped as stdin context:
-
-```bash
-GEMINI_RESPONSE=$(cat /tmp/gemini-review-diff.txt | gemini -p "$(cat <<'PROMPT_EOF'
-You are reviewing uncommitted code changes. The git diff is provided via stdin.
-
-Read CLAUDE.md for full project rules, then review the diff against this checklist.
-
-## Review Checklist
-
-Check ONLY for real issues. Do not nitpick style, naming, or formatting unless it causes a bug.
-
-**BUGS** — Logic errors, null/nil/undefined handling, off-by-one, missing error handling, race conditions, unreachable code, wrong return types
-
-**SECURITY** — Secrets or PII logged or exposed, missing input validation, system internals leaked in error messages, hardcoded secrets, injection vulnerabilities
-
-**COMPLIANCE** — Violations of rules defined in CLAUDE.md. Check the project's specific rules and architecture decisions.
-
-**TESTS** — Do these changes touch shared modules or critical paths? If so, do corresponding tests exist?
-
-## Output Format
-
-Return findings in this exact format. If a category has no issues, write "No issues found."
-
-### BUGS
-- [high|medium|low] `file:line` — Description. **Reason:** Why this is a problem.
-
-### SECURITY
-- [high|medium|low] `file:line` — Description. **Reason:** Why this is a problem.
-
-### COMPLIANCE
-- [high|medium|low] `file:line` — Description. **Reason:** Why this is a problem.
-
-### TESTS
-- [action needed|note] Description. **Reason:** Why tests are needed here.
-
-### SUMMARY
-X issues found (Y high, Z medium, W low). One-sentence overall assessment.
-PROMPT_EOF
-)" -o text 2>/tmp/gemini-stderr.txt) ; GEMINI_EXIT=$?
-
-if grep -q "MODEL_CAPACITY_EXHAUSTED\|No capacity available\|code.*429" /tmp/gemini-stderr.txt 2>/dev/null; then
-  echo "GEMINI_UNAVAILABLE"
-elif [ "$GEMINI_EXIT" -ne 0 ]; then
-  echo "GEMINI_ERROR"
-  cat /tmp/gemini-stderr.txt
-else
-  echo "$GEMINI_RESPONSE"
-fi
-```
-
-Set a **600-second timeout** on the Bash tool call.
-
-**If Gemini succeeds:** proceed to Step 4 (Evaluate Findings). Note who reviewed: "Reviewed by: Gemini".
-
-**If Gemini is unavailable (GEMINI_UNAVAILABLE or GEMINI_ERROR):** proceed to Step 3 (Claude fallback).
-
-Clean up temp files after use:
-```bash
-rm -f /tmp/gemini-review-diff.txt /tmp/gemini-stderr.txt
-```
-
-### Step 3: Claude Sub-Agent Fallback
-
-Only use this if Gemini is unavailable. Use the **Agent tool** with `subagent_type: "Explore"` to spawn a read-only reviewer.
+Use the **Agent tool** with `subagent_type: "Explore"` to spawn one read-only reviewer.
 
 **The sub-agent prompt must include:**
 
 1. The full `git diff` output from Step 1
 2. The test results (if tests were run)
-3. The same review checklist from Step 2
-4. The required output format (same as Step 2)
+3. The full review checklist (all categories from both specialists below, combined)
+4. The required output format
+5. Instruction to read `CLAUDE.md` for project rules
 
-Note who reviewed: "Reviewed by: Claude sub-agent (Gemini unavailable)".
+Use the combined checklist:
+
+```
+You are a code reviewer. Read CLAUDE.md for project rules, then review this diff.
+
+Check ONLY for real issues. Do not nitpick style, naming, or formatting unless it causes a bug. If no issues found in a category, say "No issues found." Do not invent issues to seem thorough.
+
+**BUGS** — Logic errors, null/nil/undefined handling, off-by-one, missing error handling, race conditions, unreachable code, wrong return types, state machine violations, async/await mistakes
+
+**SECURITY** — Secrets or PII logged or exposed, missing input validation at system boundaries, system internals leaked in error messages, hardcoded secrets, injection vulnerabilities
+
+**COMPLIANCE** — Violations of rules defined in CLAUDE.md. Check the project's specific rules and architecture decisions.
+
+**TESTS** — Do these changes touch shared modules or critical paths? If so, do corresponding tests exist?
+
+For each finding:
+- [high|medium|low] `file:line` — Description. **Reason:** Why this is a problem.
+```
+
+Note who reviewed: "Reviewed by: Claude (single reviewer)".
+
+### Step 3B: Parallel Specialist Reviewers (50+ lines)
+
+Spawn **two** Agent tool calls in a **single message** (parallel execution), both with `subagent_type: "Explore"`.
+
+Each agent gets the same diff and test output, but a **different role and focused checklist**.
+
+---
+
+**Agent 1 — "Bug Hunter"** (correctness + security)
+
+```
+You are a **Bug Hunter** reviewing code changes. Your ONLY job is finding logic errors and security vulnerabilities. Ignore style, naming, and compliance rules — another reviewer handles those.
+
+[Include: full git diff output, test results if any]
+
+Read CLAUDE.md for project context, then review the diff against ONLY these categories:
+
+**BUGS** — Logic errors, null/nil/undefined handling, off-by-one, missing error handling, race conditions, unreachable code, wrong return types, state machine violations, async/await mistakes, incorrect boolean logic
+
+**SECURITY** — Secrets or PII logged or exposed, missing input validation at system boundaries, system internals leaked in error messages, hardcoded secrets, injection vulnerabilities, unsafe deserialization, credential exposure
+
+## Output Format
+For each finding:
+- [high|medium|low] `file:line` — Description. **Reason:** Why this is a problem.
+
+If no issues found in a category, write "No issues found."
+Do not invent issues to seem thorough. Only report what you can point to in the diff.
+```
+
+---
+
+**Agent 2 — "Rules Auditor"** (project rules + test coverage)
+
+```
+You are a **Rules Auditor** reviewing code changes. Your ONLY job is checking compliance with this project's specific rules and test coverage. Ignore general code quality and security — another reviewer handles those.
+
+[Include: full git diff output, test results if any]
+
+Read CLAUDE.md for project rules and architecture decisions, then review the diff against ONLY these categories:
+
+**COMPLIANCE** — Violations of rules defined in CLAUDE.md. Check architecture decisions, coding conventions, and any project-specific constraints documented there.
+
+**TESTS** — Do these changes touch shared modules or critical paths? If so, do corresponding tests exist? Are test assertions structural (not exact string matches)?
+
+## Output Format
+For each finding:
+- [high|medium|low] `file:line` — Description. **Reason:** Why this is a problem.
+
+If no issues found in a category, write "No issues found."
+Do not invent issues to seem thorough. Only report what you can point to in the diff.
+```
+
+---
+
+Note who reviewed: "Reviewed by: Claude (Bug Hunter + Rules Auditor, parallel)".
 
 ### Step 4: Evaluate Findings (The Judge)
 
-Whether the findings came from Gemini or Claude, **critically evaluate each one**. The reviewer has fresh eyes but lacks your conversation context — it doesn't know WHY you made certain choices.
+Combine findings from all reviewers and **critically evaluate each one**. The reviewers have fresh eyes but lack your conversation context — they don't know WHY you made certain choices.
 
 For each finding:
 
@@ -135,7 +144,7 @@ For each finding:
 ```
 ## Code Review Results
 
-Reviewed by: Gemini (or: Claude sub-agent)
+Reviewed by: Claude (Bug Hunter + Rules Auditor, parallel) — or: Claude (single reviewer)
 Reviewed X files, Y lines changed.
 
 | # | Verdict | Category | File | Issue | Action |
@@ -149,7 +158,8 @@ If all findings are false positives or no issues found, say so briefly and move 
 
 ## Important Rules
 
-1. **Gemini first, always.** Only fall back to Claude sub-agent on capacity errors. The whole point is an independent architecture reviewing your code.
-2. **Never skip the review.** Don't self-review and claim "looks fine."
-3. **Never blindly accept all findings.** Reviewers can hallucinate file paths, misread logic, or flag intentional choices.
-4. **Include test output.** If unit tests were run and failed, that's the #1 finding — everything else is secondary.
+1. **Never skip the review.** Don't self-review and claim "looks fine."
+2. **Never blindly accept all findings.** Reviewers can hallucinate file paths, misread logic, or flag intentional choices.
+3. **Include test output.** If unit tests were run and failed, that's the #1 finding — everything else is secondary.
+4. **Parallel when warranted.** Only spawn multiple agents for 50+ line changes. Small diffs get one focused reviewer.
+5. **Agents are read-only.** Use `subagent_type: "Explore"` — reviewers must never edit code. You (the judge) make fixes.

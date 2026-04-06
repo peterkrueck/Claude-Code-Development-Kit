@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [3.0.1] - 2026-04-06
+
+### Changed
+
+- **review-work**: Switched from Gemini-first to Claude sub-agents. Spawns parallel specialists (Bug Hunter + Rules Auditor) for 50+ line diffs, single reviewer for smaller changes. No longer requires Gemini CLI.
+- **second-opinion**: Permission-free invocation pattern — no more `$()` wrapping or `/tmp/` redirects that triggered permission prompts. Added autonomous multi-turn debate mode (2-4 rounds without user confirmation). Explicit no-fallback-to-weaker-models policy.
+
+### Fixed
+
+- **review-on-stop.sh**: Session ID robustness — uses `"unknown"` fallback instead of silently exiting when session ID is missing.
+- **review-on-stop.sh**: Worktree support — reads `cwd` from hook input JSON for correct `PROJECT_DIR` in git worktrees.
+- **review-on-stop.sh**: State file stores advice (`PHASE:ADVICE`) so phase 2 recalls the original suggestion without re-reading config.
+- **snapshot-baseline.sh**: Same session ID and worktree CWD fixes as review-on-stop.sh.
+
+
 ## [3.0.0] - 2026-03-28
 
 ### Philosophy
