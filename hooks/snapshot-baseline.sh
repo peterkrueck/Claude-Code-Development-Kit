@@ -1,6 +1,6 @@
 #!/bin/bash
 # snapshot-baseline.sh — Capture git diff baseline at session start
-# Runs on Notification events. Only snapshots once per session (first invocation).
+# Runs on SessionStart. Only snapshots once per session (idempotent).
 # The stop hook uses this baseline to exclude pre-existing dirty files.
 # Configuration: hooks/config/pipeline.json
 

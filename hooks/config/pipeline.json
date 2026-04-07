@@ -1,6 +1,7 @@
 {
   "enabled": true,
   "min_lines_changed": 10,
+  "review_threshold": 50,
   "file_patterns": ["*.py", "*.ts", "*.js", "*.swift", "*.go", "*.rs"],
   "review_command": "/review-work",
   "test_command": null,

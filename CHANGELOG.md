@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [3.0.2] - 2026-04-08
+
+### Added
+
+- **`/merge` command** — Worktree finalization workflow: survey changes → update docs → commit → merge to main via `git -C` → clean up worktree. Installed as core (always available).
+- **Two-tier review suggestions** — `review-on-stop.sh` now only suggests `/review-work` at 50+ lines changed; below that, suggests tests + docs only. Configurable via `review_threshold` in `pipeline.json`.
+- **Anti-bloat rules in `/update-docs`** — "What NOT to Document" table, density test, doc-specific enforcement (delete don't strike, 10-word row limit), and a Bloat Check procedure. Backported from production use.
+- **Template improvements** — Richer commented examples across all templates:
+  - `CLAUDE.md`: settled-decisions tip, test-to-code mapping table
+  - `GEMINI.md`: Developer Workflow section (AI-agent calibration)
+  - `spec.md`: Rate Limiting & Quotas, Feature Flags sections
+  - `progress.md`: Security Issues, Technical Debt, Deferred Work sections
+  - `deployment-infrastructure.md`: DNS Records, Plan Limits sections
+
+### Fixed
+
+- **snapshot-baseline.sh**: Now runs on `SessionStart` instead of `Notification` — captures git baseline before any work happens, not after the first tool notification.
+
+
 ## [3.0.1] - 2026-04-06
 
 ### Changed

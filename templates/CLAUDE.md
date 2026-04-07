@@ -18,6 +18,9 @@
 <!-- Document settled decisions here so Claude doesn't relitigate them.
      Include brief rationale for each. -->
 
+<!-- Tip: Also list decisions that are SETTLED so Claude doesn't relitigate them.
+     Example: "REST over GraphQL — decided, don't suggest changing." -->
+
 <!--
 Example:
 - **Authentication**: JWT tokens with refresh rotation. Why: stateless, scales horizontally.
@@ -62,10 +65,13 @@ npm run test:unit     # Unit tests only (~1s)
 npm run test:e2e      # E2E tests (~20s, hits network)
 ```
 
-**When to run tests:**
-- After changing shared utilities: unit tests
-- After changing API endpoints: E2E tests
-- Before deployment: both
+**When to run which tests:**
+| What changed | Run |
+|---|---|
+| Shared utilities | Unit tests |
+| API endpoints | E2E tests |
+| Database schema | Integration tests |
+| Before deployment | All suites |
 -->
 
 ## 6. Privacy & Security

@@ -23,15 +23,32 @@ Example:
 
 ## Current Work
 
-<!-- What's actively being worked on right now? -->
+<!-- Use status indicators: IN PROGRESS, TODO, BLOCKED
+     Example:
+     - **Phase 4: Analytics** — IN PROGRESS
+       - [x] Dashboard layout
+       - [ ] Retention charts — TODO
+       - [ ] Export API — BLOCKED (waiting on schema migration) -->
 
 ## Known Issues / Blockers
 
 <!-- Anything preventing progress or requiring attention. -->
 
+## Security Issues
+
+<!-- Track security findings separately — they're higher priority than features.
+     | # | Issue | Resolution | Status |
+     |---|-------|-----------|--------|  -->
+
+## Technical Debt
+
+<!-- Track known shortcuts that need revisiting.
+     | Item | Impact | Next Step |
+     |------|--------|-----------|  -->
+
 ## Next Steps
 
-<!-- Prioritized list of what comes next. -->
+<!-- Prioritized list of what comes next — explicitly ordered by priority. -->
 
 <!--
 Example:
@@ -44,3 +61,7 @@ Example:
 ## Future Phases
 
 <!-- Longer-term roadmap items not yet started. -->
+
+## Deferred Work
+
+<!-- Items explicitly deprioritized — keeps them visible without cluttering active work. -->

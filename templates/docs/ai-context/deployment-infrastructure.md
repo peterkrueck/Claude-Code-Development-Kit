@@ -52,6 +52,18 @@ Example:
 - **Deployment**: Manual via `/deploy` skill (no auto-deploy)
 -->
 
+## DNS Records
+
+<!-- Document actual records for disaster recovery / onboarding.
+     | Type | Name | Value | Purpose |
+     |------|------|-------|---------|  -->
+
+## Plan Limits & Upgrade Path
+
+<!-- Document current plan constraints so Claude can flag when you're approaching them.
+     Example: Supabase Free — 500MB database, 1GB storage, 500K Edge Function invocations/month -->
+
 ## Monitoring
 
-<!-- What monitoring exists? Health checks, alerting, dashboards. -->
+<!-- What monitoring exists? Health checks, alerting, dashboards.
+     Be honest about gaps — documenting what's NOT monitored is valuable too. -->

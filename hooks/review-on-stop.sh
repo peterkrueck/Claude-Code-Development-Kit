@@ -113,9 +113,11 @@ PHASE_DOCS=$(jq -r '.phases.docs // true' "$CONFIG_FILE")
 REVIEW_CMD=$(jq -r '.review_command // "/review-work"' "$CONFIG_FILE")
 TEST_CMD=$(jq -r '.test_command // null' "$CONFIG_FILE")
 DOCS_CMD=$(jq -r '.docs_command // "/update-docs"' "$CONFIG_FILE")
+REVIEW_THRESHOLD=$(jq -r '.review_threshold // 50' "$CONFIG_FILE")
 
+# Two-tier: only suggest review command above review_threshold
 SUGGESTIONS=()
-[[ "$PHASE_REVIEW" == "true" ]] && SUGGESTIONS+=("$REVIEW_CMD")
+[[ "$PHASE_REVIEW" == "true" && $TOTAL_NEW -ge $REVIEW_THRESHOLD ]] && SUGGESTIONS+=("$REVIEW_CMD")
 [[ "$PHASE_TESTS" == "true" && "$TEST_CMD" != "null" ]] && SUGGESTIONS+=("$TEST_CMD")
 [[ "$PHASE_DOCS" == "true" ]] && SUGGESTIONS+=("$DOCS_CMD")
 SUGGEST_STR=$(IFS=', '; echo "${SUGGESTIONS[*]}")

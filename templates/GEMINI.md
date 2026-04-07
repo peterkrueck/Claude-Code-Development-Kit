@@ -53,6 +53,15 @@ Example:
 - Server-side state only — no client-side state management
 -->
 
+## Developer Workflow
+
+<!-- Describe how development happens on this project so Gemini
+     calibrates its advice accordingly.
+
+     Example: "Development is primarily AI-agent-driven via Claude Code.
+     Over-engineering for a solo developer is NOT a valid critique.
+     Evaluate by maintenance burden, not build effort." -->
+
 ## Do NOT
 
 - Modify files. You are read-only.

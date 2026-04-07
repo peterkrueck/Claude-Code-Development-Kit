@@ -311,7 +311,7 @@ main() {
     print_color "$YELLOW" "Ready to install to: $TARGET_DIR"
     echo
     print_color "$GREEN" "  Will install:"
-    echo "    - Core (CLAUDE.md, /prime, /update-docs, security, docs, assets)"
+    echo "    - Core (CLAUDE.md, /prime, /merge, /update-docs, security, docs, assets)"
     [ "$INSTALL_REVIEW_SKILLS" = "y" ] && echo "    - Review skills (/review-work, /second-opinion)"
     [ "$INSTALL_VISUAL_SKILLS" = "y" ] && echo "    - Visual skills (/image-gen, /image-edit, /bg-remove)"
     [ "$INSTALL_DEPLOY_TEMPLATE" = "y" ] && echo "    - Deploy skill template"
@@ -350,8 +350,9 @@ main() {
         print_color "$YELLOW" "  Preserved existing CLAUDE.md"
     fi
 
-    # /prime command
+    # Commands
     copy_file "$SCRIPT_DIR/commands/prime.md" "$TARGET_DIR/.claude/commands/prime.md" "Command"
+    copy_file "$SCRIPT_DIR/commands/merge.md" "$TARGET_DIR/.claude/commands/merge.md" "Command"
 
     # /update-docs skill (core — always installed)
     mkdir -p "$TARGET_DIR/.claude/skills/update-docs"
@@ -475,12 +476,15 @@ main() {
         notification_hooks=$(echo "$notification_hooks" | jq --arg dir "$TARGET_DIR" \
             '. + [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/notify.sh input")}]')
     fi
-    if [ "$INSTALL_REVIEW_ON_STOP" = "y" ]; then
-        notification_hooks=$(echo "$notification_hooks" | jq --arg dir "$TARGET_DIR" \
-            '. + [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/snapshot-baseline.sh")}]')
-    fi
     if [ "$(echo "$notification_hooks" | jq 'length')" -gt 0 ]; then
         hooks_json=$(echo "$hooks_json" | jq --argjson nh "$notification_hooks" '. + {"Notification": [{"hooks": $nh}]}')
+    fi
+
+    # SessionStart: baseline snapshot (captures git state before any work)
+    if [ "$INSTALL_REVIEW_ON_STOP" = "y" ]; then
+        hooks_json=$(echo "$hooks_json" | jq --arg dir "$TARGET_DIR" '. + {"SessionStart": [{
+            "hooks": [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/snapshot-baseline.sh")}]
+        }]}')
     fi
 
     # Add stop notification if notifications enabled but review-on-stop is NOT (it handles its own completion sound)

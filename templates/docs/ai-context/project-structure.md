@@ -22,7 +22,8 @@
 your-project/
 ├── .claude/
 │   ├── commands/
-│   │   └── prime.md                    # /prime — load core project context
+│   │   ├── prime.md                    # /prime — load core project context
+│   │   └── merge.md                    # /merge — finalize worktree work
 │   ├── hooks/
 │   │   ├── review-on-stop.sh           # Advisory review nudge on stop
 │   │   ├── snapshot-baseline.sh        # Session baseline capture

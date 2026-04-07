@@ -46,3 +46,13 @@ Error: `{ success: false, error_code: string, message: string }`
 ## Data Flows
 
 <!-- End-to-end flows for the most important user journeys. -->
+
+## Rate Limiting & Quotas
+
+<!-- Document usage limits per feature/tier if applicable.
+     Example: 10 requests/week free, unlimited for Pro -->
+
+## Feature Flags
+
+<!-- Document runtime feature gates and what they control.
+     Example: `memoryEnabled` gates all memory UI, routing, and API calls -->

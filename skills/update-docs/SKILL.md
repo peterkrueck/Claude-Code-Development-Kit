@@ -27,6 +27,20 @@ Do NOT run this skill for:
 - Performance optimizations without API changes
 - Comment or documentation-only changes
 
+## What NOT to Document
+
+Claude Code can read files and grep code. Only document what **cannot be inferred from the code itself**:
+
+| Don't document | Why | Instead |
+|----------------|-----|---------|
+| Standard language conventions | Claude already knows them | Only project-specific deviations |
+| Response JSON examples | Claude reads actual source files | Request contract + error codes only |
+| File-by-file descriptions | Claude can Glob and Read | Only non-obvious file purposes |
+| Completed checklist items | Done = in git history | Remove from progress.md |
+| ASCII art diagrams | Many lines, low value | Use compact tables |
+
+**Density test:** Before adding content, ask: "Could Claude figure this out by reading the code?" If yes, don't document it.
+
 ## Process
 
 ### Step 1: Analyze What Changed
@@ -87,15 +101,25 @@ If `docs/ai-context/` files don't exist yet, create them from the current codeba
 
 **progress.md:**
 - Use absolute dates, never relative ("March 2026", not "last week")
-- Mark completed items with dates
-- Keep the "Next Steps" section current — remove items that are done
+- When marking items complete, DELETE the item (don't strike through) — the fix is in git history
+- Keep completed phase summaries to a single table row (~10 words), not paragraphs
+- Remove completed checklist items that have been done for 2+ weeks
+- Security items: remove when fixed, keep only open issues
 
 **spec.md:**
-- Include exact API contracts (request/response shapes)
-- Document data flows end-to-end
-- Specify platform requirements and compatibility
+- Don't duplicate CLAUDE.md content (architecture principles, coding standards)
+- Document request format + error codes + key behaviors — skip response examples
+- Reference shared utility files by path, don't reproduce their content
 
 **CLAUDE.md:**
-- Rules must be actionable and verifiable
-- Architecture decisions should include brief rationale
-- Group rules by domain (security, testing, architecture, etc.)
+- Only rules that change Claude's behavior — if removing a line wouldn't cause Claude to do anything differently, delete it
+- Not a reference doc: no test structure tables, no naming convention tables for standard patterns
+
+## Bloat Check
+
+After updating, silently check `progress.md`:
+- Each completed phase row: ~10 words max in "What" column — trim immediately if longer
+- No duplication with spec.md — if progress.md restates architecture details, delete and cross-reference
+- Dead items: remove completed checklist items done 2+ weeks with no ongoing relevance
+
+Then check if CLAUDE.md would also benefit from an update based on the changes made.
