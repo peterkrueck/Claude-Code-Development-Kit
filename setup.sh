@@ -415,6 +415,7 @@ main() {
     if [ "$INSTALL_REVIEW_ON_STOP" = "y" ]; then
         copy_file "$SCRIPT_DIR/hooks/review-on-stop.sh" "$TARGET_DIR/.claude/hooks/review-on-stop.sh" "Hook"
         copy_file "$SCRIPT_DIR/hooks/snapshot-baseline.sh" "$TARGET_DIR/.claude/hooks/snapshot-baseline.sh" "Hook"
+        copy_file "$SCRIPT_DIR/hooks/cleanup-session.sh" "$TARGET_DIR/.claude/hooks/cleanup-session.sh" "Hook"
         copy_file "$SCRIPT_DIR/hooks/config/pipeline.json" "$TARGET_DIR/.claude/hooks/config/pipeline.json" "Config"
     fi
 
@@ -481,9 +482,13 @@ main() {
     fi
 
     # SessionStart: baseline snapshot (captures git state before any work)
+    # SessionEnd: cleanup per-session temp files
     if [ "$INSTALL_REVIEW_ON_STOP" = "y" ]; then
         hooks_json=$(echo "$hooks_json" | jq --arg dir "$TARGET_DIR" '. + {"SessionStart": [{
             "hooks": [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/snapshot-baseline.sh")}]
+        }]}')
+        hooks_json=$(echo "$hooks_json" | jq --arg dir "$TARGET_DIR" '. + {"SessionEnd": [{
+            "hooks": [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/cleanup-session.sh"), "timeout": 5}]
         }]}')
     fi
 

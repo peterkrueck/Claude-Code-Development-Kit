@@ -8,6 +8,12 @@
 
 <!-- One-line summary: e.g., "Pre-launch — all features complete, preparing for deployment" -->
 
+## Recent Changes
+
+<!-- Dated short-form log of what changed recently — useful for session handoff.
+     One line per entry: `YYYY-MM-DD — what changed (brief why)`.
+     Trim entries older than ~30 days. -->
+
 ## Completed
 
 <!-- List completed milestones with dates. -->
