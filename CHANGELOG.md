@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [3.0.3] - 2026-05-06
+
+### Added
+
+- **`cleanup-session.sh` hook** — New `SessionEnd` hook that removes per-session `/tmp/claude-baseline-*.numstat` and `/tmp/claude-stop-*.state` files. Wired automatically when `review-on-stop` is installed. Prevents `/tmp` accumulation across long-lived development machines.
+- **Gemini 3.1 Pro Preview pin in `second-opinion`** — All `gemini` invocations now pass `-m gemini-3.1-pro-preview` explicitly. Without the pin, Gemini CLI may default to a smaller model and silently degrade the second-opinion value.
+- **`progress.md` template** — New commented `Recent Changes` section between Project Status and Completed, for dated short-form session-handoff notes.
+- **`GEMINI.md` template** — Severity-flag usage example; expanded `Do NOT` list with two new entries (don't suggest undocumented commands; don't re-derive rules already in CLAUDE.md).
+
+### Maintenance
+
+- The `gemini-3.1-pro-preview` pin in `skills/second-opinion/SKILL.md` will need updating when Google renames or deprecates that preview model. This is the cost of pinning vs. floating; we accept it for second-opinion quality.
+
+
 ## [3.0.2] - 2026-04-08
 
 ### Added
