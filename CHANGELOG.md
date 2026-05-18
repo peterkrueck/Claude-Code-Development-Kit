@@ -6,6 +6,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [3.1.0] - 2026-05-18
+
+### Added
+
+- **`/plan-feature` command** — Designed for use inside Plan Mode (Shift+Tab). Encodes the pattern: parallel research sub-agents → state tradeoffs (not just choices) → Context7 first for libraries → `/review-work` before final verification → `/second-opinion` before exiting plan mode. Ports proven workflow from production use.
+- **`/prime --deploy` flag** — Optional flag that loads `docs/ai-context/deployment-infrastructure.md` in addition to the three core docs. Deployment infra is stable and often large; loading it on every routine `/prime` wastes context. Includes explicit note explaining why paths are plain text (not `@`-references) — the harness auto-expands `@`-mentions before routing, which would defeat the conditional load.
+- **`/second-opinion` model override** — New `CLAUDE_SECOND_OPINION_MODEL` env var lets users self-rescue when Google deprecates the pinned `gemini-3.1-pro-preview` (preview models rotate fast). Every bash invocation now uses the `${CLAUDE_SECOND_OPINION_MODEL:-gemini-3.1-pro-preview}` pattern. Expanded error detection distinguishes capacity-exhausted (transient) from model-deprecated (permanent) failures and tells the user exactly how to recover.
+- **Operator Model template sections** — New commented sections in `templates/CLAUDE.md` (§2) and `templates/GEMINI.md` (replaces "Developer Workflow") describing the solo-founder / AI-agent collaboration model: role split, "evaluate by maintenance burden not build effort," boundaries, calibration of recommendations. Especially valuable for AI-agent-driven workflows where "over-engineered for a solo dev" is rarely valid critique.
+
+### Changed
+
+- **`/merge` command — full rewrite for safety, then dual-mode for reach.** Previously auto-invoked `/update-docs`, auto-staged with implicit commit logic, had no clean-tree check, AND required a `git worktree` (regular-branch users couldn't use it at all). New version is **verify + ship, not do-everything cleanup**, and supports both flows:
+  - **Pre-flight auto-detects mode** by comparing `git rev-parse --git-dir` to `--git-common-dir`. Equal → standard mode (`git checkout main && git merge ...`). Different → worktree mode (`git -C <main-repo-path> merge ...` + `ExitWorktree`). Steps 1/2/3/6 are mode-independent; Steps 4/5 branch.
+  - **Philosophy block** clarifies that doc updates, commits, and tests belong to the work session — `/merge` only verifies and ships.
+  - **`$ARGUMENTS` conventions**: `Verified: <context>` (opt-in commit annotation) and `summary: <override>` (skip auto-synthesis of merge message).
+  - **Step 1 — mental model**: form understanding from `git diff main` inline (small diffs) or via Explore sub-agent (>200 lines OR >10 files) to keep context clean.
+  - **Step 2 — docs-currency guardrail**: maps touched top-level dirs to candidate docs; applies skip criteria from the `update-docs` skill; if substantive diff lacks doc touches → **STOPS and asks user** (abort / proceed-with-drift / cancel). Never auto-invokes `/update-docs`.
+  - **Step 3 — clean-tree guardrail**: dirty tree → **STOPS and asks user** to name files explicitly. Never `git add -A` or `.`.
+  - **Step 5 — branch ref cleanup**: adds `git branch -d <branch>` after merge in both modes so a future branch (or `git worktree add`) with the same name doesn't reuse a stale ref.
+- **README restructured around the "maintenance engine" framing.** Leads with the problem (static `CLAUDE.md` decay, session continuity loss) then the loop (`/prime` → work → `/review-work` → `/update-docs` → `/merge`) instead of a parts list. Adds `/merge` and `/plan-feature` to the installed-commands list and file tree (both previously missing). Pulls FAQ into a focused Compatibility section.
+- **setup.sh in-installer tutorial extended to 8 steps including `/merge`.** Adds a footer mention of `/plan-feature` for Plan Mode users. Post-install "test your setup" line now shows the `/prime → /merge` workflow pair instead of just `/prime`. Version banner bumped from v3.0.0 to v3.1.0.
+
+### Template renumbering
+
+- `templates/CLAUDE.md` sections renumbered to accommodate new §2 Operator Model: previous 2→3 (Architecture Decisions), 3→4 (Tool Usage), 4→5 (Coding Standards), 5→6 (Testing), 6→7 (Privacy & Security). Existing users with customized `CLAUDE.md` files are unaffected (the installer preserves existing files).
+
+
 ## [3.0.3] - 2026-05-06
 
 ### Added

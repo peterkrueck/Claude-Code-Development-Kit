@@ -1,91 +1,106 @@
 # Claude Code Development Kit
 
-A lightweight starter kit for Claude Code subscribers. Gives your project a solid foundation — documentation structure, code review automation, image tools, and sensible defaults — that you extend as you go.
+**Keep Claude Code coherent across sessions.** A starter kit that maintains the context layer Claude actually reads.
 
-This isn't a heavy framework. It's the setup you'd build yourself after a few weeks of using Claude Code, packaged so you start with it on day one.
+## Why this exists
 
-## Who This Is For
+A static `CLAUDE.md` decays within a few sessions. The context window fills up. Decisions you made yesterday get re-derived today because nothing kept the docs in sync with the code. Every fresh session starts from scratch, even when the answer is one `git log` away.
 
-You have a Claude Code subscription and want to hit the ground running. Maybe you're building an app, a side project, or starting something new. You want Claude to understand your project structure, review its own work, and not accidentally `git push --force` your main branch.
+This kit is the maintenance layer between you and Claude Code. Four focused doc files become the project's working memory. Slash commands keep them current. Hooks catch the things you'd forget. It's the setup you'd build yourself after a few weeks of using Claude Code, packaged so you start with it on day one.
 
-This kit gives you that. Install what you need, skip what you don't, extend it however you want.
+## The loop
 
-## Quick Start
+```
+   /prime           load project context at session start
+        ↓
+   work             Claude writes the code
+        ↓
+   /review-work     parallel sub-agents catch bugs + rule violations
+        ↓
+   /update-docs     keep ai-context docs in sync (skipping trivial changes)
+        ↓
+   /merge           verify and ship (standard branch or git worktree)
+```
 
-**One command:**
+For larger features: `/plan-feature` inside Plan Mode (Shift+Tab) dispatches parallel research sub-agents and pulls in a Gemini second opinion before you commit to an approach.
+
+## Who this is for
+
+You have a Claude Code subscription and want to hit the ground running. Maybe you're building an app, a side project, or starting something new. You want Claude to understand your project structure, review its own work, keep its own notes in sync — and not accidentally `git push --force` your main branch.
+
+This isn't a heavy framework. It's structured defaults that compound over time.
+
+## Quick start
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/peterkrueck/Claude-Code-Development-Kit/main/install.sh | bash
 ```
 
-**Or clone and run:**
+Or clone:
+
 ```bash
 git clone https://github.com/peterkrueck/Claude-Code-Development-Kit.git
 cd Claude-Code-Development-Kit
 ./setup.sh
 ```
 
-The installer walks you through what to include. Everything is optional except the core.
+The installer walks you through what to include — Full (recommended), Customize, or Minimal. Re-run anytime to add features.
 
-## How It Works
+**First session:**
 
-**Skills** are things Claude does — automatically based on context, or when you type a `/slash-command`. **Hooks** run in the background on specific events (security checks, review nudges, notification sounds). **Commands** are manual triggers you type, like `/prime` to load your project context.
+```bash
+cd your-project
+claude
+> /prime
+```
 
-The installer gives you three paths: **full** (recommended — installs everything), **customize** (choose each feature individually), or **minimal** (core only). Re-run anytime to add more.
+Claude reads your docs, summarizes the project, and you're ready to work.
 
-## What You Get
+## What's in the box
 
-### Always installed (core)
+### Core (always installed)
 
-- **`CLAUDE.md`** — A template for your project's AI instruction set. This is how you tell Claude your project's rules, architecture decisions, and constraints.
-- **`/prime` command** — Loads your documentation into context. Run it at the start of a session.
-- **`/update-docs` skill** — Keeps your documentation in sync after code changes.
-- **Documentation scaffolding** — Four structured files (`spec.md`, `project-structure.md`, `progress.md`, `deployment-infrastructure.md`) plus directories for legal, business, design, and open issues.
-- **Security scanner** — Blocks API keys and secrets from leaking through MCP plugins.
-- **Deny list** — Prevents `git push --force`, `rm -rf`, `git reset --hard`, and other destructive commands.
-- **Asset directories** — `assets/` for your app icons, logos, and graphics.
+| | |
+|---|---|
+| `CLAUDE.md` template | Your project's AI instruction set |
+| `/prime` command | Load core docs into context (use `/prime --deploy` to also load infra) |
+| `/merge` command | Verify docs are current + tree is clean, then ship to main. Works with standard branches and `git worktree`. |
+| `/update-docs` skill | Keep `docs/ai-context/` in sync after code changes — skips trivial diffs |
+| Doc scaffolding | Four focused files: `spec.md`, `project-structure.md`, `progress.md`, `deployment-infrastructure.md` |
+| Security scanner hook | Blocks API keys and secrets from leaking to MCP plugins |
+| Deny list | Prevents `git push --force`, `rm -rf`, `git reset --hard`, and other destructive commands |
+| Asset directories | `assets/` scaffolding for icons, logos, social, web |
 
-### Optional: Review skills
+### Quality gates (optional)
 
-Independent code review and architecture consultation.
+| | |
+|---|---|
+| `/review-work` | Spawns parallel Claude sub-agents (Bug Hunter + Rules Auditor) to review your uncommitted diff. Single reviewer for small changes, parallel specialists for 50+ lines. |
+| `/second-opinion` | Auto-triggers when Claude hits architecture decisions or debugging dead ends. Consults Google's Gemini CLI for a genuinely independent perspective (different model architecture). |
+| `/plan-feature` | Runs in Plan Mode. Parallel research sub-agents + tradeoff statements + `/second-opinion` before exiting plan mode. |
+| Review-on-stop hook | Three-stop advisory nudge: first stop shows changes + review suggestions, second stop is a reminder, third stop lets you out. Never traps you. |
 
-- `/review-work` — Spawns parallel Claude sub-agents (Bug Hunter + Rules Auditor) to review your uncommitted diff. Scales automatically: single reviewer for small changes, parallel specialists for 50+ lines.
-- `/second-opinion` — Auto-triggers when Claude faces tricky architecture decisions. Consults Google's Gemini CLI for a genuinely independent perspective (different AI architecture).
+`/second-opinion` and `/plan-feature` require [Gemini CLI](https://github.com/google-gemini/gemini-cli).
 
-`/second-opinion` requires: [Gemini CLI](https://github.com/google-gemini/gemini-cli)
+### Templates
 
-### Optional: Visual skills
+`GEMINI.md` (read natively by Gemini CLI), plus the four `docs/ai-context/` files and asset directory scaffolding.
 
-For any project that needs visual assets — app icons, UI artwork, social media graphics, marketing materials, or website imagery. Generate images with AI, edit with precision, remove backgrounds locally.
+### Optional add-ons
 
-- `/image-gen` — AI image generation via Gemini. Optional reference photos for style consistency across variations.
-- `/image-edit` — Crop, resize, rotate, mirror. Analyzes content bounds before cutting (never guesses coordinates).
-- `/bg-remove` — Background removal via rembg. Runs 100% locally, nothing sent externally.
+- **Visual skills** — `/image-gen` (AI image generation via Gemini), `/image-edit` (crop/resize/rotate/mirror with content-bounds detection), `/bg-remove` (local background removal via rembg). Needs Python 3, Pillow, numpy; `/image-gen` needs a `GEMINI_API_KEY`; `/bg-remove` needs rembg.
+- **Deploy skill template** — A customizable deployment pipeline you fill in with your own commands. Follows: detect changes → run tests → deploy → verify → report.
+- **Audio notifications** — Plays a sound when Claude finishes a task or needs your input. macOS + Linux.
 
-Requires: Python 3, Pillow, numpy. `/image-gen` also needs a `GEMINI_API_KEY`. `/bg-remove` needs rembg.
-
-### Optional: Deploy skill template
-
-A customizable deployment pipeline you fill in with your own commands. Follows: detect changes → run tests → deploy → verify → report.
-
-### Optional: Gemini integration
-
-`GEMINI.md` — an instruction file that Gemini CLI reads automatically. Gives Gemini full context about your project when invoked as a reviewer or consultant.
-
-### Optional: Review-on-stop hook
-
-Nudges you to review before finishing. When you have 10+ lines of new code (net changes this session, not pre-existing dirty state), the first stop shows an advisory with changed files and suggests review/test/docs. Stop again for a reminder, a third time to skip entirely. Never traps you — three stops always gets you out.
-
-### Optional: Audio notifications
-
-Plays a sound when Claude finishes a task or needs your input. Supports macOS and Linux.
-
-## What Gets Installed
+## What gets installed
 
 ```
 your-project/
 ├── .claude/
 │   ├── commands/
-│   │   └── prime.md                    # /prime — load project context
+│   │   ├── prime.md                    # /prime — load project context
+│   │   ├── merge.md                    # /merge — verify and ship
+│   │   └── plan-feature.md             # /plan-feature — plan in Plan Mode (optional)
 │   ├── hooks/
 │   │   ├── security-scan.sh            # Blocks secrets from leaking to plugins
 │   │   ├── review-on-stop.sh           # Advisory review nudge (if selected)
@@ -97,7 +112,7 @@ your-project/
 │   │   └── sounds/
 │   │       ├── complete.wav
 │   │       └── input-needed.wav
-│   ├── skills/                         # Selected skills (review, visual, deploy)
+│   ├── skills/                         # Selected skills (update-docs, review, visual, deploy)
 │   └── settings.local.json             # Permissions, hooks, deny list
 │
 ├── assets/                             # Your visual assets
@@ -117,18 +132,28 @@ your-project/
 └── GEMINI.md                           # Gemini instructions (if selected)
 ```
 
+## Compatibility
+
+**Do I need Gemini CLI?**
+Only for `/second-opinion` and `/plan-feature` (which calls `/second-opinion` internally). The `/review-work` skill uses Claude sub-agents and works without it. Everything else works without it too.
+
+**Can I use this with Cursor / Windsurf / Codex?**
+The skills and hooks are Claude Code-specific. The documentation templates work with any AI tool. Skills should work with most AI coding tools that support the skill format.
+
+**Is this for large teams?**
+It works for teams, but it's designed for individual developers and small teams. If you're running complex multi-agent workflows at scale via the API, this probably isn't what you need.
 
 ## Upgrading from v2
 
 v3 is a major rewrite. Commands became skills, the 3-tier doc system became 4 focused files, Gemini moved from MCP to native CLI, Context7 is now a plugin.
 
-**v2 is still available:**
+v2 is still available:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/peterkrueck/Claude-Code-Development-Kit/v2/install.sh | bash
 ```
 
 See [CHANGELOG.md](CHANGELOG.md) for the full migration guide.
-
 
 ## Uninstalling
 
@@ -139,17 +164,6 @@ rm -rf .claude/ docs/ai-context/ assets/ CLAUDE.md GEMINI.md
 ```
 
 The scaffolding directories (`docs/legal/`, `docs/business/`, etc.) are empty by default — remove them too if unused. Your code is never modified.
-
-## FAQ
-
-**Do I need Gemini CLI?**
-Only for `/second-opinion`. The `/review-work` skill uses Claude sub-agents and works without it. Everything else works without it too.
-
-**Can I use this with Cursor/Windsurf/Codex?**
-The skills and hooks are Claude Code-specific. The documentation templates work with any AI tool. SKILLS should work with most AI coding tools by now.
-
-**Is this for large teams?**
-It works for teams, but it's designed for individual developers and small teams. If you're running complex multi-agent workflows at scale via the API, this probably isn't what you need.
 
 ## License
 

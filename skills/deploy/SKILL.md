@@ -109,3 +109,57 @@ Health: ok
 2. **Verification is the smoke test** — confirms the deployed code works
 3. **Rollback is fast** — redeploy from a previous git commit
 4. **Verification failures may be transient** — retry once before investigating
+
+---
+
+## Example: filled-in version
+
+Here's what the skeleton above looks like with the placeholders replaced. Stack: a Node.js API on Fly.io with a Postgres backend, health-checked via `curl`. **Adapt to your own stack — this is reference, not prescription.**
+
+### Step 1: Detect What Changed
+```bash
+git diff --name-only HEAD
+git diff --name-only --cached
+```
+Mapping: anything under `src/api/` → deploy `api`. `migrations/` touched → run migration after deploy.
+
+### Step 2: Run Tests (Pre-Deploy Gate)
+```bash
+npm test
+```
+Fail → STOP, fix first.
+
+### Step 3: Deploy
+```bash
+flyctl deploy --app my-api
+```
+Fail → STOP. Don't continue to other targets if this is part of a multi-target deploy.
+
+### Step 4: Post-Deploy Verification
+```bash
+curl -fsSL https://my-api.fly.dev/health
+```
+- 2xx → pass.
+- Fail → re-run once (transient API timeouts happen). Still failing → rollback:
+  ```bash
+  flyctl releases list --app my-api
+  flyctl deploy --image registry.fly.io/my-api:<previous-tag>
+  ```
+
+### Step 5: Health Check
+```bash
+curl -fsSL https://my-api.fly.dev/health | jq '.db_connected'
+```
+Confirms DB and downstream dependencies are reachable, not just the HTTP listener.
+
+### Step 6: Report
+```
+Deploy Complete
+───────────────
+Targets deployed: api
+Tests: 47/47 passed
+Verification: passed
+Health: ok (db_connected: true)
+```
+
+**Other stacks fit the same shape:** Supabase Edge Functions (shadow-slug deploy + smoke probe + swap), Vercel (preview → promote with `vercel --prod`), Cloudflare Workers (`wrangler deploy` + health probe), AWS Lambda (`sam deploy` + CloudWatch check). Pick the one closest to your stack and substitute. The 6-step structure stays.

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Claude Code Development Kit v3.0.0 — Setup Script
+# Claude Code Development Kit v3.1.0 — Setup Script
 #
 # Installs skills, hooks, templates, and settings into a target project.
 
@@ -137,13 +137,21 @@ show_workflow_overview() {
     print_color "$GREEN" "     > /update-docs"
     echo "     Only updates what actually changed."
     echo
-    print_color "$YELLOW" "  7. Finish — review-on-stop nudges you"
+    print_color "$YELLOW" "  7. Ship to main"
+    print_color "$GREEN" "     > /merge"
+    echo "     Verifies docs are current + tree is clean, then merges."
+    echo "     Works with standard branches and git worktree. Stops to ask"
+    echo "     if anything looks off — never auto-fixes a half-ready branch."
+    echo
+    print_color "$YELLOW" "  8. Finish — review-on-stop nudges you"
     echo "     stop → advisory → stop → reminder → stop → exit"
     echo "     Gentle nudge to review. Never traps you."
     print_color "$DIM" "                                                  (review-on-stop)"
     echo
     print_color "$DIM" "  Always on: security scanner blocks secrets from leaking."
     print_color "$DIM" "  Notifications: sound alerts when Claude finishes or needs input."
+    print_color "$DIM" "  Also: /plan-feature in Plan Mode (Shift+Tab) for parallel"
+    print_color "$DIM" "        research + Gemini second opinion before exiting plan mode."
     echo
 }
 
@@ -166,7 +174,7 @@ safe_read_setup_mode() {
 main() {
     echo
     print_color "$BLUE" "==========================================="
-    print_color "$BLUE" "  Claude Code Development Kit v3.0.0"
+    print_color "$BLUE" "  Claude Code Development Kit v3.1.0"
     print_color "$BLUE" "==========================================="
     echo
 
@@ -353,6 +361,7 @@ main() {
     # Commands
     copy_file "$SCRIPT_DIR/commands/prime.md" "$TARGET_DIR/.claude/commands/prime.md" "Command"
     copy_file "$SCRIPT_DIR/commands/merge.md" "$TARGET_DIR/.claude/commands/merge.md" "Command"
+    copy_file "$SCRIPT_DIR/commands/plan-feature.md" "$TARGET_DIR/.claude/commands/plan-feature.md" "Command"
 
     # /update-docs skill (core — always installed)
     mkdir -p "$TARGET_DIR/.claude/skills/update-docs"
@@ -563,7 +572,7 @@ main() {
     fi
     echo "  Test your setup:"
     echo "    cd \"$TARGET_DIR\" && claude"
-    echo "    Then: /prime"
+    echo "    Then try: /prime  (loads docs)  →  /merge  (ships work)"
     echo
     print_color "$DIM" "  To uninstall: remove .claude/, docs/ai-context/, assets/,"
     print_color "$DIM" "  CLAUDE.md, and GEMINI.md from your project."
