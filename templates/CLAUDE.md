@@ -13,7 +13,23 @@
 - **Use available skills proactively**: `/review-work` for code review, `/update-docs` after significant changes, `/deploy` for deployments.
 - **Context7 first**: When working with external libraries, check Context7 for current documentation before relying on training data.
 
-## 2. Key Architecture Decisions
+## 2. Operator Model
+
+<!-- Describe how you and Claude collaborate. Optional but valuable for
+     solo / AI-agent-driven workflows.
+
+Example:
+
+- **Role split.** I'm the decision-maker, director, and reviewer. AI agents
+  (Claude + sub-agents) write the code. Build effort ≈ zero; cost is
+  maintenance, debuggability, and decision overhead.
+- **Evaluate by maintenance burden, not build effort.** "Too much code for
+  a solo dev" is not a valid critique — pick libraries and architectures on
+  technical merit.
+- **Boundaries:** always ask before git commits, breaking changes, deleting
+  files, and architecture decisions worth ≥1 day of rework to undo. -->
+
+## 3. Key Architecture Decisions
 
 <!-- Document settled decisions here so Claude doesn't relitigate them.
      Include brief rationale for each. -->
@@ -28,7 +44,7 @@ Example:
 - **State management**: Server-side only. Why: single source of truth, no sync bugs.
 -->
 
-## 3. Tool Usage Rules
+## 4. Tool Usage Rules
 
 <!-- Map tasks to the correct tools for your project. -->
 
@@ -40,7 +56,7 @@ Example:
 | Documentation update | `/update-docs` skill |
 | Deployment | `/deploy` skill |
 
-## 4. Coding Standards
+## 5. Coding Standards
 
 <!-- Keep only standards that are non-obvious or project-specific.
      Don't document standard language conventions — Claude already knows those. -->
@@ -53,7 +69,7 @@ Example:
 - All time logic in PostgreSQL, never client-side
 -->
 
-## 5. Testing
+## 6. Testing
 
 <!-- Document your test commands and when to run them. -->
 
@@ -74,7 +90,7 @@ npm run test:e2e      # E2E tests (~20s, hits network)
 | Before deployment | All suites |
 -->
 
-## 6. Privacy & Security
+## 7. Privacy & Security
 
 <!-- Document non-negotiable security rules for your project. -->
 

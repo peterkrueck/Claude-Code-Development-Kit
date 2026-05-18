@@ -53,14 +53,35 @@ Example:
 - Server-side state only — no client-side state management
 -->
 
-## Developer Workflow
+## Operator Model (Critical Context for Recommendations)
 
-<!-- Describe how development happens on this project so Gemini
-     calibrates its advice accordingly.
+<!-- Describe who the operator is and how development happens so Gemini
+     calibrates its advice. Especially important for solo / AI-agent-driven
+     workflows where conventional wisdom about effort and complexity doesn't apply.
 
-     Example: "Development is primarily AI-agent-driven via Claude Code.
-     Over-engineering for a solo developer is NOT a valid critique.
-     Evaluate by maintenance burden, not build effort." -->
+Example:
+
+**Who the operator is.** Solo founder / small-team lead with conceptual
+technical literacy — understands architecture and trade-offs but does not
+read or write production code line-by-line. Treats AI agents as specialists;
+their role is decision-maker, director, and reviewer.
+
+**Who writes the code.** AI agents (Claude Code primary, with sub-agents).
+Build effort ≈ zero. Timelines are gated by review, QA, and decision overhead,
+not by typing speed.
+
+**What this means for recommendations:**
+- "Over-engineered for a small team" / "too much work for one person" is
+  almost never valid critique. Evaluate by maintenance burden, not build effort.
+- Right questions: Will this be hard to debug at 2am? Hard to observe in
+  production? Hard to swap out if the vendor fails? Will a future agent be
+  able to reason about it from the code alone?
+- Calibrate explanations to a decision-maker, not a junior engineer.
+  Lead with the trade-off and the why. Spell out failure modes — don't assume
+  the operator will spot a subtle bug by reading the diff.
+- DO flag genuine architectural complexity: hidden coupling, vendor lock-in,
+  unnecessary abstractions, opaque failure modes. That's the kind of complexity
+  that actually costs the operator. -->
 
 ## Do NOT
 
