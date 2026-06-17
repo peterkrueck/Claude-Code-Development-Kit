@@ -1,0 +1,20 @@
+{
+  "allow": [
+    "Bash(awk:*)",
+    "Bash(sed:*)",
+    "Bash(sort:*)",
+    "Bash(uniq:*)",
+    "Bash(cut:*)",
+    "Bash(tr:*)",
+    "Bash(diff:*)",
+    "Bash(head:*)",
+    "Bash(tail:*)",
+    "Bash(wc:*)",
+    "Bash(grep:*)",
+    "Bash(find:*)",
+    "Bash(echo:*)",
+    "Bash(printf:*)",
+    "Bash(date:*)"
+  ],
+  "deny": []
+}

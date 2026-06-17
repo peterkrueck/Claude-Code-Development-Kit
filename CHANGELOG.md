@@ -6,6 +6,43 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [3.2.0] - 2026-06-18
+
+A broad transfer of improvements proven in production, generalized for any stack. Non-breaking — the installer preserves existing files, and every default works without new dependencies.
+
+### Added
+
+- **Second opinion is now dual-engine with an install-time choice.** `/second-opinion` can drive **OpenAI Codex** (the new default) or **Google Gemini**, or both. The installer asks which engine(s) to wire up:
+  - **Codex (default)** — `codex exec -s read-only -C <repo-root>`, no model pin (Codex owns its default; the `*-codex` model family is rejected on ChatGPT-account logins, so leaving it unset is correct). Reads a new `AGENTS.md` consultant briefing at the repo root.
+  - **Gemini** — unchanged invocation, still pinned to a Pro-tier default and overridable via `CLAUDE_SECOND_OPINION_MODEL`. Installed as the broad/default skill when chosen as the default engine, or as the explicit-only `second-opinion-gemini` skill (triggers on "ask Gemini" / "ask both") when "both" is chosen.
+  - Shared invocation discipline (600s timeout, permission-free pattern, no silent model downgrade, autonomous multi-turn) applies to both.
+- **`templates/AGENTS.md`** — a generalized OpenAI Codex consultant briefing, mirroring `templates/GEMINI.md` (read-only role, prime-yourself docs, Context7 research, severity codes, commented Operator Model). Installed when Codex is the chosen engine.
+- **`/verify` command** — a cross-stack template that runs the app or its tests to confirm a change *actually works* (observed behavior, not just compilation), with commented per-stack sections (web / iOS / Android / server / database). Installed as core; pairs with `/review-work`.
+- **`context7-guidance` skill** — teaches when/how to fetch current library docs via Context7 (the kit shipped the permission but not the pedagogy). Installed as core.
+- **`track-file-touch.sh` hook** (PostToolUse Write|Edit) — records the files *this session* edits into a manifest, so `review-on-stop.sh` scopes its advisory to session changes only and stops firing on pre-existing dirty state. Cleaned up on SessionEnd.
+- **New permission modules** — `ai-cli-models.json` (`Bash(codex:*)`, `Bash(gemini:*)`), `bash-utilities.json` (read-only shell utilities), and `fetch-common-docs.json` (doc-domain WebFetch allowlist). The latter two are always composed; both are strictly less powerful than what core already allows (`curl`, `WebSearch`).
+
+### Changed
+
+- **`/review-work` — verification rigor.** Reviewers now triage the diff into modules + risk surfaces (auth, schema migrations, config/secrets, dependency updates, critical paths), self-prime via `/prime`, **verify every external-API claim against Context7** (`[verified]`/`[unverified]`/`[n/a]`, with unverified API claims auto-discarded by the judge), and report an **intent verdict** against the active task in `progress.md` before severity-grouped findings. An optional **Architect** reviewer joins for multi-module / new-abstraction / unfinished-refactor diffs.
+- **`/prime` — tiered loading.** Defaults to a **light prime** (~4-6k tokens: doc TOCs, opening invariants, the project-structure Map, task-relevant sections) instead of slurping whole docs. New `--full` loads everything; `progress.md` is now opt-in via `-p`/`--progress`; `--deploy` unchanged. Optional `[module]` routing for projects with distinct areas.
+- **`/merge` — silent-breakage detection.** Adds a divergence check (`git merge-base` + `merge-tree` dry-run) and, when branches have diverged, a two-phase `--no-ff --no-commit` → build/test → commit so a clean auto-merge that breaks the build (e.g. a moved declaration that compiles on each parent alone) is caught before shipping. Conflict archaeology is offered, never auto-applied. Commit metadata genericized.
+- **`/update-docs` — density-first discipline.** "Default for every line is delete" hoisted to Step 1; a net-line audit guard pauses when a run adds ≥10 lines and deletes 0; architecture-only skip bar; optional named-reference (trap) lifecycle grammar; header-rename / single-source-of-truth hazards documented.
+- **`/deploy` template** — generalized shadow/canary + target-discovery patterns with per-provider placeholders; the previous destructive git-checkout rollback was removed in favor of report-and-keep-shadow.
+- **`bg-remove`** — evidence-based model guidance and a transparency-verification note (Preview.app checkerboard; the Read tool renders transparency as black).
+- **`templates/CLAUDE.md` / `templates/GEMINI.md`** — concrete Operator Model example, a Technical-Documentation lifecycle note, and a Tool Usage row reflecting the dual-engine second opinion.
+- **`setup.sh`** — added the second-opinion engine prompt, AGENTS.md install, `/verify` + `context7-guidance` as core, `track-file-touch.sh` registration, and the new permission-module composition. Version banner → v3.2.0.
+
+### Removed
+
+- **`/plan-feature` command** — removed (added in v3.1.0; no longer part of the recommended loop). Plan Mode plus `/review-work`, `/verify`, and `/second-opinion` cover the same ground without a dedicated command.
+- **`settings/permissions/skills-review.json`** — its single `Bash(gemini:*)` entry is now a subset of `ai-cli-models.json`, which the installer composes when review skills are selected.
+
+### Template renumbering
+
+- `templates/CLAUDE.md` gains a new §5 Technical Documentation (doc-lifecycle discipline). Subsequent sections shift: previous 5→6 (Coding Standards), 6→7 (Testing), 7→8 (Privacy & Security). Existing users with customized `CLAUDE.md` files are unaffected — the installer preserves existing files.
+
+
 ## [3.1.0] - 2026-05-18
 
 ### Added

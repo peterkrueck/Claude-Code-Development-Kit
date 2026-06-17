@@ -1,0 +1,11 @@
+{
+  "allow": [
+    "WebFetch(domain:npmjs.com)",
+    "WebFetch(domain:registry.npmjs.org)",
+    "WebFetch(domain:unpkg.com)",
+    "WebFetch(domain:github.com)",
+    "WebFetch(domain:raw.githubusercontent.com)",
+    "WebFetch(domain:stackoverflow.com)"
+  ],
+  "deny": []
+}

@@ -28,9 +28,9 @@ FILE_PATTERNS=()
 if [[ -f "$CONFIG_FILE" ]]; then
     while IFS= read -r _pat; do
         [[ -n "$_pat" ]] && FILE_PATTERNS+=("$_pat")
-    done < <(jq -r '(.file_patterns // ["*.py","*.ts","*.js","*.swift","*.go","*.rs"]) | .[]' "$CONFIG_FILE" 2>/dev/null)
+    done < <(jq -r '(.file_patterns // ["*.py","*.ts","*.tsx","*.js","*.jsx","*.swift","*.go","*.rs"]) | .[]' "$CONFIG_FILE" 2>/dev/null)
 else
-    FILE_PATTERNS=("*.py" "*.ts" "*.js" "*.swift" "*.go" "*.rs")
+    FILE_PATTERNS=("*.py" "*.ts" "*.tsx" "*.js" "*.jsx" "*.swift" "*.go" "*.rs")
 fi
 
 git diff --numstat HEAD -- "${FILE_PATTERNS[@]}" 2>/dev/null > "$BASELINE"

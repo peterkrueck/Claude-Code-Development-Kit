@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Claude Code Development Kit v3.1.0 — Setup Script
+# Claude Code Development Kit v3.2.0 — Setup Script
 #
 # Installs skills, hooks, templates, and settings into a target project.
 
@@ -27,8 +27,11 @@ INSTALL_REVIEW_SKILLS="n"
 INSTALL_VISUAL_SKILLS="n"
 INSTALL_DEPLOY_TEMPLATE="n"
 INSTALL_GEMINI="n"
+INSTALL_AGENTS="n"
 INSTALL_REVIEW_ON_STOP="n"
 INSTALL_NOTIFICATIONS="n"
+# Second-opinion engine: codex | gemini | both | none
+SECOND_OPINION_ENGINE="none"
 
 print_color() {
     local color=$1; shift
@@ -150,8 +153,9 @@ show_workflow_overview() {
     echo
     print_color "$DIM" "  Always on: security scanner blocks secrets from leaking."
     print_color "$DIM" "  Notifications: sound alerts when Claude finishes or needs input."
-    print_color "$DIM" "  Also: /plan-feature in Plan Mode (Shift+Tab) for parallel"
-    print_color "$DIM" "        research + Gemini second opinion before exiting plan mode."
+    print_color "$DIM" "  Also: /verify to run the app/tests and confirm a change works,"
+    print_color "$DIM" "        and ask for a \"second opinion\" for an independent review from"
+    print_color "$DIM" "        a different model (OpenAI Codex and/or Google Gemini)."
     echo
 }
 
@@ -169,12 +173,38 @@ safe_read_setup_mode() {
     done
 }
 
+# Second-opinion engine selection: 1=Codex (default), 2=Gemini, 3=Both
+safe_read_engine() {
+    local var_name="$1"
+    local prompt="$2"
+    local user_input sanitized_input valid_input=false
+    while [ "$valid_input" = false ]; do
+        if ! safe_read user_input "$prompt"; then return 1; fi
+        sanitized_input="$(echo "${user_input//$'\r'/}" | tr -d '[:space:]')"
+        case "$sanitized_input" in
+            1|"") valid_input=true; printf -v "$var_name" '%s' "codex" ;;
+            2)    valid_input=true; printf -v "$var_name" '%s' "gemini" ;;
+            3)    valid_input=true; printf -v "$var_name" '%s' "both" ;;
+            *) print_color "$YELLOW" "Please enter 1, 2, or 3." ;;
+        esac
+    done
+}
+
+# Derive consultant-template flags from the chosen engine
+derive_engine_flags() {
+    case "$SECOND_OPINION_ENGINE" in
+        codex)  INSTALL_AGENTS="y" ;;
+        gemini) INSTALL_GEMINI="y" ;;
+        both)   INSTALL_AGENTS="y"; INSTALL_GEMINI="y" ;;
+    esac
+}
+
 # ── Main ─────────────────────────────────────────────────────────────────
 
 main() {
     echo
     print_color "$BLUE" "==========================================="
-    print_color "$BLUE" "  Claude Code Development Kit v3.1.0"
+    print_color "$BLUE" "  Claude Code Development Kit v3.2.0"
     print_color "$BLUE" "==========================================="
     echo
 
@@ -213,10 +243,13 @@ main() {
     echo
     print_color "$GREEN" "  Core (always installed):"
     echo "    - CLAUDE.md — your project's AI instruction set"
-    echo "    - /prime command — loads core documentation into context"
+    echo "    - /prime command — loads core docs (tiered: light by default, --full)"
+    echo "    - /merge command — verify docs + clean tree, then ship to main"
+    echo "    - /verify command — run the app/tests to confirm a change works"
     echo "    - /update-docs skill — keeps documentation in sync with code"
+    echo "    - context7-guidance skill — fetch current library docs via Context7"
     echo "    - Security scanner — blocks secrets from leaking to MCP/plugins"
-    echo "    - Deny list — prevents destructive git/rm commands"
+    echo "    - Deny list + safe shell/doc-fetch allowlist"
     echo "    - Documentation scaffolding (spec, structure, progress, deployment)"
     echo "    - Asset directories (assets/)"
     echo
@@ -234,15 +267,16 @@ main() {
             INSTALL_REVIEW_SKILLS="y"
             INSTALL_VISUAL_SKILLS="y"
             INSTALL_DEPLOY_TEMPLATE="y"
-            INSTALL_GEMINI="y"
+            SECOND_OPINION_ENGINE="both"
             INSTALL_REVIEW_ON_STOP="y"
             INSTALL_NOTIFICATIONS="y"
             print_color "$GREEN" "  Full install:"
             echo "    ✓ Review skills (/review-work, /second-opinion)"
+            echo "    ✓ Second opinion: OpenAI Codex (default) + Google Gemini"
+            echo "    ✓ AGENTS.md + GEMINI.md consultant templates"
             echo "    ✓ Visual skills (/image-gen, /image-edit, /bg-remove)"
             echo "    ✓ Deploy skill template"
-            echo "    ✓ GEMINI.md template"
-            echo "    ✓ Review-on-stop hook"
+            echo "    ✓ Review-on-stop hook (session-scoped via track-file-touch)"
             echo "    ✓ Audio notifications"
             echo
             print_color "$DIM" "  Some skills need additional setup — see post-install notes."
@@ -255,13 +289,28 @@ main() {
             # Review Skills
             print_color "$CYAN" "  Review Skills"
             echo "    Independent code review using parallel Claude sub-agents, plus"
-            echo "    architecture consultation via Gemini CLI for genuinely independent"
-            echo "    second opinions."
+            echo "    architecture consultation via an external AI for genuinely"
+            echo "    independent second opinions."
             echo
-            echo "    Includes: /review-work (Claude sub-agents), /second-opinion (Gemini)"
-            print_color "$DIM" "    /second-opinion requires: Gemini CLI (https://github.com/google-gemini/gemini-cli)"
+            echo "    Includes: /review-work (Claude sub-agents), /second-opinion"
             safe_read_yn INSTALL_REVIEW_SKILLS "    Install review skills? (y/n): "
             echo
+
+            # Second-opinion engine
+            if [ "$INSTALL_REVIEW_SKILLS" = "y" ]; then
+                print_color "$CYAN" "  Second-Opinion Engine"
+                echo "    /second-opinion consults an external AI with a different model"
+                echo "    architecture than Claude — it catches blind spots Claude shares"
+                echo "    with itself. Pick which engine(s) to wire up:"
+                echo
+                echo "    [1] OpenAI Codex   (default — reads AGENTS.md)"
+                echo "    [2] Google Gemini  (reads GEMINI.md)"
+                echo "    [3] Both           (Codex default; \"ask Gemini\" for the other)"
+                print_color "$DIM" "    Needs the matching CLI: Codex (https://github.com/openai/codex)"
+                print_color "$DIM" "    and/or Gemini CLI (https://github.com/google-gemini/gemini-cli)"
+                safe_read_engine SECOND_OPINION_ENGINE "    Your choice (1/2/3): "
+                echo
+            fi
 
             # Visual Skills
             print_color "$CYAN" "  Visual Skills"
@@ -285,17 +334,6 @@ main() {
             safe_read_yn INSTALL_DEPLOY_TEMPLATE "    Install deploy template? (y/n): "
             echo
 
-            # Gemini Integration
-            print_color "$CYAN" "  Gemini Integration"
-            echo "    Creates GEMINI.md — an instruction file that Gemini CLI reads"
-            echo "    automatically, giving it full context about your project when"
-            echo "    invoked as a second-opinion consultant."
-            if [ "$INSTALL_REVIEW_SKILLS" = "y" ]; then
-                print_color "$GREEN" "    Recommended: you selected review skills which use Gemini."
-            fi
-            safe_read_yn INSTALL_GEMINI "    Install GEMINI.md template? (y/n): "
-            echo
-
             # Review-on-Stop
             print_color "$CYAN" "  Review-on-Stop Hook"
             echo "    Nudges you to review before finishing. When you have 10+"
@@ -314,16 +352,20 @@ main() {
             ;;
     esac
 
+    # Derive AGENTS.md / GEMINI.md consultant-template flags from the engine choice
+    derive_engine_flags
+
     # Confirm
     echo
     print_color "$YELLOW" "Ready to install to: $TARGET_DIR"
     echo
     print_color "$GREEN" "  Will install:"
-    echo "    - Core (CLAUDE.md, /prime, /merge, /update-docs, security, docs, assets)"
-    [ "$INSTALL_REVIEW_SKILLS" = "y" ] && echo "    - Review skills (/review-work, /second-opinion)"
+    echo "    - Core (CLAUDE.md, /prime, /merge, /verify, /update-docs, context7-guidance, security, docs, assets)"
+    [ "$INSTALL_REVIEW_SKILLS" = "y" ] && echo "    - Review skills (/review-work, /second-opinion — engine: $SECOND_OPINION_ENGINE)"
+    [ "$INSTALL_AGENTS" = "y" ] && echo "    - AGENTS.md consultant template (OpenAI Codex)"
+    [ "$INSTALL_GEMINI" = "y" ] && echo "    - GEMINI.md consultant template (Google Gemini)"
     [ "$INSTALL_VISUAL_SKILLS" = "y" ] && echo "    - Visual skills (/image-gen, /image-edit, /bg-remove)"
     [ "$INSTALL_DEPLOY_TEMPLATE" = "y" ] && echo "    - Deploy skill template"
-    [ "$INSTALL_GEMINI" = "y" ] && echo "    - GEMINI.md template"
     [ "$INSTALL_REVIEW_ON_STOP" = "y" ] && echo "    - Review-on-stop hook"
     [ "$INSTALL_NOTIFICATIONS" = "y" ] && echo "    - Audio notifications"
     echo
@@ -361,11 +403,15 @@ main() {
     # Commands
     copy_file "$SCRIPT_DIR/commands/prime.md" "$TARGET_DIR/.claude/commands/prime.md" "Command"
     copy_file "$SCRIPT_DIR/commands/merge.md" "$TARGET_DIR/.claude/commands/merge.md" "Command"
-    copy_file "$SCRIPT_DIR/commands/plan-feature.md" "$TARGET_DIR/.claude/commands/plan-feature.md" "Command"
+    copy_file "$SCRIPT_DIR/commands/verify.md" "$TARGET_DIR/.claude/commands/verify.md" "Command"
 
     # /update-docs skill (core — always installed)
     mkdir -p "$TARGET_DIR/.claude/skills/update-docs"
     copy_file "$SCRIPT_DIR/skills/update-docs/SKILL.md" "$TARGET_DIR/.claude/skills/update-docs/SKILL.md" "Skill"
+
+    # context7-guidance skill (core — pairs with the recommended Context7 plugin)
+    mkdir -p "$TARGET_DIR/.claude/skills/context7-guidance"
+    copy_file "$SCRIPT_DIR/skills/context7-guidance/SKILL.md" "$TARGET_DIR/.claude/skills/context7-guidance/SKILL.md" "Skill"
 
     # Security scanner
     copy_file "$SCRIPT_DIR/hooks/security-scan.sh" "$TARGET_DIR/.claude/hooks/security-scan.sh" "Hook"
@@ -380,10 +426,26 @@ main() {
 
     # Review skills
     if [ "$INSTALL_REVIEW_SKILLS" = "y" ]; then
-        for skill in review-work second-opinion; do
-            mkdir -p "$TARGET_DIR/.claude/skills/$skill"
-            copy_file "$SCRIPT_DIR/skills/$skill/SKILL.md" "$TARGET_DIR/.claude/skills/$skill/SKILL.md" "Skill"
-        done
+        # review-work (engine-independent)
+        mkdir -p "$TARGET_DIR/.claude/skills/review-work"
+        copy_file "$SCRIPT_DIR/skills/review-work/SKILL.md" "$TARGET_DIR/.claude/skills/review-work/SKILL.md" "Skill"
+
+        # second-opinion — the default engine owns the generic "/second-opinion" trigger
+        mkdir -p "$TARGET_DIR/.claude/skills/second-opinion"
+        case "$SECOND_OPINION_ENGINE" in
+            gemini)
+                # Gemini is the sole/default engine — install its broad (default-form) skill
+                copy_file "$SCRIPT_DIR/skills/second-opinion-gemini/SKILL.default.md" "$TARGET_DIR/.claude/skills/second-opinion/SKILL.md" "Skill"
+                ;;
+            codex|both)
+                copy_file "$SCRIPT_DIR/skills/second-opinion/SKILL.md" "$TARGET_DIR/.claude/skills/second-opinion/SKILL.md" "Skill"
+                ;;
+        esac
+        # "both" also installs the explicit-only Gemini variant ("ask Gemini")
+        if [ "$SECOND_OPINION_ENGINE" = "both" ]; then
+            mkdir -p "$TARGET_DIR/.claude/skills/second-opinion-gemini"
+            copy_file "$SCRIPT_DIR/skills/second-opinion-gemini/SKILL.md" "$TARGET_DIR/.claude/skills/second-opinion-gemini/SKILL.md" "Skill"
+        fi
     fi
 
     # Visual skills
@@ -410,7 +472,16 @@ main() {
         copy_file "$SCRIPT_DIR/skills/deploy/SKILL.md" "$TARGET_DIR/.claude/skills/deploy/SKILL.md" "Skill"
     fi
 
-    # Gemini integration
+    # Second-opinion consultant templates (driven by the engine choice)
+    # AGENTS.md is read by OpenAI Codex; GEMINI.md is read by the Gemini CLI.
+    if [ "$INSTALL_AGENTS" = "y" ]; then
+        if [ ! -f "$TARGET_DIR/AGENTS.md" ]; then
+            cp "$SCRIPT_DIR/templates/AGENTS.md" "$TARGET_DIR/AGENTS.md"
+            print_color "$GREEN" "  Created AGENTS.md"
+        else
+            print_color "$YELLOW" "  Preserved existing AGENTS.md"
+        fi
+    fi
     if [ "$INSTALL_GEMINI" = "y" ]; then
         if [ ! -f "$TARGET_DIR/GEMINI.md" ]; then
             cp "$SCRIPT_DIR/templates/GEMINI.md" "$TARGET_DIR/GEMINI.md"
@@ -420,10 +491,11 @@ main() {
         fi
     fi
 
-    # Review-on-stop hook
+    # Review-on-stop hook (+ session-scoping via the file-touch manifest)
     if [ "$INSTALL_REVIEW_ON_STOP" = "y" ]; then
         copy_file "$SCRIPT_DIR/hooks/review-on-stop.sh" "$TARGET_DIR/.claude/hooks/review-on-stop.sh" "Hook"
         copy_file "$SCRIPT_DIR/hooks/snapshot-baseline.sh" "$TARGET_DIR/.claude/hooks/snapshot-baseline.sh" "Hook"
+        copy_file "$SCRIPT_DIR/hooks/track-file-touch.sh" "$TARGET_DIR/.claude/hooks/track-file-touch.sh" "Hook"
         copy_file "$SCRIPT_DIR/hooks/cleanup-session.sh" "$TARGET_DIR/.claude/hooks/cleanup-session.sh" "Hook"
         copy_file "$SCRIPT_DIR/hooks/config/pipeline.json" "$TARGET_DIR/.claude/hooks/config/pipeline.json" "Config"
     fi
@@ -451,8 +523,16 @@ main() {
     allow_entries=$(jq -r '.allow[]' "$SCRIPT_DIR/settings/permissions/core.json")
     deny_entries=$(jq -r '.deny[]' "$SCRIPT_DIR/settings/permissions/core.json")
 
+    # Always-on convenience modules: read-only shell utilities + doc-domain WebFetch.
+    # Both are strictly less powerful than what core already allows (curl, WebSearch)
+    # and cut down on permission prompts for the hooks and skills.
+    allow_entries="$allow_entries"$'\n'$(jq -r '.allow[]' "$SCRIPT_DIR/settings/permissions/bash-utilities.json")
+    allow_entries="$allow_entries"$'\n'$(jq -r '.allow[]' "$SCRIPT_DIR/settings/permissions/fetch-common-docs.json")
+
+    # Second-opinion CLIs (Codex + Gemini). Granting an allow for an un-installed
+    # CLI is inert, so we add both whenever review skills are selected.
     if [ "$INSTALL_REVIEW_SKILLS" = "y" ]; then
-        allow_entries="$allow_entries"$'\n'$(jq -r '.allow[]' "$SCRIPT_DIR/settings/permissions/skills-review.json")
+        allow_entries="$allow_entries"$'\n'$(jq -r '.allow[]' "$SCRIPT_DIR/settings/permissions/ai-cli-models.json")
     fi
 
     if [ "$INSTALL_VISUAL_SKILLS" = "y" ]; then
@@ -491,10 +571,15 @@ main() {
     fi
 
     # SessionStart: baseline snapshot (captures git state before any work)
+    # PostToolUse(Write|Edit): record files this session touches (manifest)
     # SessionEnd: cleanup per-session temp files
     if [ "$INSTALL_REVIEW_ON_STOP" = "y" ]; then
         hooks_json=$(echo "$hooks_json" | jq --arg dir "$TARGET_DIR" '. + {"SessionStart": [{
             "hooks": [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/snapshot-baseline.sh")}]
+        }]}')
+        hooks_json=$(echo "$hooks_json" | jq --arg dir "$TARGET_DIR" '. + {"PostToolUse": [{
+            "matcher": "Write|Edit",
+            "hooks": [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/track-file-touch.sh"), "timeout": 5}]
         }]}')
         hooks_json=$(echo "$hooks_json" | jq --arg dir "$TARGET_DIR" '. + {"SessionEnd": [{
             "hooks": [{"type": "command", "command": ("bash " + $dir + "/.claude/hooks/cleanup-session.sh"), "timeout": 5}]
@@ -534,8 +619,12 @@ main() {
     echo
     echo "  1. Customize CLAUDE.md with your project rules"
     echo "  2. Fill in docs/ai-context/ templates"
-    if [ "$INSTALL_GEMINI" = "y" ]; then
-        echo "  3. Customize GEMINI.md with your project details"
+    if [ "$INSTALL_AGENTS" = "y" ] && [ "$INSTALL_GEMINI" = "y" ]; then
+        echo "  3. Customize AGENTS.md and GEMINI.md (same project context, two consultants)"
+    elif [ "$INSTALL_AGENTS" = "y" ]; then
+        echo "  3. Customize AGENTS.md with your project details (read by OpenAI Codex)"
+    elif [ "$INSTALL_GEMINI" = "y" ]; then
+        echo "  3. Customize GEMINI.md with your project details (read by Gemini CLI)"
     fi
     echo
     print_color "$CYAN" "  Recommended plugin:"
@@ -545,17 +634,26 @@ main() {
     echo
 
     # Dynamic setup instructions based on selections
+    local needs_codex_cli=false
     local needs_gemini_cli=false
     local needs_gemini_key=false
     local needs_rembg=false
 
     [ "$INSTALL_VISUAL_SKILLS" = "y" ] && needs_gemini_key=true && needs_rembg=true
-    # /second-opinion and GEMINI.md need Gemini CLI
-    [ "$INSTALL_REVIEW_SKILLS" = "y" ] && needs_gemini_cli=true
-    [ "$INSTALL_GEMINI" = "y" ] && needs_gemini_cli=true
+    # /second-opinion needs the CLI for the chosen engine(s)
+    case "$SECOND_OPINION_ENGINE" in
+        codex)  needs_codex_cli=true ;;
+        gemini) needs_gemini_cli=true ;;
+        both)   needs_codex_cli=true; needs_gemini_cli=true ;;
+    esac
 
+    if [ "$needs_codex_cli" = true ] && ! command -v codex &>/dev/null; then
+        print_color "$YELLOW" "  OpenAI Codex CLI required (/second-opinion default engine):"
+        echo "    See: https://github.com/openai/codex  (sign in with a ChatGPT account)"
+        echo
+    fi
     if [ "$needs_gemini_cli" = true ] && ! command -v gemini &>/dev/null; then
-        print_color "$YELLOW" "  Gemini CLI required (/second-opinion + GEMINI.md):"
+        print_color "$YELLOW" "  Gemini CLI required (/second-opinion Gemini engine + GEMINI.md):"
         echo "    See: https://github.com/google-gemini/gemini-cli"
         echo
     fi
@@ -575,7 +673,7 @@ main() {
     echo "    Then try: /prime  (loads docs)  →  /merge  (ships work)"
     echo
     print_color "$DIM" "  To uninstall: remove .claude/, docs/ai-context/, assets/,"
-    print_color "$DIM" "  CLAUDE.md, and GEMINI.md from your project."
+    print_color "$DIM" "  CLAUDE.md, AGENTS.md, and GEMINI.md from your project."
     echo
     print_color "$DIM" "  To add features later: re-run setup.sh (existing files"
     print_color "$DIM" "  are preserved unless you choose to overwrite)."

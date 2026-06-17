@@ -22,7 +22,9 @@ This kit is the maintenance layer between you and Claude Code. Four focused doc 
    /merge           verify and ship (standard branch or git worktree)
 ```
 
-For larger features: `/plan-feature` inside Plan Mode (Shift+Tab) dispatches parallel research sub-agents and pulls in a Gemini second opinion before you commit to an approach.
+`/verify` runs the app or its tests to confirm a change actually works (observed behavior, not just "it compiles") — the run-it-and-watch step `/review-work` points at.
+
+When Claude hits an architecture decision or a debugging dead end, ask for a **second opinion** — an independent review from a different model (OpenAI Codex by default, or Google Gemini).
 
 ## Who this is for
 
@@ -63,28 +65,29 @@ Claude reads your docs, summarizes the project, and you're ready to work.
 | | |
 |---|---|
 | `CLAUDE.md` template | Your project's AI instruction set |
-| `/prime` command | Load core docs into context (use `/prime --deploy` to also load infra) |
-| `/merge` command | Verify docs are current + tree is clean, then ship to main. Works with standard branches and `git worktree`. |
-| `/update-docs` skill | Keep `docs/ai-context/` in sync after code changes — skips trivial diffs |
+| `/prime` command | Load core docs into context — tiered: a light prime by default (~4-6k tokens), `--full` for everything, `--deploy` to also load infra |
+| `/merge` command | Verify docs are current + tree is clean, then ship to main. Detects silent clean-merge breakage with a build/test pass. Works with standard branches and `git worktree`. |
+| `/verify` command | Run the app or its tests to confirm a change actually works — a cross-stack template you fill in for your stack |
+| `/update-docs` skill | Keep `docs/ai-context/` in sync after code changes — density-first, skips trivial diffs |
+| `context7-guidance` skill | Fetch current library/framework/API docs via Context7 instead of stale training data |
 | Doc scaffolding | Four focused files: `spec.md`, `project-structure.md`, `progress.md`, `deployment-infrastructure.md` |
 | Security scanner hook | Blocks API keys and secrets from leaking to MCP plugins |
-| Deny list | Prevents `git push --force`, `rm -rf`, `git reset --hard`, and other destructive commands |
+| Deny list + allowlist | Blocks `git push --force`, `rm -rf`, `sudo`, `git reset --hard`, etc.; auto-allows safe read-only shell utilities and doc-domain fetches |
 | Asset directories | `assets/` scaffolding for icons, logos, social, web |
 
 ### Quality gates (optional)
 
 | | |
 |---|---|
-| `/review-work` | Spawns parallel Claude sub-agents (Bug Hunter + Rules Auditor) to review your uncommitted diff. Single reviewer for small changes, parallel specialists for 50+ lines. |
-| `/second-opinion` | Auto-triggers when Claude hits architecture decisions or debugging dead ends. Consults Google's Gemini CLI for a genuinely independent perspective (different model architecture). |
-| `/plan-feature` | Runs in Plan Mode. Parallel research sub-agents + tradeoff statements + `/second-opinion` before exiting plan mode. |
-| Review-on-stop hook | Three-stop advisory nudge: first stop shows changes + review suggestions, second stop is a reminder, third stop lets you out. Never traps you. |
+| `/review-work` | Spawns parallel Claude sub-agents (Bug Hunter + Rules Auditor, plus an optional Architect) to review your uncommitted diff. Verifies every external-API claim against Context7 (unverified claims are discarded) and reports whether the change actually fulfills the task in `progress.md`. |
+| `/second-opinion` | Auto-triggers when Claude hits architecture decisions or debugging dead ends. Consults an external AI with a different model architecture — **OpenAI Codex by default**, **Google Gemini** on "ask Gemini", or "ask both" to triangulate. |
+| Review-on-stop hook | Three-stop advisory nudge, scoped to the files *this session* edited. First stop shows changes + review suggestions, second stop is a reminder, third stop lets you out. Never traps you. |
 
-`/second-opinion` and `/plan-feature` require [Gemini CLI](https://github.com/google-gemini/gemini-cli).
+`/second-opinion` needs the CLI for your chosen engine: [OpenAI Codex](https://github.com/openai/codex) and/or [Gemini CLI](https://github.com/google-gemini/gemini-cli). The installer asks which one(s) to wire up.
 
 ### Templates
 
-`GEMINI.md` (read natively by Gemini CLI), plus the four `docs/ai-context/` files and asset directory scaffolding.
+`AGENTS.md` (read natively by OpenAI Codex) and/or `GEMINI.md` (read natively by Gemini CLI) — the second-opinion consultant briefings — plus the four `docs/ai-context/` files and asset directory scaffolding.
 
 ### Optional add-ons
 
@@ -98,13 +101,15 @@ Claude reads your docs, summarizes the project, and you're ready to work.
 your-project/
 ├── .claude/
 │   ├── commands/
-│   │   ├── prime.md                    # /prime — load project context
+│   │   ├── prime.md                    # /prime — load project context (tiered)
 │   │   ├── merge.md                    # /merge — verify and ship
-│   │   └── plan-feature.md             # /plan-feature — plan in Plan Mode (optional)
+│   │   └── verify.md                   # /verify — run app/tests to confirm it works
 │   ├── hooks/
 │   │   ├── security-scan.sh            # Blocks secrets from leaking to plugins
 │   │   ├── review-on-stop.sh           # Advisory review nudge (if selected)
 │   │   ├── snapshot-baseline.sh        # Session baseline capture (if selected)
+│   │   ├── track-file-touch.sh         # Records this session's edits (if selected)
+│   │   ├── cleanup-session.sh          # Clears per-session temp files (if selected)
 │   │   ├── notify.sh                   # Audio notifications (if selected)
 │   │   ├── config/
 │   │   │   ├── pipeline.json           # Review-on-stop configuration
@@ -112,7 +117,7 @@ your-project/
 │   │   └── sounds/
 │   │       ├── complete.wav
 │   │       └── input-needed.wav
-│   ├── skills/                         # Selected skills (update-docs, review, visual, deploy)
+│   ├── skills/                         # update-docs, context7-guidance (core) + review/visual/deploy
 │   └── settings.local.json             # Permissions, hooks, deny list
 │
 ├── assets/                             # Your visual assets
@@ -129,13 +134,14 @@ your-project/
 │   └── open-issues/
 │
 ├── CLAUDE.md                           # Your project's AI rules
-└── GEMINI.md                           # Gemini instructions (if selected)
+├── AGENTS.md                           # Codex consultant briefing (if selected)
+└── GEMINI.md                           # Gemini consultant briefing (if selected)
 ```
 
 ## Compatibility
 
-**Do I need Gemini CLI?**
-Only for `/second-opinion` and `/plan-feature` (which calls `/second-opinion` internally). The `/review-work` skill uses Claude sub-agents and works without it. Everything else works without it too.
+**Do I need an external CLI?**
+Only for `/second-opinion`. The installer asks which engine to wire up — [OpenAI Codex](https://github.com/openai/codex) (default), [Gemini CLI](https://github.com/google-gemini/gemini-cli), or both — and you only need the CLI for what you picked. The `/review-work` skill uses Claude sub-agents and works without either. Everything else works without them too.
 
 **Can I use this with Cursor / Windsurf / Codex?**
 The skills and hooks are Claude Code-specific. The documentation templates work with any AI tool. Skills should work with most AI coding tools that support the skill format.
@@ -160,7 +166,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the full migration guide.
 Remove the installed files from your project:
 
 ```bash
-rm -rf .claude/ docs/ai-context/ assets/ CLAUDE.md GEMINI.md
+rm -rf .claude/ docs/ai-context/ assets/ CLAUDE.md AGENTS.md GEMINI.md
 ```
 
 The scaffolding directories (`docs/legal/`, `docs/business/`, etc.) are empty by default — remove them too if unused. Your code is never modified.
