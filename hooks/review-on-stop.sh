@@ -12,6 +12,7 @@ SESSION_ID=$(echo "$HOOK_INPUT" | jq -r '.session_id // "unknown"' 2>/dev/null |
 HOOK_CWD=$(echo "$HOOK_INPUT" | jq -r '.cwd // ""' 2>/dev/null || echo "")
 STATE_FILE="/tmp/claude-stop-${SESSION_ID}.state"
 BASELINE="/tmp/claude-baseline-${SESSION_ID}.numstat"
+MANIFEST="/tmp/claude-touched-${SESSION_ID}.files"
 
 # Use cwd from hook input (handles worktrees correctly), fall back to git toplevel
 if [[ -n "$HOOK_CWD" && -d "$HOOK_CWD" ]]; then
@@ -21,6 +22,14 @@ else
 fi
 
 cd "$PROJECT_DIR" 2>/dev/null || exit 0
+
+# Manifest guard: if this session never edited a file (via Write/Edit), skip.
+# Without this, another session's dirty state in the same cwd would trigger a
+# false advisory. track-file-touch.sh writes the manifest on PostToolUse.
+if [[ ! -s "$MANIFEST" ]]; then
+    "$SCRIPT_DIR/notify.sh" complete 2>/dev/null || true
+    exit 0
+fi
 
 # Load configuration
 CONFIG_FILE="$SCRIPT_DIR/config/pipeline.json"
@@ -37,13 +46,15 @@ MIN_LINES=$(jq -r '.min_lines_changed // 10' "$CONFIG_FILE")
 FILE_PATTERNS=()
 while IFS= read -r _pat; do
     [[ -n "$_pat" ]] && FILE_PATTERNS+=("$_pat")
-done < <(jq -r '(.file_patterns // ["*.py","*.ts","*.js","*.swift","*.go","*.rs"]) | .[]' "$CONFIG_FILE" 2>/dev/null)
+done < <(jq -r '(.file_patterns // ["*.py","*.ts","*.tsx","*.js","*.jsx","*.swift","*.go","*.rs"]) | .[]' "$CONFIG_FILE" 2>/dev/null)
 
-# Build git diff pattern args
-PATTERN_ARGS=()
-for p in "${FILE_PATTERNS[@]}"; do
-    PATTERN_ARGS+=("$p")
-done
+# Build the list of files THIS session touched (deduplicated, made repo-relative).
+# Diffs are later scoped to this list so pre-session dirty files are ignored.
+TOUCHED_FILES=()
+while IFS= read -r _f; do
+    [[ -n "$_f" ]] && TOUCHED_FILES+=("$_f")
+done < <(sort -u "$MANIFEST" 2>/dev/null | sed "s|^${PROJECT_DIR}/||")
+[[ ${#TOUCHED_FILES[@]} -eq 0 ]] && { "$SCRIPT_DIR/notify.sh" complete 2>/dev/null || true; exit 0; }
 
 # Multi-phase stop: 1st stop = advisory, 2nd stop = reminder, 3rd stop = allow
 if [[ -f "$STATE_FILE" ]]; then
@@ -64,8 +75,22 @@ if [[ -f "$STATE_FILE" ]]; then
     fi
 fi
 
-# Get current diff (using configured file patterns)
-CURRENT=$(git diff --numstat HEAD -- "${PATTERN_ARGS[@]}" 2>/dev/null || true)
+# Get current diff — scoped to the intersection of (files this session touched)
+# and (configured file patterns). Passing both the touched paths and the pattern
+# globs as pathspecs would OR them; instead we diff the touched files, then let
+# the patterns constrain by piping through a glob match. git diff with explicit
+# paths already restricts to session files; the pattern filter keeps it stack-aware.
+CURRENT=$(git diff --numstat HEAD -- "${TOUCHED_FILES[@]}" 2>/dev/null \
+    | awk -F'\t' -v pats="$(IFS='|'; echo "${FILE_PATTERNS[*]}")" '
+        BEGIN {
+            n = split(pats, p, "|")
+            for (i = 1; i <= n; i++) {
+                gsub(/\./, "\\.", p[i]); gsub(/\*/, ".*", p[i])
+                rx[i] = "^" p[i] "$"
+            }
+        }
+        { for (i = 1; i <= n; i++) if ($3 ~ rx[i]) { print; next } }
+    ' || true)
 [[ -z "$CURRENT" ]] && { "$SCRIPT_DIR/notify.sh" complete 2>/dev/null || true; exit 0; }
 
 # Calculate net new changes (delta from baseline)

@@ -46,13 +46,13 @@ Model files are cached in `~/.u2net/` (downloaded on first use per model, ~170MB
 
 ### Step 2: Remove Background
 
-Use the `birefnet-general` model — it produces the best results for character art and general images.
+Use the `birefnet-general` model — validated in testing on illustrated/character art *and* general photos, producing clean edges across both.
 
 ```bash
 source ~/.claude/tools/rembg-env/bin/activate && rembg i -m birefnet-general <input> <output>
 ```
 
-**Model choice:** Always use `birefnet-general`. It gives clean edges and handles both character art and photographic subjects well.
+**Model choice:** Default to `birefnet-general`. In side-by-side testing it gave clean edges on both illustrated subjects and photographic ones. Avoid anime-trained models (e.g. `isnet-anime`): on non-anime and even some illustrated inputs they tend to add artifacts and leave dark patches around edges. If `birefnet-general` underperforms on a specific image, compare against another general model rather than an anime-specific one.
 
 ### Step 3: Verify Result
 
@@ -127,9 +127,11 @@ Done: background removed
   Model: birefnet-general (local, offline)
 ```
 
+**Verify before shipping:** open the output in Preview.app (or any viewer that shows the checkerboard pattern) to confirm real transparency. The Read tool renders transparency as solid black, so it cannot distinguish a transparent background from a black one — composite-over-a-color (Step 3) or a checkerboard viewer is the only reliable check.
+
 ## Important Rules
 
-1. **Always use `birefnet-general`** — best general-purpose model for this task.
+1. **Default to `birefnet-general`** — in side-by-side testing it produced the cleanest edges on both illustrated and photographic inputs; anime-trained models added artifacts. Only switch models if it visibly underperforms on a specific image.
 2. **Always activate the venv** before running rembg or Python with Pillow/numpy.
 3. **Always verify with magenta composite** — don't trust the Read tool's rendering of transparency.
 4. **Never send images to external services** — rembg runs 100% locally.

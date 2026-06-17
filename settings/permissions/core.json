@@ -22,7 +22,11 @@
     "mcp__ide__getDiagnostics"
   ],
   "deny": [
+    "Bash(sudo:*)",
     "Bash(rm -rf:*)",
+    "Bash(rm -fr:*)",
+    "Bash(rm -r -f:*)",
+    "Bash(rm -f -r:*)",
     "Bash(git push --force:*)",
     "Bash(git push -f:*)",
     "Bash(git reset --hard:*)",

@@ -4,8 +4,18 @@ This directory contains documentation for the Claude Code Development Kit itself
 
 ## Reference
 
-- **[skills.md](skills.md)** — Detailed reference for all 7 skills
+- **[skills.md](skills.md)** — Detailed reference for all skills
 - **[../README.md](../README.md)** — Main project README with quick start guide
+
+## Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/prime` | Load project context — tiered (light by default, `--full`, `--deploy`) |
+| `/merge` | Verify docs + clean tree, then ship to main (build-verified on divergence) |
+| `/verify` | Run the app/tests to confirm a change actually works (cross-stack template) |
+
+Second-opinion consultant briefings install as `AGENTS.md` (OpenAI Codex) and/or `GEMINI.md` (Gemini CLI), depending on the engine you choose at install.
 
 ## Installed Documentation
 
